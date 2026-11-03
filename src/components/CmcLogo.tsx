@@ -14,15 +14,29 @@ export const CmcLogo: React.FC<CmcLogoProps> = ({
   showSubtitle = true
 }) => {
   const iconDimensions = {
-    sm: 30,
-    md: 38,
+    sm: 32,
+    md: 40,
     lg: 48,
     xl: 60
   }[size];
 
+  const titleSizes = {
+    sm: 'text-lg',
+    md: 'text-xl',
+    lg: 'text-2xl',
+    xl: 'text-3xl'
+  }[size];
+
+  const subSizes = {
+    sm: 'text-[9px]',
+    md: 'text-[10px]',
+    lg: 'text-[11px]',
+    xl: 'text-xs'
+  }[size];
+
   return (
-    <div className={`flex items-center gap-3 select-none ${className}`}>
-      {/* Icon Mark */}
+    <div className={`flex items-center gap-2.5 sm:gap-3 select-none ${className}`}>
+      {/* High-Contrast Vector Insignia */}
       <svg
         width={iconDimensions}
         height={iconDimensions}
@@ -33,71 +47,60 @@ export const CmcLogo: React.FC<CmcLogoProps> = ({
         aria-hidden="true"
       >
         <defs>
-          <linearGradient id="cmcGradLogo" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#0c4436" />
-            <stop offset="100%" stopColor="#146d58" />
+          <linearGradient id="cmcEmblemBgGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#0f172a" />
+            <stop offset="100%" stopColor="#1e293b" />
           </linearGradient>
-          <linearGradient id="accentGradLogo" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#2dd4bf" />
-            <stop offset="100%" stopColor="#0d9488" />
+          <linearGradient id="cmcTealGrad" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#38bdf8" />
+            <stop offset="100%" stopColor="#0284c7" />
           </linearGradient>
-          <filter id="shadowLogo" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor="#042018" floodOpacity="0.25" />
-          </filter>
         </defs>
 
-        {/* Archival Shield */}
+        {/* Outer Shield Frame in Deep Navy with Medical Sky Border */}
         <rect
-          x="2"
-          y="2"
-          width="44"
-          height="44"
-          rx="12"
-          fill="url(#cmcGradLogo)"
-          stroke="#1a8a70"
-          strokeWidth="1.2"
+          width="48"
+          height="48"
+          rx="14"
+          fill="url(#cmcEmblemBgGrad)"
+          stroke="#0284c7"
+          strokeWidth="1.8"
         />
 
-        {/* Dynamic Knowledge Arch */}
+        {/* Open Archive Folio at Base */}
         <path
-          d="M10 36C15 33 20 32 24 32C28 32 33 33 38 36"
-          stroke="url(#accentGradLogo)"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.9"
+          d="M11 36C16 33.5 20.5 33.5 24 35C27.5 33.5 32 33.5 37 36V37.5C32 35 27.5 35 24 36.5C20.5 35 16 35 11 37.5V36Z"
+          fill="#38bdf8"
         />
 
-        {/* Archival Open Book Silhouette */}
-        <path
-          d="M12 34C17 31.5 21.5 31.5 24 33C26.5 31.5 31 31.5 36 34V36C31 33.5 26.5 33.5 24 35C21.5 33.5 17 33.5 12 36V34Z"
-          fill="#ffffff"
-          fillOpacity="0.25"
-        />
+        {/* Pure White Medical Cross Core (High Visibility in all environments) */}
+        <rect x="21" y="10" width="6" height="21" rx="2" fill="#ffffff" />
+        <rect x="13.5" y="17.5" width="21" height="6" rx="2" fill="#ffffff" />
 
-        {/* Medical Cross */}
-        <g filter="url(#shadowLogo)">
-          <rect x="21" y="11" width="6" height="19" rx="2" fill="#ffffff" />
-          <rect x="14.5" y="17.5" width="19" height="6" rx="2" fill="#ffffff" />
-          <circle cx="24" cy="20.5" r="1.5" fill="#0c4436" />
-        </g>
+        {/* Central Clinical Jewel Node */}
+        <circle cx="24" cy="20.5" r="2.2" fill="#0284c7" />
 
-        {/* Precision Node */}
-        <circle cx="24" cy="9.5" r="1.5" fill="#5eead4" />
+        {/* Top Apex Knowledge Spark */}
+        <circle cx="24" cy="7.5" r="1.5" fill="#38bdf8" />
       </svg>
 
       {/* Typography Lockup */}
       {variant !== 'icon' && (
-        <div className="flex flex-col leading-none">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl md:text-2xl font-extrabold tracking-tight text-slate-900 font-sans">
+        <div className="flex flex-col leading-tight">
+          <div className="flex items-baseline gap-1.5 font-sans">
+            <span className={`${titleSizes} font-black tracking-tight text-slate-900 dark:text-white`}>
               CMC
             </span>
-            <span className="text-xl md:text-2xl font-bold tracking-tight text-emerald-800 font-sans">
-              Med<span className="text-slate-800 font-semibold">Archive</span>
+            <span className={`${titleSizes} font-extrabold tracking-tight`}>
+              <span className="text-sky-600 dark:text-sky-400">Med</span>
+              <span className="text-slate-800 dark:text-slate-100 font-bold">Archive</span>
             </span>
           </div>
+
           {showSubtitle && variant === 'full' && (
-            <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-slate-500 mt-1">
+            <span
+              className={`${subSizes} uppercase font-bold tracking-[0.16em] text-slate-500 dark:text-slate-400 mt-0.5`}
+            >
               Chittagong Medical College
             </span>
           )}

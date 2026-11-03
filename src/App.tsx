@@ -711,11 +711,11 @@ export default function App() {
                       MCQ Examination Practice
                     </h3>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-600/10 text-emerald-800 dark:text-emerald-300 border border-emerald-600/20">
-                      14 Papers
+                      {MCQ_VERIFICATION_STATS.papersCount} Papers
                     </span>
                   </div>
                   <span className="mut text-sm">
-                    14 authentic CMU First Professional examination papers with verified textbook citations.
+                    {MCQ_VERIFICATION_STATS.papersCount} authentic CMU examination papers across Anatomy ({MCQ_VERIFICATION_STATS.anatomyCount} Qs) and Biochemistry ({MCQ_VERIFICATION_STATS.biochemistryCount} Qs) with verified textbook citations.
                   </span>
                 </button>
 
@@ -1350,7 +1350,11 @@ export default function App() {
                         {sub.name}
                       </h4>
                       <p className="text-xs text-[var(--mut)] mb-3 leading-relaxed">
-                        Chittagong Medical University 1st Professional MBBS Examination. Includes Paper-I and Paper-II with verified textbook solutions.
+                        {sub.name === 'Anatomy'
+                          ? "Chittagong Medical University 1st Professional MBBS. Covers Gross Anatomy, Histology, Embryology, and Neuroanatomy with verified textbook solutions."
+                          : sub.name === 'Biochemistry'
+                          ? "Chittagong Medical University 1st Professional MBBS. Covers Biomolecules, Metabolism, Clinical Biochemistry, and Genetics with verified textbook solutions."
+                          : "Chittagong Medical University 1st Professional MBBS Examination. Includes Paper-I and Paper-II with verified textbook solutions."}
                       </p>
 
                       <div className="space-y-1.5 pt-3 border-t border-[var(--line)] text-xs">
@@ -1432,61 +1436,12 @@ export default function App() {
                       <ChevronRight size={14} />
                     </button>
                   </div>
-
-                  <div
-                    onClick={() => {
-                      setMcqSelectedSubject('Biochemistry');
-                      setMcqSelectedPaper(null);
-                      setMcqSelectedYear(null);
-                    }}
-                    className="card p-5 cursor-pointer hover:border-[var(--t)] hover:shadow-xs transition-all border border-dashed border-[var(--line)] bg-[var(--card)] group"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 flex items-center justify-center font-bold">
-                        <FileText size={20} />
-                      </div>
-                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-amber-500/15 text-amber-700 rounded-full">
-                        In Digitization
-                      </span>
-                    </div>
-
-                    <h4 className="text-lg font-bold group-hover:text-[var(--t)] mb-1">
-                      Biochemistry
-                    </h4>
-                    <p className="text-xs text-[var(--mut)] mb-3 leading-relaxed">
-                      First Professional MBBS Biochemistry examination papers. Official CMU examination MCQs are currently being digitized and verified.
-                    </p>
-
-                    <div className="space-y-1.5 pt-3 border-t border-[var(--line)] text-xs text-[var(--mut)]">
-                      <div className="flex items-center justify-between">
-                        <span>Status:</span>
-                        <span className="font-semibold text-amber-600">Pending Verification</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Exam Scope:</span>
-                        <span>Paper-I &amp; Paper-II</span>
-                      </div>
-                    </div>
-
-                    <button
-                      className="btn w-full mt-4 alt text-xs font-semibold flex items-center justify-center gap-1.5"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMcqSelectedSubject('Biochemistry');
-                        setMcqSelectedPaper(null);
-                        setMcqSelectedYear(null);
-                      }}
-                    >
-                      <span>Check Biochemistry</span>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
                 </div>
 
                 <div className="p-4 bg-[var(--card)] border border-[var(--line)] rounded-lg text-xs text-[var(--mut)] flex items-start gap-2.5">
                   <ShieldAlert size={16} className="text-[var(--t)] shrink-0 mt-0.5" />
                   <div>
-                    <b>Authentic Chittagong Medical University Question Bank:</b> All question items are extracted verbatim from official CMU 1st Professional MBBS examination papers. Answers strictly reflect standard textbook citations (Snell, Gray's Anatomy, Moore Clinically Oriented Anatomy, Langman's Medical Embryology, BD Chaurasia, Junqueira's Basic Histology).
+                    <b>Authentic Chittagong Medical University Question Bank:</b> All question items are extracted verbatim from official CMU 1st Professional MBBS examination papers. Answers strictly reflect standard textbook citations (Snell, Gray's Anatomy, Moore Clinically Oriented Anatomy, Langman's Medical Embryology, BD Chaurasia, Junqueira's Histology, Harper's Illustrated Biochemistry, Lippincott Illustrated Reviews: Biochemistry, Satyanarayana, Vasudevan).
                   </div>
                 </div>
               </div>
@@ -1572,7 +1527,11 @@ export default function App() {
                         </h4>
 
                         <p className="text-xs text-[var(--mut)] mb-3 leading-relaxed">
-                          {paper.name === 'Paper-I'
+                          {mcqSelectedSubject?.toLowerCase() === 'biochemistry'
+                            ? paper.name === 'Paper-I'
+                              ? 'Biophysics, Solutions, Acid-Base Balance, Carbohydrate, Protein & Lipid Chemistry, Enzymes, Vitamins, and Digestion & Absorption.'
+                              : 'Metabolism of Carbohydrates, Lipids, Amino acids, Bioenergetics, Molecular Biology, Genetics, Endocrinology, and Organ Function Tests.'
+                            : paper.name === 'Paper-I'
                             ? 'General Anatomy, General Histology, Embryology, Genetics, Head & Neck, Brain, and Eyeball.'
                             : 'Abdomen, Pelvis, Thorax, Superior Extremity, and Inferior Extremity.'}
                         </p>

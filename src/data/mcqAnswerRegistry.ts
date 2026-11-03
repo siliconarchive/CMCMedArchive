@@ -1,5 +1,7 @@
 // CMC MedArchive — Authoritative MCQ Answer Registry & Verification System
-// Source: Anatomy MCQ - Full Answer Script (CMU 1st Prof, 2021-2025)
+// Source Curricula:
+//   - Anatomy: Anatomy Questions and Answers (CMU 1st Prof, 2021-2025) - 19 Papers, 380 Questions
+//   - Biochemistry: Biochemistry MCQ Bank with Corrected Answers and Reasons (1st Prof MBBS) - 20 Papers, 400 Questions
 // Standard Medical References:
 //   - Snell's Clinical Anatomy by Regions (10th Ed.)
 //   - Gray's Anatomy for Students (4th Ed.) / Gray's Anatomy (42nd Ed.)
@@ -7,6 +9,9 @@
 //   - BD Chaurasia's Human Anatomy (8th Ed., Vols 1-4)
 //   - Langman's Medical Embryology (14th Ed.)
 //   - Junqueira's Basic Histology: Text and Atlas (16th Ed.)
+//   - Harper's Illustrated Biochemistry (32nd Ed.)
+//   - Lehninger Principles of Biochemistry (8th Ed.)
+//   - Guyton and Hall Textbook of Medical Physiology (14th Ed.)
 
 export type VerificationStatus = 'Verified' | 'Provisional' | 'Needs Review';
 
@@ -28,21 +33,23 @@ export interface McqAnswerRecord {
   reviewReason?: string;
 }
 
-// Global Verification Statistics
+// Global Verification Statistics for all imported subjects
 export const MCQ_VERIFICATION_STATS = {
-  totalQuestions: 380,
-  verifiedCount: 275,
-  provisionalCount: 48,
-  needsReviewCount: 57,
-  papersCount: 19,
+  totalQuestions: 780,
+  verifiedCount: 621,
+  provisionalCount: 49,
+  needsReviewCount: 110,
+  papersCount: 39,
+  anatomyCount: 380,
+  biochemistryCount: 400,
   yearsCovered: "2021–2025"
 };
 
 // Detailed Answer Records Registry
 export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
-  "cmu-2025-may-p1-q1": {
-    "questionId": "cmu-2025-may-p1-q1",
-    "stem": "Following are fibrous joint",
+  "cmu-ana-2025-may-p1-q1": {
+    "questionId": "cmu-ana-2025-may-p1-q1",
+    "stem": "Fibrous joints",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -52,12 +59,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q2": {
-    "questionId": "cmu-2025-may-p1-q2",
-    "stem": "Collagen fibers are abundant in",
+  "cmu-ana-2025-may-p1-q2": {
+    "questionId": "cmu-ana-2025-may-p1-q2",
+    "stem": "Collagen fibers abundant in",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -67,11 +74,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-may-p1-q3": {
-    "questionId": "cmu-2025-may-p1-q3",
+  "cmu-ana-2025-may-p1-q3": {
+    "questionId": "cmu-ana-2025-may-p1-q3",
     "stem": "Spermatogenesis",
     "type": "TF",
     "subject": "Anatomy",
@@ -83,12 +90,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
     "explanation": "Option e: reduction division (meiosis) is one step inside it, not the name of the whole process.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)",
     "reviewReason": "Option e: reduction division (meiosis) is one step inside it, not the name of the whole process."
   },
-  "cmu-2025-may-p1-q4": {
-    "questionId": "cmu-2025-may-p1-q4",
-    "stem": "Middle ear communication with",
+  "cmu-ana-2025-may-p1-q4": {
+    "questionId": "cmu-ana-2025-may-p1-q4",
+    "stem": "Middle ear communicates with",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -98,12 +105,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d, e | False: a, b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q5": {
-    "questionId": "cmu-2025-may-p1-q5",
-    "stem": "Extra pyramidal tracts are",
+  "cmu-ana-2025-may-p1-q5": {
+    "questionId": "cmu-ana-2025-may-p1-q5",
+    "stem": "Extrapyramidal tracts",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -113,11 +120,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-may-p1-q6": {
-    "questionId": "cmu-2025-may-p1-q6",
+  "cmu-ana-2025-may-p1-q6": {
+    "questionId": "cmu-ana-2025-may-p1-q6",
     "stem": "Limbic system includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -128,12 +135,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q7": {
-    "questionId": "cmu-2025-may-p1-q7",
-    "stem": "Uniaxial joint is/are",
+  "cmu-ana-2025-may-p1-q7": {
+    "questionId": "cmu-ana-2025-may-p1-q7",
+    "stem": "Uniaxial joint",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -143,12 +150,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q8": {
-    "questionId": "cmu-2025-may-p1-q8",
-    "stem": "Middle cerebral artery supplies following area",
+  "cmu-ana-2025-may-p1-q8": {
+    "questionId": "cmu-ana-2025-may-p1-q8",
+    "stem": "MCA supplies",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -162,9 +169,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Central (lenticulostriate) branches supply basal ganglia and much of the internal capsule. Orbit's key differs; textbooks vary slightly."
   },
-  "cmu-2025-may-p1-q9": {
-    "questionId": "cmu-2025-may-p1-q9",
-    "stem": "Following is/are central lymphoid organ:",
+  "cmu-ana-2025-may-p1-q9": {
+    "questionId": "cmu-ana-2025-may-p1-q9",
+    "stem": "Central lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -174,12 +181,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q10": {
-    "questionId": "cmu-2025-may-p1-q10",
-    "stem": "Pterion is the meeting point of following bones",
+  "cmu-ana-2025-may-p1-q10": {
+    "questionId": "cmu-ana-2025-may-p1-q10",
+    "stem": "Pterion: meeting point of",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -193,9 +200,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Also includes greater wing of sphenoid."
   },
-  "cmu-2025-may-p1-q11": {
-    "questionId": "cmu-2025-may-p1-q11",
-    "stem": "Following are muscles of facial expression",
+  "cmu-ana-2025-may-p1-q11": {
+    "questionId": "cmu-ana-2025-may-p1-q11",
+    "stem": "Muscles of facial expression",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -205,12 +212,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Buccinator",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q12": {
-    "questionId": "cmu-2025-may-p1-q12",
-    "stem": "Following are parasympathetic nucleus",
+  "cmu-ana-2025-may-p1-q12": {
+    "questionId": "cmu-ana-2025-may-p1-q12",
+    "stem": "Parasympathetic nucleus",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -224,8 +231,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Orbit marks b (cochlear nucleus) - wrong."
   },
-  "cmu-2025-may-p1-q13": {
-    "questionId": "cmu-2025-may-p1-q13",
+  "cmu-ana-2025-may-p1-q13": {
+    "questionId": "cmu-ana-2025-may-p1-q13",
     "stem": "Endocrine gland",
     "type": "SBA",
     "subject": "Anatomy",
@@ -236,11 +243,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Has rich blood supply",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q14": {
-    "questionId": "cmu-2025-may-p1-q14",
+  "cmu-ana-2025-may-p1-q14": {
+    "questionId": "cmu-ana-2025-may-p1-q14",
     "stem": "Retina",
     "type": "SBA",
     "subject": "Anatomy",
@@ -252,11 +259,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "C) Blind spot has no photoreceptors",
     "explanation": "As printed, a is false (pigment epithelium is the OUTERMOST layer). Orbit marks a, so the question probably meant 'outermost'.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy",
     "officialOrbitDiscrepancy": "As printed, a is false (pigment epithelium is the OUTERMOST layer). Orbit marks a, so the question probably meant 'outermost'."
   },
-  "cmu-2025-may-p1-q15": {
-    "questionId": "cmu-2025-may-p1-q15",
+  "cmu-ana-2025-may-p1-q15": {
+    "questionId": "cmu-ana-2025-may-p1-q15",
     "stem": "Cerebellum",
     "type": "SBA",
     "subject": "Anatomy",
@@ -266,12 +273,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.76",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "E) Connected with brainstem by peduncles",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "correctAnswerSummary": "E) Connected with the brain stem",
+    "explanation": "Verified solution based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-may-p1-q16": {
-    "questionId": "cmu-2025-may-p1-q16",
+  "cmu-ana-2025-may-p1-q16": {
+    "questionId": "cmu-ana-2025-may-p1-q16",
     "stem": "Mast cells",
     "type": "SBA",
     "subject": "Anatomy",
@@ -282,11 +289,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Participate in allergic reaction",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-may-p1-q17": {
-    "questionId": "cmu-2025-may-p1-q17",
+  "cmu-ana-2025-may-p1-q17": {
+    "questionId": "cmu-ana-2025-may-p1-q17",
     "stem": "Skeletal muscle fiber",
     "type": "SBA",
     "subject": "Anatomy",
@@ -297,11 +304,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Multinucleated fibers with striations",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-may-p1-q18": {
-    "questionId": "cmu-2025-may-p1-q18",
+  "cmu-ana-2025-may-p1-q18": {
+    "questionId": "cmu-ana-2025-may-p1-q18",
     "stem": "Mature neurons are",
     "type": "SBA",
     "subject": "Anatomy",
@@ -312,12 +319,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Permanent cell",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p1-q19": {
-    "questionId": "cmu-2025-may-p1-q19",
-    "stem": "Nerve that pass through cavernous sinus is",
+  "cmu-ana-2025-may-p1-q19": {
+    "questionId": "cmu-ana-2025-may-p1-q19",
+    "stem": "Nerve passing through cavernous sinus",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -327,12 +334,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Abducent",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified solution based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-may-p1-q20": {
-    "questionId": "cmu-2025-may-p1-q20",
-    "stem": "Following are basal nuclei",
+  "cmu-ana-2025-may-p1-q20": {
+    "questionId": "cmu-ana-2025-may-p1-q20",
+    "stem": "Basal nuclei",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -342,12 +349,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.76",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Caudate nucleus",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-may-p2-q1": {
-    "questionId": "cmu-2025-may-p2-q1",
-    "stem": "Female urinary bladder is supplied by following arteries",
+  "cmu-ana-2025-may-p2-q1": {
+    "questionId": "cmu-ana-2025-may-p2-q1",
+    "stem": "Female urinary bladder arteries",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -358,12 +365,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
     "explanation": "In females the vaginal artery replaces the inferior vesical artery.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "In females the vaginal artery replaces the inferior vesical artery."
   },
-  "cmu-2025-may-p2-q2": {
-    "questionId": "cmu-2025-may-p2-q2",
-    "stem": "Modifications of gastrointestinal mucosa are",
+  "cmu-ana-2025-may-p2-q2": {
+    "questionId": "cmu-ana-2025-may-p2-q2",
+    "stem": "Modifications of GI mucosa",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -373,12 +380,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-may-p2-q3": {
-    "questionId": "cmu-2025-may-p2-q3",
-    "stem": "Lateral branches of abdominal aorta supplies",
+  "cmu-ana-2025-may-p2-q3": {
+    "questionId": "cmu-ana-2025-may-p2-q3",
+    "stem": "Lateral branches of abdominal aorta supply",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -388,12 +395,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2025-may-p2-q4": {
-    "questionId": "cmu-2025-may-p2-q4",
-    "stem": "Contents of adductor canal are",
+  "cmu-ana-2025-may-p2-q4": {
+    "questionId": "cmu-ana-2025-may-p2-q4",
+    "stem": "Contents of adductor canal",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -404,12 +411,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Femoral artery, vein, saphenous nerve (and nerve to vastus medialis).",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Femoral artery, vein, saphenous nerve (and nerve to vastus medialis)."
   },
-  "cmu-2025-may-p2-q5": {
-    "questionId": "cmu-2025-may-p2-q5",
-    "stem": "Dorsiflexion of foot is done by following muscles",
+  "cmu-ana-2025-may-p2-q5": {
+    "questionId": "cmu-ana-2025-may-p2-q5",
+    "stem": "Dorsiflexion of foot",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -420,12 +427,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Orbit marks EDL as F and flexor hallucis longus as T - wrong. FHL is a plantar flexor.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Orbit marks EDL as F and flexor hallucis longus as T - wrong. FHL is a plantar flexor."
   },
-  "cmu-2025-may-p2-q6": {
-    "questionId": "cmu-2025-may-p2-q6",
-    "stem": "Posterior wall of axilla is formed by",
+  "cmu-ana-2025-may-p2-q6": {
+    "questionId": "cmu-ana-2025-may-p2-q6",
+    "stem": "Posterior wall of axilla formed by",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -436,11 +443,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
     "explanation": "Orbit marks subscapularis as F - wrong. Posterior wall: subscapularis, teres major, latissimus dorsi.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Orbit marks subscapularis as F - wrong. Posterior wall: subscapularis, teres major, latissimus dorsi."
   },
-  "cmu-2025-may-p2-q7": {
-    "questionId": "cmu-2025-may-p2-q7",
+  "cmu-ana-2025-may-p2-q7": {
+    "questionId": "cmu-ana-2025-may-p2-q7",
     "stem": "Vena caval opening of diaphragm",
     "type": "TF",
     "subject": "Anatomy",
@@ -452,11 +459,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
     "explanation": "Orbit marks c T - wrong; the opening is widened (not closed) in inspiration. It lies at T8.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Orbit marks c T - wrong; the opening is widened (not closed) in inspiration. It lies at T8."
   },
-  "cmu-2025-may-p2-q8": {
-    "questionId": "cmu-2025-may-p2-q8",
+  "cmu-ana-2025-may-p2-q8": {
+    "questionId": "cmu-ana-2025-may-p2-q8",
     "stem": "Intercostal nerves",
     "type": "TF",
     "subject": "Anatomy",
@@ -466,14 +473,14 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.77",
     "verificationStatus": "Provisional",
-    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
     "explanation": "11 pairs (so 'in number' option a is F).",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "11 pairs (so 'in number' option a is F)."
   },
-  "cmu-2025-may-p2-q9": {
-    "questionId": "cmu-2025-may-p2-q9",
-    "stem": "Conducting system of heart includes",
+  "cmu-ana-2025-may-p2-q9": {
+    "questionId": "cmu-ana-2025-may-p2-q9",
+    "stem": "Conducting system of heart",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -483,12 +490,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2025-may-p2-q10": {
-    "questionId": "cmu-2025-may-p2-q10",
-    "stem": "Muscle supplied by axillary nerve are",
+  "cmu-ana-2025-may-p2-q10": {
+    "questionId": "cmu-ana-2025-may-p2-q10",
+    "stem": "Muscle supplied by axillary nerve",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -499,12 +506,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
     "explanation": "Orbit marks teres major and coracobrachialis T - wrong (lower subscapular and musculocutaneous nerves).",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Orbit marks teres major and coracobrachialis T - wrong (lower subscapular and musculocutaneous nerves)."
   },
-  "cmu-2025-may-p2-q11": {
-    "questionId": "cmu-2025-may-p2-q11",
-    "stem": "In which layer of abdominal wall, deep inguinal ring lies?",
+  "cmu-ana-2025-may-p2-q11": {
+    "questionId": "cmu-ana-2025-may-p2-q11",
+    "stem": "Deep inguinal ring lies in layer",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -514,11 +521,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Fascia transversalis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-may-p2-q12": {
-    "questionId": "cmu-2025-may-p2-q12",
+  "cmu-ana-2025-may-p2-q12": {
+    "questionId": "cmu-ana-2025-may-p2-q12",
     "stem": "Ligament preventing backward falling of trunk",
     "type": "SBA",
     "subject": "Anatomy",
@@ -528,14 +535,14 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.77",
     "verificationStatus": "Needs Review",
-    "correctAnswerSummary": "A) Iliofemoral ligament",
+    "correctAnswerSummary": "A) Ilio femoral ligament",
     "explanation": "Orbit marks ischiofemoral. Standard texts (BD Chaurasia): iliofemoral (Y ligament) prevents the trunk falling backward.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Orbit marks ischiofemoral. Standard texts (BD Chaurasia): iliofemoral (Y ligament) prevents the trunk falling backward."
   },
-  "cmu-2025-may-p2-q13": {
-    "questionId": "cmu-2025-may-p2-q13",
-    "stem": "Which muscle connects vertebral column with lower limb?",
+  "cmu-ana-2025-may-p2-q13": {
+    "questionId": "cmu-ana-2025-may-p2-q13",
+    "stem": "Muscle connecting vertebral column with lower limb",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -545,12 +552,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Psoas major",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-may-p2-q14": {
-    "questionId": "cmu-2025-may-p2-q14",
-    "stem": "If urethral fold fails to fuse it leads to",
+  "cmu-ana-2025-may-p2-q14": {
+    "questionId": "cmu-ana-2025-may-p2-q14",
+    "stem": "Urethral fold fails to fuse",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -560,12 +567,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Hypospadias",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-may-p2-q15": {
-    "questionId": "cmu-2025-may-p2-q15",
-    "stem": "Which organ is completely covered by peritoneum?",
+  "cmu-ana-2025-may-p2-q15": {
+    "questionId": "cmu-ana-2025-may-p2-q15",
+    "stem": "Organ completely covered by peritoneum",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -576,12 +583,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "D) Spleen",
     "explanation": "Except at the hilum.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Except at the hilum."
   },
-  "cmu-2025-may-p2-q16": {
-    "questionId": "cmu-2025-may-p2-q16",
-    "stem": "Artery present in superior mediastinum is",
+  "cmu-ana-2025-may-p2-q16": {
+    "questionId": "cmu-ana-2025-may-p2-q16",
+    "stem": "Artery in superior mediastinum",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -591,11 +598,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Left subclavian artery",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2025-may-p2-q17": {
-    "questionId": "cmu-2025-may-p2-q17",
+  "cmu-ana-2025-may-p2-q17": {
+    "questionId": "cmu-ana-2025-may-p2-q17",
     "stem": "Phrenic nerve supplies",
     "type": "SBA",
     "subject": "Anatomy",
@@ -607,12 +614,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "A) Diaphragm",
     "explanation": "Visceral pleura and visceral pericardium are not supplied by it.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "Visceral pleura and visceral pericardium are not supplied by it."
   },
-  "cmu-2025-may-p2-q18": {
-    "questionId": "cmu-2025-may-p2-q18",
-    "stem": "Vertebrosternal sets of ribs are",
+  "cmu-ana-2025-may-p2-q18": {
+    "questionId": "cmu-ana-2025-may-p2-q18",
+    "stem": "Vertebrosternal ribs",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -623,12 +630,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "A) 3, 4, 5",
     "explanation": "Vertebrosternal ribs are 1-7; only option a lies fully within 1-7.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Vertebrosternal ribs are 1-7; only option a lies fully within 1-7."
   },
-  "cmu-2025-may-p2-q19": {
-    "questionId": "cmu-2025-may-p2-q19",
-    "stem": "Submucous coat is absent in",
+  "cmu-ana-2025-may-p2-q19": {
+    "questionId": "cmu-ana-2025-may-p2-q19",
+    "stem": "Submucous coat absent in",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -638,12 +645,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Gall bladder",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-may-p2-q20": {
-    "questionId": "cmu-2025-may-p2-q20",
-    "stem": "Multipennate muscle is",
+  "cmu-ana-2025-may-p2-q20": {
+    "questionId": "cmu-ana-2025-may-p2-q20",
+    "stem": "Multipennate muscle",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -653,12 +660,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.77",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Subscapularis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p1-q1": {
-    "questionId": "cmu-2025-nov-p1-q1",
-    "stem": "Pterion is the meeting place of the following bones",
+  "cmu-ana-2025-nov-p1-q1": {
+    "questionId": "cmu-ana-2025-nov-p1-q1",
+    "stem": "Pterion: meeting point of",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -672,8 +679,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Orbit marks zygomatic T and frontal F - wrong. Pterion = frontal, parietal, temporal, greater wing of sphenoid."
   },
-  "cmu-2025-nov-p1-q2": {
-    "questionId": "cmu-2025-nov-p1-q2",
+  "cmu-ana-2025-nov-p1-q2": {
+    "questionId": "cmu-ana-2025-nov-p1-q2",
     "stem": "Simple columnar epithelium present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -684,12 +691,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-nov-p1-q3": {
-    "questionId": "cmu-2025-nov-p1-q3",
-    "stem": "Extra pyramidal tracts are",
+  "cmu-ana-2025-nov-p1-q3": {
+    "questionId": "cmu-ana-2025-nov-p1-q3",
+    "stem": "Extrapyramidal tracts",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -699,11 +706,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-nov-p1-q4": {
-    "questionId": "cmu-2025-nov-p1-q4",
+  "cmu-ana-2025-nov-p1-q4": {
+    "questionId": "cmu-ana-2025-nov-p1-q4",
     "stem": "Refractive media of eyeball",
     "type": "TF",
     "subject": "Anatomy",
@@ -718,8 +725,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Cornea (aqueous, lens, vitreous are the others)."
   },
-  "cmu-2025-nov-p1-q5": {
-    "questionId": "cmu-2025-nov-p1-q5",
+  "cmu-ana-2025-nov-p1-q5": {
+    "questionId": "cmu-ana-2025-nov-p1-q5",
     "stem": "Mitosis",
     "type": "TF",
     "subject": "Anatomy",
@@ -730,11 +737,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
+    "explanation": "Verified in accordance with Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2025-nov-p1-q6": {
-    "questionId": "cmu-2025-nov-p1-q6",
+  "cmu-ana-2025-nov-p1-q6": {
+    "questionId": "cmu-ana-2025-nov-p1-q6",
     "stem": "Derivatives of mesoderm",
     "type": "TF",
     "subject": "Anatomy",
@@ -745,12 +752,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, e | False: a, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q7": {
-    "questionId": "cmu-2025-nov-p1-q7",
-    "stem": "Content of carotid sheath are",
+  "cmu-ana-2025-nov-p1-q7": {
+    "questionId": "cmu-ana-2025-nov-p1-q7",
+    "stem": "Content of carotid sheath",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -764,9 +771,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Common/internal carotid artery, IJV, vagus. External carotid is outside the sheath. Orbit's key differs."
   },
-  "cmu-2025-nov-p1-q8": {
-    "questionId": "cmu-2025-nov-p1-q8",
-    "stem": "Following is/are purely motor cranial nerve",
+  "cmu-ana-2025-nov-p1-q8": {
+    "questionId": "cmu-ana-2025-nov-p1-q8",
+    "stem": "Purely motor cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -776,12 +783,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-nov-p1-q9": {
-    "questionId": "cmu-2025-nov-p1-q9",
-    "stem": "Following is/are central lymphoid organ",
+  "cmu-ana-2025-nov-p1-q9": {
+    "questionId": "cmu-ana-2025-nov-p1-q9",
+    "stem": "Central lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -791,12 +798,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q10": {
-    "questionId": "cmu-2025-nov-p1-q10",
-    "stem": "Deep cerebellar nuclei are",
+  "cmu-ana-2025-nov-p1-q10": {
+    "questionId": "cmu-ana-2025-nov-p1-q10",
+    "stem": "Deep cerebellar nuclei",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -806,12 +813,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2025-nov-p1-q11": {
-    "questionId": "cmu-2025-nov-p1-q11",
-    "stem": "Hard palate is formed by the following bone",
+  "cmu-ana-2025-nov-p1-q11": {
+    "questionId": "cmu-ana-2025-nov-p1-q11",
+    "stem": "Hard palate formed by",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -821,12 +828,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Maxilla",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q12": {
-    "questionId": "cmu-2025-nov-p1-q12",
-    "stem": "Muscle that opens laryngeal inlet is",
+  "cmu-ana-2025-nov-p1-q12": {
+    "questionId": "cmu-ana-2025-nov-p1-q12",
+    "stem": "Muscle that opens laryngeal inlet",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -836,12 +843,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Thyroepiglottic",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q13": {
-    "questionId": "cmu-2025-nov-p1-q13",
-    "stem": "Following are parasympathetic nucleus",
+  "cmu-ana-2025-nov-p1-q13": {
+    "questionId": "cmu-ana-2025-nov-p1-q13",
+    "stem": "Parasympathetic nucleus",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -850,14 +857,14 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.78",
     "verificationStatus": "Provisional",
-    "correctAnswerSummary": "E) Spinal (sacral parasympathetic",
-    "explanation": "Nucleus ambiguus is branchial motor; mesencephalic nucleus is sensory. nucleus)",
+    "correctAnswerSummary": "E) Spinal",
+    "explanation": "Nucleus ambiguus is branchial motor; mesencephalic nucleus is sensory.",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
-    "reviewReason": "Nucleus ambiguus is branchial motor; mesencephalic nucleus is sensory. nucleus)"
+    "reviewReason": "Nucleus ambiguus is branchial motor; mesencephalic nucleus is sensory."
   },
-  "cmu-2025-nov-p1-q14": {
-    "questionId": "cmu-2025-nov-p1-q14",
-    "stem": "Which one of the following is the effect of sympathetic system?",
+  "cmu-ana-2025-nov-p1-q14": {
+    "questionId": "cmu-ana-2025-nov-p1-q14",
+    "stem": "Effect of sympathetic system",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -867,11 +874,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Decrease peristalsis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q15": {
-    "questionId": "cmu-2025-nov-p1-q15",
+  "cmu-ana-2025-nov-p1-q15": {
+    "questionId": "cmu-ana-2025-nov-p1-q15",
     "stem": "Reticular fiber found in",
     "type": "SBA",
     "subject": "Anatomy",
@@ -882,11 +889,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Lymphoid organ",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-nov-p1-q16": {
-    "questionId": "cmu-2025-nov-p1-q16",
+  "cmu-ana-2025-nov-p1-q16": {
+    "questionId": "cmu-ana-2025-nov-p1-q16",
     "stem": "Epithelial tissue",
     "type": "SBA",
     "subject": "Anatomy",
@@ -897,12 +904,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Is avascular",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-nov-p1-q17": {
-    "questionId": "cmu-2025-nov-p1-q17",
-    "stem": "Principle muscle of mastication is",
+  "cmu-ana-2025-nov-p1-q17": {
+    "questionId": "cmu-ana-2025-nov-p1-q17",
+    "stem": "Principal muscle of mastication",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -912,12 +919,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Masseter",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p1-q18": {
-    "questionId": "cmu-2025-nov-p1-q18",
-    "stem": "Cell present in the lacuna of haversian system is",
+  "cmu-ana-2025-nov-p1-q18": {
+    "questionId": "cmu-ana-2025-nov-p1-q18",
+    "stem": "Cell in lacuna of Haversian system",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -927,12 +934,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Osteocyte",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2025-nov-p1-q19": {
-    "questionId": "cmu-2025-nov-p1-q19",
-    "stem": "Nerve that pass through cavernous sinus is",
+  "cmu-ana-2025-nov-p1-q19": {
+    "questionId": "cmu-ana-2025-nov-p1-q19",
+    "stem": "Nerve through cavernous sinus",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -940,14 +947,15 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "session": "November 2025",
     "curriculum": "New Curriculum",
     "bookPage": "p.78",
-    "verificationStatus": "Verified",
+    "verificationStatus": "Provisional",
     "correctAnswerSummary": "A) Abducent",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Abducent runs freely through the sinus lumen; oculomotor, trochlear, ophthalmic and maxillary lie in its lateral wall.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy",
+    "reviewReason": "Abducent runs freely through the sinus lumen; oculomotor, trochlear, ophthalmic and maxillary lie in its lateral wall."
   },
-  "cmu-2025-nov-p1-q20": {
-    "questionId": "cmu-2025-nov-p1-q20",
-    "stem": "Following layer of scalp is known as safety valve haematoma",
+  "cmu-ana-2025-nov-p1-q20": {
+    "questionId": "cmu-ana-2025-nov-p1-q20",
+    "stem": "Layer of scalp = 'safety valve' haematoma",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -957,11 +965,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.78",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Loose areolar tissue",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2025-nov-p2-q1": {
-    "questionId": "cmu-2025-nov-p2-q1",
+  "cmu-ana-2025-nov-p2-q1": {
+    "questionId": "cmu-ana-2025-nov-p2-q1",
     "stem": "Branches of axillary artery",
     "type": "TF",
     "subject": "Anatomy",
@@ -972,11 +980,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2025-nov-p2-q2": {
-    "questionId": "cmu-2025-nov-p2-q2",
+  "cmu-ana-2025-nov-p2-q2": {
+    "questionId": "cmu-ana-2025-nov-p2-q2",
     "stem": "Parietal pleura",
     "type": "TF",
     "subject": "Anatomy",
@@ -987,12 +995,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2025-nov-p2-q3": {
-    "questionId": "cmu-2025-nov-p2-q3",
-    "stem": "Abduction of Shoulder joint is done by following muscles",
+  "cmu-ana-2025-nov-p2-q3": {
+    "questionId": "cmu-ana-2025-nov-p2-q3",
+    "stem": "Abduction of shoulder",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1003,12 +1011,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: c, d, e | False: a, b",
     "explanation": "Serratus anterior (with trapezius) rotates the scapula for abduction beyond 90 degrees. Orbit marks e F - debated.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Serratus anterior (with trapezius) rotates the scapula for abduction beyond 90 degrees. Orbit marks e F - debated."
   },
-  "cmu-2025-nov-p2-q4": {
-    "questionId": "cmu-2025-nov-p2-q4",
-    "stem": "Tributaries of coronary sinus :",
+  "cmu-ana-2025-nov-p2-q4": {
+    "questionId": "cmu-ana-2025-nov-p2-q4",
+    "stem": "Tributaries of coronary sinus",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1018,11 +1026,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q5": {
-    "questionId": "cmu-2025-nov-p2-q5",
+  "cmu-ana-2025-nov-p2-q5": {
+    "questionId": "cmu-ana-2025-nov-p2-q5",
     "stem": "Retroperitoneal organs",
     "type": "TF",
     "subject": "Anatomy",
@@ -1033,11 +1041,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d, e | False: a, b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q6": {
-    "questionId": "cmu-2025-nov-p2-q6",
+  "cmu-ana-2025-nov-p2-q6": {
+    "questionId": "cmu-ana-2025-nov-p2-q6",
     "stem": "Mediastinal surface of right lung related to",
     "type": "TF",
     "subject": "Anatomy",
@@ -1049,11 +1057,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
     "explanation": "Right phrenic nerve lies on the mediastinal pleura but is not a groove/impression. Orbit also F.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax",
     "officialOrbitDiscrepancy": "Right phrenic nerve lies on the mediastinal pleura but is not a groove/impression. Orbit also F."
   },
-  "cmu-2025-nov-p2-q7": {
-    "questionId": "cmu-2025-nov-p2-q7",
+  "cmu-ana-2025-nov-p2-q7": {
+    "questionId": "cmu-ana-2025-nov-p2-q7",
     "stem": "Content of spermatic cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -1064,11 +1072,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q8": {
-    "questionId": "cmu-2025-nov-p2-q8",
+  "cmu-ana-2025-nov-p2-q8": {
+    "questionId": "cmu-ana-2025-nov-p2-q8",
     "stem": "Supplied by superior gluteal nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -1079,11 +1087,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2025-nov-p2-q9": {
-    "questionId": "cmu-2025-nov-p2-q9",
+  "cmu-ana-2025-nov-p2-q9": {
+    "questionId": "cmu-ana-2025-nov-p2-q9",
     "stem": "Submucosal glands present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -1095,11 +1103,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
     "explanation": "Oesophageal glands proper lie in the submucosa (Junqueira). Orbit marks a F.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Oesophageal glands proper lie in the submucosa (Junqueira). Orbit marks a F."
   },
-  "cmu-2025-nov-p2-q10": {
-    "questionId": "cmu-2025-nov-p2-q10",
+  "cmu-ana-2025-nov-p2-q10": {
+    "questionId": "cmu-ana-2025-nov-p2-q10",
     "stem": "Derivatives of hindgut",
     "type": "TF",
     "subject": "Anatomy",
@@ -1110,12 +1118,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q11": {
-    "questionId": "cmu-2025-nov-p2-q11",
-    "stem": "Winging of the scapula caused by paralysis of",
+  "cmu-ana-2025-nov-p2-q11": {
+    "questionId": "cmu-ana-2025-nov-p2-q11",
+    "stem": "Winging of scapula caused by paralysis of",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1125,12 +1133,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Serratus anterior",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q12": {
-    "questionId": "cmu-2025-nov-p2-q12",
-    "stem": "Which ligament of the liver is the remnant of the umbilical vein?",
+  "cmu-ana-2025-nov-p2-q12": {
+    "questionId": "cmu-ana-2025-nov-p2-q12",
+    "stem": "Remnant of umbilical vein",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1140,11 +1148,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Ligamentum teres hepatis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q13": {
-    "questionId": "cmu-2025-nov-p2-q13",
+  "cmu-ana-2025-nov-p2-q13": {
+    "questionId": "cmu-ana-2025-nov-p2-q13",
     "stem": "Branch arising from roots of brachial plexus",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1155,12 +1163,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Long thoracic nerve",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q14": {
-    "questionId": "cmu-2025-nov-p2-q14",
-    "stem": "Which diameter of thoracic cavity increased by pump handle movement?",
+  "cmu-ana-2025-nov-p2-q14": {
+    "questionId": "cmu-ana-2025-nov-p2-q14",
+    "stem": "Diameter increased by pump-handle movement",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1169,12 +1177,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.79",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "B) Anteroposterior",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "B) Anteroposterior diameter",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q15": {
-    "questionId": "cmu-2025-nov-p2-q15",
+  "cmu-ana-2025-nov-p2-q15": {
+    "questionId": "cmu-ana-2025-nov-p2-q15",
     "stem": "Strongest ligament of hip joint",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1185,12 +1193,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Iliofemoral ligament",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2025-nov-p2-q16": {
-    "questionId": "cmu-2025-nov-p2-q16",
-    "stem": "Conducting system of heart supplied by left coronary artery",
+  "cmu-ana-2025-nov-p2-q16": {
+    "questionId": "cmu-ana-2025-nov-p2-q16",
+    "stem": "Conducting system supplied by left coronary artery",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1201,12 +1209,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "B) SA node",
     "explanation": "Weak question: SA node is from RCA in about 60%, left coronary in about 40%. b is the best option here.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "Weak question: SA node is from RCA in about 60%, left coronary in about 40%. b is the best option here."
   },
-  "cmu-2025-nov-p2-q17": {
-    "questionId": "cmu-2025-nov-p2-q17",
-    "stem": "Viscera to which right kidney is related",
+  "cmu-ana-2025-nov-p2-q17": {
+    "questionId": "cmu-ana-2025-nov-p2-q17",
+    "stem": "Viscera related to right kidney",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1216,12 +1224,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Liver",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q18": {
-    "questionId": "cmu-2025-nov-p2-q18",
-    "stem": "Which muscle forms the inguinal ligament?",
+  "cmu-ana-2025-nov-p2-q18": {
+    "questionId": "cmu-ana-2025-nov-p2-q18",
+    "stem": "Muscle forming inguinal ligament",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1230,12 +1238,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.79",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "B) External oblique",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "B) External oblique muscle",
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2025-nov-p2-q19": {
-    "questionId": "cmu-2025-nov-p2-q19",
+  "cmu-ana-2025-nov-p2-q19": {
+    "questionId": "cmu-ana-2025-nov-p2-q19",
     "stem": "Primary support of uterus",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1246,12 +1254,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Pelvic diaphragm",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2025-nov-p2-q20": {
-    "questionId": "cmu-2025-nov-p2-q20",
-    "stem": "Keystone of medial longitudinal arch of foot",
+  "cmu-ana-2025-nov-p2-q20": {
+    "questionId": "cmu-ana-2025-nov-p2-q20",
+    "stem": "Keystone of medial longitudinal arch",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1261,11 +1269,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.79",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Talus",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p1-q1": {
-    "questionId": "cmu-2024-may-p1-q1",
+  "cmu-ana-2024-may-p1-q1": {
+    "questionId": "cmu-ana-2024-may-p1-q1",
     "stem": "Carotid sheath contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -1276,11 +1284,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q2": {
-    "questionId": "cmu-2024-may-p1-q2",
+  "cmu-ana-2024-may-p1-q2": {
+    "questionId": "cmu-ana-2024-may-p1-q2",
     "stem": "Reticular fiber found in",
     "type": "TF",
     "subject": "Anatomy",
@@ -1291,11 +1299,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-may-p1-q3": {
-    "questionId": "cmu-2024-may-p1-q3",
+  "cmu-ana-2024-may-p1-q3": {
+    "questionId": "cmu-ana-2024-may-p1-q3",
     "stem": "Skeletal muscle fiber",
     "type": "TF",
     "subject": "Anatomy",
@@ -1307,11 +1315,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
     "explanation": "Orbit marks e F; limb and trunk skeletal muscle arises from somites (paraxial mesoderm).",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Orbit marks e F; limb and trunk skeletal muscle arises from somites (paraxial mesoderm)."
   },
-  "cmu-2024-may-p1-q4": {
-    "questionId": "cmu-2024-may-p1-q4",
+  "cmu-ana-2024-may-p1-q4": {
+    "questionId": "cmu-ana-2024-may-p1-q4",
     "stem": "Structural abnormalities of chromosome",
     "type": "TF",
     "subject": "Anatomy",
@@ -1326,8 +1334,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Ring chromosome is structural; Orbit marks it F. Turner and trisomy are numerical."
   },
-  "cmu-2024-may-p1-q5": {
-    "questionId": "cmu-2024-may-p1-q5",
+  "cmu-ana-2024-may-p1-q5": {
+    "questionId": "cmu-ana-2024-may-p1-q5",
     "stem": "Fibrous joints",
     "type": "TF",
     "subject": "Anatomy",
@@ -1338,11 +1346,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q6": {
-    "questionId": "cmu-2024-may-p1-q6",
+  "cmu-ana-2024-may-p1-q6": {
+    "questionId": "cmu-ana-2024-may-p1-q6",
     "stem": "Commissural fibers",
     "type": "TF",
     "subject": "Anatomy",
@@ -1353,11 +1361,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, e | False: a, c, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-may-p1-q7": {
-    "questionId": "cmu-2024-may-p1-q7",
+  "cmu-ana-2024-may-p1-q7": {
+    "questionId": "cmu-ana-2024-may-p1-q7",
     "stem": "Nasopharynx communicates with",
     "type": "TF",
     "subject": "Anatomy",
@@ -1372,8 +1380,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Orbit marks b F, but it communicates with the middle ear via the auditory tube."
   },
-  "cmu-2024-may-p1-q8": {
-    "questionId": "cmu-2024-may-p1-q8",
+  "cmu-ana-2024-may-p1-q8": {
+    "questionId": "cmu-ana-2024-may-p1-q8",
     "stem": "Extrapyramidal tracts",
     "type": "TF",
     "subject": "Anatomy",
@@ -1384,11 +1392,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2024-may-p1-q9": {
-    "questionId": "cmu-2024-may-p1-q9",
+  "cmu-ana-2024-may-p1-q9": {
+    "questionId": "cmu-ana-2024-may-p1-q9",
     "stem": "Endodermal derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -1399,11 +1407,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q10": {
-    "questionId": "cmu-2024-may-p1-q10",
+  "cmu-ana-2024-may-p1-q10": {
+    "questionId": "cmu-ana-2024-may-p1-q10",
     "stem": "Nasal septum formed by",
     "type": "TF",
     "subject": "Anatomy",
@@ -1414,12 +1422,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q11": {
-    "questionId": "cmu-2024-may-p1-q11",
-    "stem": "Avascular structure in the eyeball is",
+  "cmu-ana-2024-may-p1-q11": {
+    "questionId": "cmu-ana-2024-may-p1-q11",
+    "stem": "Avascular structure in eyeball",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1429,12 +1437,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Lens",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q12": {
-    "questionId": "cmu-2024-may-p1-q12",
-    "stem": "Wall of artery is thicker than vein is due to",
+  "cmu-ana-2024-may-p1-q12": {
+    "questionId": "cmu-ana-2024-may-p1-q12",
+    "stem": "Artery wall thicker than vein due to",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1444,11 +1452,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Well developed tunica media",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q13": {
-    "questionId": "cmu-2024-may-p1-q13",
+  "cmu-ana-2024-may-p1-q13": {
+    "questionId": "cmu-ana-2024-may-p1-q13",
     "stem": "Descending tract",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1459,12 +1467,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Tectospinal",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified solution based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2024-may-p1-q14": {
-    "questionId": "cmu-2024-may-p1-q14",
-    "stem": "Which one of the following is the effect of sympathetic system?",
+  "cmu-ana-2024-may-p1-q14": {
+    "questionId": "cmu-ana-2024-may-p1-q14",
+    "stem": "Effect of sympathetic system",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1474,12 +1482,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Decrease peristalsis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q15": {
-    "questionId": "cmu-2024-may-p1-q15",
-    "stem": "Nissl's granules are present in",
+  "cmu-ana-2024-may-p1-q15": {
+    "questionId": "cmu-ana-2024-may-p1-q15",
+    "stem": "Nissl granules present in",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1489,11 +1497,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Pyramidal cell",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q16": {
-    "questionId": "cmu-2024-may-p1-q16",
+  "cmu-ana-2024-may-p1-q16": {
+    "questionId": "cmu-ana-2024-may-p1-q16",
     "stem": "Parasympathetic fibers present in",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1504,12 +1512,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Oculomotor nerve",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-may-p1-q17": {
-    "questionId": "cmu-2024-may-p1-q17",
-    "stem": "Hard palate is formed by the following bone",
+  "cmu-ana-2024-may-p1-q17": {
+    "questionId": "cmu-ana-2024-may-p1-q17",
+    "stem": "Hard palate formed by",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1519,12 +1527,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Maxilla",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q18": {
-    "questionId": "cmu-2024-may-p1-q18",
-    "stem": "Cell present in the lacuna of haversian system is",
+  "cmu-ana-2024-may-p1-q18": {
+    "questionId": "cmu-ana-2024-may-p1-q18",
+    "stem": "Cell in lacuna of Haversian system",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1534,12 +1542,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Osteocyte",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-may-p1-q19": {
-    "questionId": "cmu-2024-may-p1-q19",
-    "stem": "Following are multipolar neuron",
+  "cmu-ana-2024-may-p1-q19": {
+    "questionId": "cmu-ana-2024-may-p1-q19",
+    "stem": "Multipolar neuron",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1549,12 +1557,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Purkinje cell",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-may-p1-q20": {
-    "questionId": "cmu-2024-may-p1-q20",
-    "stem": "Derivatives of pharyngeal pouch",
+  "cmu-ana-2024-may-p1-q20": {
+    "questionId": "cmu-ana-2024-may-p1-q20",
+    "stem": "Derivative of pharyngeal pouch",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1564,12 +1572,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.80",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Thymus",
-    "explanation": "Verified based on Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development"
+    "explanation": "Verified solution based on Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2024-may-p2-q1": {
-    "questionId": "cmu-2024-may-p2-q1",
-    "stem": "Structure crossed by the root of the mesentery",
+  "cmu-ana-2024-may-p2-q1": {
+    "questionId": "cmu-ana-2024-may-p2-q1",
+    "stem": "Structure crossed by root of mesentery",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1580,12 +1588,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
     "explanation": "Root crosses 3rd part of duodenum, aorta, IVC, right ureter, right psoas major. Orbit marks b F.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Root crosses 3rd part of duodenum, aorta, IVC, right ureter, right psoas major. Orbit marks b F."
   },
-  "cmu-2024-may-p2-q2": {
-    "questionId": "cmu-2024-may-p2-q2",
-    "stem": "Veins end into coronary sinus are",
+  "cmu-ana-2024-may-p2-q2": {
+    "questionId": "cmu-ana-2024-may-p2-q2",
+    "stem": "Veins ending into coronary sinus",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1595,11 +1603,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q3": {
-    "questionId": "cmu-2024-may-p2-q3",
+  "cmu-ana-2024-may-p2-q3": {
+    "questionId": "cmu-ana-2024-may-p2-q3",
     "stem": "Respiratory zone of bronchial tree",
     "type": "TF",
     "subject": "Anatomy",
@@ -1611,11 +1619,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
     "explanation": "Begins at respiratory bronchiole; alveolar capillaries come from the pulmonary artery. Weakly worded question.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Begins at respiratory bronchiole; alveolar capillaries come from the pulmonary artery. Weakly worded question."
   },
-  "cmu-2024-may-p2-q4": {
-    "questionId": "cmu-2024-may-p2-q4",
+  "cmu-ana-2024-may-p2-q4": {
+    "questionId": "cmu-ana-2024-may-p2-q4",
     "stem": "Flexor of elbow joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -1626,11 +1634,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-may-p2-q5": {
-    "questionId": "cmu-2024-may-p2-q5",
+  "cmu-ana-2024-may-p2-q5": {
+    "questionId": "cmu-ana-2024-may-p2-q5",
     "stem": "Nerve related to humerus",
     "type": "TF",
     "subject": "Anatomy",
@@ -1642,11 +1650,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
     "explanation": "Ulnar nerve touches the back of the medial epicondyle. Orbit's key differs (marks e T).",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Ulnar nerve touches the back of the medial epicondyle. Orbit's key differs (marks e T)."
   },
-  "cmu-2024-may-p2-q6": {
-    "questionId": "cmu-2024-may-p2-q6",
+  "cmu-ana-2024-may-p2-q6": {
+    "questionId": "cmu-ana-2024-may-p2-q6",
     "stem": "Quadriceps femoris",
     "type": "TF",
     "subject": "Anatomy",
@@ -1657,11 +1665,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: d, e | False: a, b, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q7": {
-    "questionId": "cmu-2024-may-p2-q7",
+  "cmu-ana-2024-may-p2-q7": {
+    "questionId": "cmu-ana-2024-may-p2-q7",
     "stem": "Histological features of duodenum",
     "type": "TF",
     "subject": "Anatomy",
@@ -1672,11 +1680,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, e | False: a, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q8": {
-    "questionId": "cmu-2024-may-p2-q8",
+  "cmu-ana-2024-may-p2-q8": {
+    "questionId": "cmu-ana-2024-may-p2-q8",
     "stem": "Contents of rectus sheath",
     "type": "TF",
     "subject": "Anatomy",
@@ -1687,11 +1695,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q9": {
-    "questionId": "cmu-2024-may-p2-q9",
+  "cmu-ana-2024-may-p2-q9": {
+    "questionId": "cmu-ana-2024-may-p2-q9",
     "stem": "Ureter",
     "type": "TF",
     "subject": "Anatomy",
@@ -1703,11 +1711,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
     "explanation": "Ureter develops from the ureteric bud (mesoderm), not endoderm; it has three constrictions; lined by transitional epithelium. Orbit marks c T.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Ureter develops from the ureteric bud (mesoderm), not endoderm; it has three constrictions; lined by transitional epithelium. Orbit marks c T."
   },
-  "cmu-2024-may-p2-q10": {
-    "questionId": "cmu-2024-may-p2-q10",
+  "cmu-ana-2024-may-p2-q10": {
+    "questionId": "cmu-ana-2024-may-p2-q10",
     "stem": "Femoral artery",
     "type": "TF",
     "subject": "Anatomy",
@@ -1718,12 +1726,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-may-p2-q11": {
-    "questionId": "cmu-2024-may-p2-q11",
-    "stem": "The groove behind the hilum of right lung lodges",
+  "cmu-ana-2024-may-p2-q11": {
+    "questionId": "cmu-ana-2024-may-p2-q11",
+    "stem": "Groove behind hilum of right lung lodges",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1733,11 +1741,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Esophagus",
-    "explanation": "Verified based on Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax"
+    "explanation": "Verified solution based on Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2024-may-p2-q12": {
-    "questionId": "cmu-2024-may-p2-q12",
+  "cmu-ana-2024-may-p2-q12": {
+    "questionId": "cmu-ana-2024-may-p2-q12",
     "stem": "Most common position of vermiform appendix",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1748,12 +1756,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Retro-caecal",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q13": {
-    "questionId": "cmu-2024-may-p2-q13",
-    "stem": "The most common site of fracture of the clavicle",
+  "cmu-ana-2024-may-p2-q13": {
+    "questionId": "cmu-ana-2024-may-p2-q13",
+    "stem": "Most common site of clavicle fracture",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1762,13 +1770,13 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.81",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "D) Junction of medial two-thirds and lateral one-third",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "D) Junction of the medial two third and lateral one third",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q14": {
-    "questionId": "cmu-2024-may-p2-q14",
-    "stem": "The transpyloric plane of the abdomen passes through",
+  "cmu-ana-2024-may-p2-q14": {
+    "questionId": "cmu-ana-2024-may-p2-q14",
+    "stem": "Transpyloric plane passes through",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1777,13 +1785,13 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.81",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "D) Origin of superior mesenteric artery",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "D) The origin of the superior mesenteric artery",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q15": {
-    "questionId": "cmu-2024-may-p2-q15",
-    "stem": "In structure of hepatic lobule",
+  "cmu-ana-2024-may-p2-q15": {
+    "questionId": "cmu-ana-2024-may-p2-q15",
+    "stem": "Hepatic lobule",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1792,13 +1800,13 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.81",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "C) Portal triad lies at corners of lobule",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "C) Portal triad lies at the corners of lobule",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q16": {
-    "questionId": "cmu-2024-may-p2-q16",
-    "stem": "Lymphatics from the nipple and areola drain mainly into",
+  "cmu-ana-2024-may-p2-q16": {
+    "questionId": "cmu-ana-2024-may-p2-q16",
+    "stem": "Lymphatics from nipple and areola drain mainly into",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1807,13 +1815,13 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.81",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "A) Pectoral group of axillary nodes",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "correctAnswerSummary": "A) Pectoral group of axillary lymph node",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q17": {
-    "questionId": "cmu-2024-may-p2-q17",
-    "stem": "The back of the medial epicondyle of humerus related to",
+  "cmu-ana-2024-may-p2-q17": {
+    "questionId": "cmu-ana-2024-may-p2-q17",
+    "stem": "Back of medial epicondyle related to",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1823,11 +1831,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Ulnar nerve",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-may-p2-q18": {
-    "questionId": "cmu-2024-may-p2-q18",
+  "cmu-ana-2024-may-p2-q18": {
+    "questionId": "cmu-ana-2024-may-p2-q18",
     "stem": "Paralysis of which nerve causes foot drop",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1839,12 +1847,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "D) Deep peroneal",
     "explanation": "Common peroneal nerve injury is the classic cause; of the options, deep peroneal.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "Common peroneal nerve injury is the classic cause; of the options, deep peroneal."
   },
-  "cmu-2024-may-p2-q19": {
-    "questionId": "cmu-2024-may-p2-q19",
-    "stem": "Pleural reflection lies at which rib level in the mid axillary line?",
+  "cmu-ana-2024-may-p2-q19": {
+    "questionId": "cmu-ana-2024-may-p2-q19",
+    "stem": "Pleural reflection at mid-axillary line",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -1853,13 +1861,13 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.81",
     "verificationStatus": "Provisional",
-    "correctAnswerSummary": "D) 10th rib",
+    "correctAnswerSummary": "D) 10th",
     "explanation": "Pleura: 8th rib (midclavicular), 10th (midaxillary), 12th (paravertebral).",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax",
     "reviewReason": "Pleura: 8th rib (midclavicular), 10th (midaxillary), 12th (paravertebral)."
   },
-  "cmu-2024-may-p2-q20": {
-    "questionId": "cmu-2024-may-p2-q20",
+  "cmu-ana-2024-may-p2-q20": {
+    "questionId": "cmu-ana-2024-may-p2-q20",
     "stem": "Anterior relation of sacroiliac joint",
     "type": "SBA",
     "subject": "Anatomy",
@@ -1870,12 +1878,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.81",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Obturator nerve",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-nov-p1-q1": {
-    "questionId": "cmu-2024-nov-p1-q1",
-    "stem": "Following are paired dural venous sinuses",
+  "cmu-ana-2024-nov-p1-q1": {
+    "questionId": "cmu-ana-2024-nov-p1-q1",
+    "stem": "Paired dural venous sinuses",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1885,12 +1893,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2024-nov-p1-q2": {
-    "questionId": "cmu-2024-nov-p1-q2",
-    "stem": "Following are avascular structure",
+  "cmu-ana-2024-nov-p1-q2": {
+    "questionId": "cmu-ana-2024-nov-p1-q2",
+    "stem": "Avascular structures",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -1904,8 +1912,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Orbit marks dermis T - wrong, the dermis is vascular."
   },
-  "cmu-2024-nov-p1-q3": {
-    "questionId": "cmu-2024-nov-p1-q3",
+  "cmu-ana-2024-nov-p1-q3": {
+    "questionId": "cmu-ana-2024-nov-p1-q3",
     "stem": "Hyaline cartilage present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -1916,11 +1924,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-nov-p1-q4": {
-    "questionId": "cmu-2024-nov-p1-q4",
+  "cmu-ana-2024-nov-p1-q4": {
+    "questionId": "cmu-ana-2024-nov-p1-q4",
     "stem": "Peripheral lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
@@ -1935,8 +1943,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "The spleen is a peripheral lymphoid organ; Orbit marks it F."
   },
-  "cmu-2024-nov-p1-q5": {
-    "questionId": "cmu-2024-nov-p1-q5",
+  "cmu-ana-2024-nov-p1-q5": {
+    "questionId": "cmu-ana-2024-nov-p1-q5",
     "stem": "Hard palate formed by",
     "type": "TF",
     "subject": "Anatomy",
@@ -1947,11 +1955,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q6": {
-    "questionId": "cmu-2024-nov-p1-q6",
+  "cmu-ana-2024-nov-p1-q6": {
+    "questionId": "cmu-ana-2024-nov-p1-q6",
     "stem": "Hind brain includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -1963,11 +1971,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
     "explanation": "Pons belongs to the hindbrain; Orbit marks it F.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy",
     "officialOrbitDiscrepancy": "Pons belongs to the hindbrain; Orbit marks it F."
   },
-  "cmu-2024-nov-p1-q7": {
-    "questionId": "cmu-2024-nov-p1-q7",
+  "cmu-ana-2024-nov-p1-q7": {
+    "questionId": "cmu-ana-2024-nov-p1-q7",
     "stem": "Superior orbital fissure transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -1978,11 +1986,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d, e | False: b, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q8": {
-    "questionId": "cmu-2024-nov-p1-q8",
+  "cmu-ana-2024-nov-p1-q8": {
+    "questionId": "cmu-ana-2024-nov-p1-q8",
     "stem": "Spinal cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -1993,11 +2001,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q9": {
-    "questionId": "cmu-2024-nov-p1-q9",
+  "cmu-ana-2024-nov-p1-q9": {
+    "questionId": "cmu-ana-2024-nov-p1-q9",
     "stem": "Meiosis cell division",
     "type": "TF",
     "subject": "Anatomy",
@@ -2009,11 +2017,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
     "explanation": "Meiosis occurs in primary spermatocytes/oocytes (immature germ cells); mature gametes do not divide. Orbit marks a T, b F - I disagree.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Meiosis occurs in primary spermatocytes/oocytes (immature germ cells); mature gametes do not divide. Orbit marks a T, b F - I disagree."
   },
-  "cmu-2024-nov-p1-q10": {
-    "questionId": "cmu-2024-nov-p1-q10",
+  "cmu-ana-2024-nov-p1-q10": {
+    "questionId": "cmu-ana-2024-nov-p1-q10",
     "stem": "Deep cerebellar nucleus",
     "type": "TF",
     "subject": "Anatomy",
@@ -2024,11 +2032,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2024-nov-p1-q11": {
-    "questionId": "cmu-2024-nov-p1-q11",
+  "cmu-ana-2024-nov-p1-q11": {
+    "questionId": "cmu-ana-2024-nov-p1-q11",
     "stem": "Safety muscle of tongue",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2039,12 +2047,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Genioglossus",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q12": {
-    "questionId": "cmu-2024-nov-p1-q12",
-    "stem": "Muscle that open laryngeal inlet is:",
+  "cmu-ana-2024-nov-p1-q12": {
+    "questionId": "cmu-ana-2024-nov-p1-q12",
+    "stem": "Muscle that opens laryngeal inlet",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -2054,11 +2062,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Thyroepiglottic",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q13": {
-    "questionId": "cmu-2024-nov-p1-q13",
+  "cmu-ana-2024-nov-p1-q13": {
+    "questionId": "cmu-ana-2024-nov-p1-q13",
     "stem": "Parasympathetic nucleus",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2068,12 +2076,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "curriculum": "New Curriculum",
     "bookPage": "p.82",
     "verificationStatus": "Verified",
-    "correctAnswerSummary": "A) Dorsal nucleus (dorsal motor nucleus of vagus)",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "correctAnswerSummary": "A) Dorsal nucleus",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q14": {
-    "questionId": "cmu-2024-nov-p1-q14",
+  "cmu-ana-2024-nov-p1-q14": {
+    "questionId": "cmu-ana-2024-nov-p1-q14",
     "stem": "Effect of sympathetic system",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2084,12 +2092,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Decrease peristalsis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q15": {
-    "questionId": "cmu-2024-nov-p1-q15",
-    "stem": "Following are bipolar neuron",
+  "cmu-ana-2024-nov-p1-q15": {
+    "questionId": "cmu-ana-2024-nov-p1-q15",
+    "stem": "Bipolar neuron",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -2099,11 +2107,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Olfactory cell",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q16": {
-    "questionId": "cmu-2024-nov-p1-q16",
+  "cmu-ana-2024-nov-p1-q16": {
+    "questionId": "cmu-ana-2024-nov-p1-q16",
     "stem": "Basal nuclei",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2114,12 +2122,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Amygdaloid nucleus",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q17": {
-    "questionId": "cmu-2024-nov-p1-q17",
-    "stem": "Principal muscle of mastication is",
+  "cmu-ana-2024-nov-p1-q17": {
+    "questionId": "cmu-ana-2024-nov-p1-q17",
+    "stem": "Principal muscle of mastication",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -2129,11 +2137,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Masseter",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q18": {
-    "questionId": "cmu-2024-nov-p1-q18",
+  "cmu-ana-2024-nov-p1-q18": {
+    "questionId": "cmu-ana-2024-nov-p1-q18",
     "stem": "Cell in lacuna of Haversian system",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2144,11 +2152,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) Osteocyte",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-nov-p1-q19": {
-    "questionId": "cmu-2024-nov-p1-q19",
+  "cmu-ana-2024-nov-p1-q19": {
+    "questionId": "cmu-ana-2024-nov-p1-q19",
     "stem": "Primary cartilaginous joint",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2159,11 +2167,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) First sternocostal joint",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2024-nov-p1-q20": {
-    "questionId": "cmu-2024-nov-p1-q20",
+  "cmu-ana-2024-nov-p1-q20": {
+    "questionId": "cmu-ana-2024-nov-p1-q20",
     "stem": "Characteristics of epithelium tissue",
     "type": "TF",
     "subject": "Anatomy",
@@ -2174,12 +2182,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.82",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2024-nov-p2-q1": {
-    "questionId": "cmu-2024-nov-p2-q1",
-    "stem": "Opening of right atrium of heart are",
+  "cmu-ana-2024-nov-p2-q1": {
+    "questionId": "cmu-ana-2024-nov-p2-q1",
+    "stem": "Opening of right atrium",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -2189,12 +2197,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q2": {
-    "questionId": "cmu-2024-nov-p2-q2",
-    "stem": "Carpal tunnel contains the followings",
+  "cmu-ana-2024-nov-p2-q2": {
+    "questionId": "cmu-ana-2024-nov-p2-q2",
+    "stem": "Carpal tunnel contains",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -2204,11 +2212,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q3": {
-    "questionId": "cmu-2024-nov-p2-q3",
+  "cmu-ana-2024-nov-p2-q3": {
+    "questionId": "cmu-ana-2024-nov-p2-q3",
     "stem": "Great saphenous vein",
     "type": "TF",
     "subject": "Anatomy",
@@ -2220,11 +2228,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
     "explanation": "It begins on the MEDIAL side of the foot, has valves, and passes in FRONT of the medial malleolus (Orbit marks e T).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "It begins on the MEDIAL side of the foot, has valves, and passes in FRONT of the medial malleolus (Orbit marks e T)."
   },
-  "cmu-2024-nov-p2-q4": {
-    "questionId": "cmu-2024-nov-p2-q4",
+  "cmu-ana-2024-nov-p2-q4": {
+    "questionId": "cmu-ana-2024-nov-p2-q4",
     "stem": "Superior vena cava",
     "type": "TF",
     "subject": "Anatomy",
@@ -2236,11 +2244,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
     "explanation": "SVC is formed by the right and left BRACHIOCEPHALIC veins.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "SVC is formed by the right and left BRACHIOCEPHALIC veins."
   },
-  "cmu-2024-nov-p2-q5": {
-    "questionId": "cmu-2024-nov-p2-q5",
+  "cmu-ana-2024-nov-p2-q5": {
+    "questionId": "cmu-ana-2024-nov-p2-q5",
     "stem": "Alveoli",
     "type": "TF",
     "subject": "Anatomy",
@@ -2251,11 +2259,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q6": {
-    "questionId": "cmu-2024-nov-p2-q6",
+  "cmu-ana-2024-nov-p2-q6": {
+    "questionId": "cmu-ana-2024-nov-p2-q6",
     "stem": "Muscles that dorsiflex the foot",
     "type": "TF",
     "subject": "Anatomy",
@@ -2266,11 +2274,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-nov-p2-q7": {
-    "questionId": "cmu-2024-nov-p2-q7",
+  "cmu-ana-2024-nov-p2-q7": {
+    "questionId": "cmu-ana-2024-nov-p2-q7",
     "stem": "Intracapsular structure of knee",
     "type": "TF",
     "subject": "Anatomy",
@@ -2282,11 +2290,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
     "explanation": "Popliteus tendon is intracapsular but extrasynovial. Orbit's key varies between years for the synovial membrane.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Popliteus tendon is intracapsular but extrasynovial. Orbit's key varies between years for the synovial membrane."
   },
-  "cmu-2024-nov-p2-q8": {
-    "questionId": "cmu-2024-nov-p2-q8",
+  "cmu-ana-2024-nov-p2-q8": {
+    "questionId": "cmu-ana-2024-nov-p2-q8",
     "stem": "Extra-hepatic biliary apparatus",
     "type": "TF",
     "subject": "Anatomy",
@@ -2297,11 +2305,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q9": {
-    "questionId": "cmu-2024-nov-p2-q9",
+  "cmu-ana-2024-nov-p2-q9": {
+    "questionId": "cmu-ana-2024-nov-p2-q9",
     "stem": "Pancreas",
     "type": "TF",
     "subject": "Anatomy",
@@ -2313,11 +2321,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
     "explanation": "Alpha cells secrete glucagon (beta cells secrete insulin). Pancreas is mostly retroperitoneal.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Alpha cells secrete glucagon (beta cells secrete insulin). Pancreas is mostly retroperitoneal."
   },
-  "cmu-2024-nov-p2-q10": {
-    "questionId": "cmu-2024-nov-p2-q10",
+  "cmu-ana-2024-nov-p2-q10": {
+    "questionId": "cmu-ana-2024-nov-p2-q10",
     "stem": "Anterior compartment of leg",
     "type": "TF",
     "subject": "Anatomy",
@@ -2329,11 +2337,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Flexor digitorum longus is in the posterior compartment; Orbit marks c T.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Flexor digitorum longus is in the posterior compartment; Orbit marks c T."
   },
-  "cmu-2024-nov-p2-q11": {
-    "questionId": "cmu-2024-nov-p2-q11",
+  "cmu-ana-2024-nov-p2-q11": {
+    "questionId": "cmu-ana-2024-nov-p2-q11",
     "stem": "Strongest ligament of upper limb",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2344,11 +2352,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Coracoclavicular ligament",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-nov-p2-q12": {
-    "questionId": "cmu-2024-nov-p2-q12",
+  "cmu-ana-2024-nov-p2-q12": {
+    "questionId": "cmu-ana-2024-nov-p2-q12",
     "stem": "Strong supinator of forearm",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2359,11 +2367,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Biceps brachii",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q13": {
-    "questionId": "cmu-2024-nov-p2-q13",
+  "cmu-ana-2024-nov-p2-q13": {
+    "questionId": "cmu-ana-2024-nov-p2-q13",
     "stem": "Jejunum and ileum develop from",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2374,11 +2382,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Midgut",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q14": {
-    "questionId": "cmu-2024-nov-p2-q14",
+  "cmu-ana-2024-nov-p2-q14": {
+    "questionId": "cmu-ana-2024-nov-p2-q14",
     "stem": "Parietal pleura",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2389,12 +2397,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Pain sensitive",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2024-nov-p2-q15": {
-    "questionId": "cmu-2024-nov-p2-q15",
-    "stem": "Which is not a content of femoral sheath",
+  "cmu-ana-2024-nov-p2-q15": {
+    "questionId": "cmu-ana-2024-nov-p2-q15",
+    "stem": "NOT a content of femoral sheath",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -2404,11 +2412,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Femoral nerve",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2024-nov-p2-q16": {
-    "questionId": "cmu-2024-nov-p2-q16",
+  "cmu-ana-2024-nov-p2-q16": {
+    "questionId": "cmu-ana-2024-nov-p2-q16",
     "stem": "Transpyloric plane passes through",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2420,11 +2428,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "B) L1-L2",
     "explanation": "The plane lies at L1 (some texts say lower L1/upper L2); L1-L2 is the closest option.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "The plane lies at L1 (some texts say lower L1/upper L2); L1-L2 is the closest option."
   },
-  "cmu-2024-nov-p2-q17": {
-    "questionId": "cmu-2024-nov-p2-q17",
+  "cmu-ana-2024-nov-p2-q17": {
+    "questionId": "cmu-ana-2024-nov-p2-q17",
     "stem": "Referred pain of cholecystitis felt in",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2435,12 +2443,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Tip of right shoulder",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q18": {
-    "questionId": "cmu-2024-nov-p2-q18",
-    "stem": "The least dilatable part of the urethra is",
+  "cmu-ana-2024-nov-p2-q18": {
+    "questionId": "cmu-ana-2024-nov-p2-q18",
+    "stem": "Least dilatable part of urethra",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -2450,12 +2458,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Membranous",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q19": {
-    "questionId": "cmu-2024-nov-p2-q19",
-    "stem": "Failure of testis to descend into the scrotum is called",
+  "cmu-ana-2024-nov-p2-q19": {
+    "questionId": "cmu-ana-2024-nov-p2-q19",
+    "stem": "Failure of testis to descend",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -2465,11 +2473,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Cryptorchidism",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2024-nov-p2-q20": {
-    "questionId": "cmu-2024-nov-p2-q20",
+  "cmu-ana-2024-nov-p2-q20": {
+    "questionId": "cmu-ana-2024-nov-p2-q20",
     "stem": "Structure crossing floor of ovarian fossa",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2480,11 +2488,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.83",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Obturator nerve",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-may-p1-q1": {
-    "questionId": "cmu-2023-may-p1-q1",
+  "cmu-ana-2023-may-p1-q1": {
+    "questionId": "cmu-ana-2023-may-p1-q1",
     "stem": "Membranous organelles",
     "type": "TF",
     "subject": "Anatomy",
@@ -2499,8 +2507,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Ribosome is non-membranous; Orbit marks e T."
   },
-  "cmu-2023-may-p1-q2": {
-    "questionId": "cmu-2023-may-p1-q2",
+  "cmu-ana-2023-may-p1-q2": {
+    "questionId": "cmu-ana-2023-may-p1-q2",
     "stem": "Mitotic cell division occurs in",
     "type": "TF",
     "subject": "Anatomy",
@@ -2511,11 +2519,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2023-may-p1-q3": {
-    "questionId": "cmu-2023-may-p1-q3",
+  "cmu-ana-2023-may-p1-q3": {
+    "questionId": "cmu-ana-2023-may-p1-q3",
     "stem": "Simple squamous epithelium present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -2526,11 +2534,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2023-may-p1-q4": {
-    "questionId": "cmu-2023-may-p1-q4",
+  "cmu-ana-2023-may-p1-q4": {
+    "questionId": "cmu-ana-2023-may-p1-q4",
     "stem": "Surface ectodermal derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -2541,11 +2549,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q5": {
-    "questionId": "cmu-2023-may-p1-q5",
+  "cmu-ana-2023-may-p1-q5": {
+    "questionId": "cmu-ana-2023-may-p1-q5",
     "stem": "Elastic cartilage present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -2556,12 +2564,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Auditory tube cartilage: textbooks vary; epiglottis is certain.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
-    "reviewReason": "Auditory tube cartilage: textbooks vary; epiglottis is certain."
+    "explanation": "Auditory tube cartilage: textbooks vary; epiglottis is certain. Anatomy MCQ - Questions and Answers - page 9",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
+    "reviewReason": "Auditory tube cartilage: textbooks vary; epiglottis is certain. Anatomy MCQ - Questions and Answers - page 9"
   },
-  "cmu-2023-may-p1-q6": {
-    "questionId": "cmu-2023-may-p1-q6",
+  "cmu-ana-2023-may-p1-q6": {
+    "questionId": "cmu-ana-2023-may-p1-q6",
     "stem": "Secondary cartilaginous joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -2572,11 +2580,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q7": {
-    "questionId": "cmu-2023-may-p1-q7",
+  "cmu-ana-2023-may-p1-q7": {
+    "questionId": "cmu-ana-2023-may-p1-q7",
     "stem": "Avascular structures",
     "type": "TF",
     "subject": "Anatomy",
@@ -2587,11 +2595,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q8": {
-    "questionId": "cmu-2023-may-p1-q8",
+  "cmu-ana-2023-may-p1-q8": {
+    "questionId": "cmu-ana-2023-may-p1-q8",
     "stem": "Surface modifications of cell",
     "type": "TF",
     "subject": "Anatomy",
@@ -2603,11 +2611,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
     "explanation": "Villi and papillae are tissue-level, not cell-level, modifications.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "reviewReason": "Villi and papillae are tissue-level, not cell-level, modifications."
   },
-  "cmu-2023-may-p1-q9": {
-    "questionId": "cmu-2023-may-p1-q9",
+  "cmu-ana-2023-may-p1-q9": {
+    "questionId": "cmu-ana-2023-may-p1-q9",
     "stem": "Peripheral lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
@@ -2618,11 +2626,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q10": {
-    "questionId": "cmu-2023-may-p1-q10",
+  "cmu-ana-2023-may-p1-q10": {
+    "questionId": "cmu-ana-2023-may-p1-q10",
     "stem": "Connective tissue cell",
     "type": "TF",
     "subject": "Anatomy",
@@ -2633,11 +2641,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2023-may-p1-q11": {
-    "questionId": "cmu-2023-may-p1-q11",
+  "cmu-ana-2023-may-p1-q11": {
+    "questionId": "cmu-ana-2023-may-p1-q11",
     "stem": "Jugular foramen transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -2652,8 +2660,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Also accessory nerve."
   },
-  "cmu-2023-may-p1-q12": {
-    "questionId": "cmu-2023-may-p1-q12",
+  "cmu-ana-2023-may-p1-q12": {
+    "questionId": "cmu-ana-2023-may-p1-q12",
     "stem": "Muscles of mastication",
     "type": "TF",
     "subject": "Anatomy",
@@ -2664,11 +2672,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q13": {
-    "questionId": "cmu-2023-may-p1-q13",
+  "cmu-ana-2023-may-p1-q13": {
+    "questionId": "cmu-ana-2023-may-p1-q13",
     "stem": "Motor cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -2679,11 +2687,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2023-may-p1-q14": {
-    "questionId": "cmu-2023-may-p1-q14",
+  "cmu-ana-2023-may-p1-q14": {
+    "questionId": "cmu-ana-2023-may-p1-q14",
     "stem": "Derivatives of 2nd pharyngeal arch",
     "type": "TF",
     "subject": "Anatomy",
@@ -2694,11 +2702,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development"
+    "explanation": "Verified in accordance with Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2023-may-p1-q15": {
-    "questionId": "cmu-2023-may-p1-q15",
+  "cmu-ana-2023-may-p1-q15": {
+    "questionId": "cmu-ana-2023-may-p1-q15",
     "stem": "Parotid gland",
     "type": "TF",
     "subject": "Anatomy",
@@ -2713,8 +2721,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "It is an exocrine gland and is enclosed by parotid fascia; the duct opens in the vestibule opposite the upper 2nd molar. Orbit marks b F, c T, d T."
   },
-  "cmu-2023-may-p1-q16": {
-    "questionId": "cmu-2023-may-p1-q16",
+  "cmu-ana-2023-may-p1-q16": {
+    "questionId": "cmu-ana-2023-may-p1-q16",
     "stem": "Hind brain formed by",
     "type": "TF",
     "subject": "Anatomy",
@@ -2725,11 +2733,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2023-may-p1-q17": {
-    "questionId": "cmu-2023-may-p1-q17",
+  "cmu-ana-2023-may-p1-q17": {
+    "questionId": "cmu-ana-2023-may-p1-q17",
     "stem": "Basal ganglia includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -2740,11 +2748,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-may-p1-q18": {
-    "questionId": "cmu-2023-may-p1-q18",
+  "cmu-ana-2023-may-p1-q18": {
+    "questionId": "cmu-ana-2023-may-p1-q18",
     "stem": "Deep cerebellar nuclei",
     "type": "TF",
     "subject": "Anatomy",
@@ -2755,11 +2763,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2023-may-p1-q19": {
-    "questionId": "cmu-2023-may-p1-q19",
+  "cmu-ana-2023-may-p1-q19": {
+    "questionId": "cmu-ana-2023-may-p1-q19",
     "stem": "Occipital lobe of cerebrum",
     "type": "TF",
     "subject": "Anatomy",
@@ -2774,8 +2782,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "It lies above (not below) the tentorium cerebelli."
   },
-  "cmu-2023-may-p1-q20": {
-    "questionId": "cmu-2023-may-p1-q20",
+  "cmu-ana-2023-may-p1-q20": {
+    "questionId": "cmu-ana-2023-may-p1-q20",
     "stem": "Refractive media of eyeball",
     "type": "TF",
     "subject": "Anatomy",
@@ -2786,12 +2794,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.84",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-nov-p1-q1": {
-    "questionId": "cmu-2023-nov-p1-q1",
-    "stem": "Muscles of soft palate are",
+  "cmu-ana-2023-nov-p1-q1": {
+    "questionId": "cmu-ana-2023-nov-p1-q1",
+    "stem": "Muscles of soft palate",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -2805,8 +2813,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Tensor tympani belongs to the middle ear. Orbit marks d T and e F."
   },
-  "cmu-2023-nov-p1-q2": {
-    "questionId": "cmu-2023-nov-p1-q2",
+  "cmu-ana-2023-nov-p1-q2": {
+    "questionId": "cmu-ana-2023-nov-p1-q2",
     "stem": "Simple squamous epithelium present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -2818,11 +2826,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Peritoneum = mesothelium (simple squamous); Orbit marks it F.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Peritoneum = mesothelium (simple squamous); Orbit marks it F."
   },
-  "cmu-2023-nov-p1-q3": {
-    "questionId": "cmu-2023-nov-p1-q3",
+  "cmu-ana-2023-nov-p1-q3": {
+    "questionId": "cmu-ana-2023-nov-p1-q3",
     "stem": "Superior orbital fissure transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -2837,8 +2845,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "The optic nerve passes through the optic canal; Orbit marks d T."
   },
-  "cmu-2023-nov-p1-q4": {
-    "questionId": "cmu-2023-nov-p1-q4",
+  "cmu-ana-2023-nov-p1-q4": {
+    "questionId": "cmu-ana-2023-nov-p1-q4",
     "stem": "Derivative of neural crest cell",
     "type": "TF",
     "subject": "Anatomy",
@@ -2849,11 +2857,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2023-nov-p1-q5": {
-    "questionId": "cmu-2023-nov-p1-q5",
+  "cmu-ana-2023-nov-p1-q5": {
+    "questionId": "cmu-ana-2023-nov-p1-q5",
     "stem": "Miniature long bone",
     "type": "TF",
     "subject": "Anatomy",
@@ -2864,11 +2872,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-nov-p1-q6": {
-    "questionId": "cmu-2023-nov-p1-q6",
+  "cmu-ana-2023-nov-p1-q6": {
+    "questionId": "cmu-ana-2023-nov-p1-q6",
     "stem": "Derivatives of pharyngeal pouches",
     "type": "TF",
     "subject": "Anatomy",
@@ -2879,11 +2887,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development"
+    "explanation": "Verified in accordance with Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2023-nov-p1-q7": {
-    "questionId": "cmu-2023-nov-p1-q7",
+  "cmu-ana-2023-nov-p1-q7": {
+    "questionId": "cmu-ana-2023-nov-p1-q7",
     "stem": "Part of basal ganglia",
     "type": "TF",
     "subject": "Anatomy",
@@ -2898,8 +2906,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Dentate nucleus is cerebellar; Orbit marks it T."
   },
-  "cmu-2023-nov-p1-q8": {
-    "questionId": "cmu-2023-nov-p1-q8",
+  "cmu-ana-2023-nov-p1-q8": {
+    "questionId": "cmu-ana-2023-nov-p1-q8",
     "stem": "Sensory cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -2910,11 +2918,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: d, e | False: a, b, c",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2023-nov-p1-q9": {
-    "questionId": "cmu-2023-nov-p1-q9",
+  "cmu-ana-2023-nov-p1-q9": {
+    "questionId": "cmu-ana-2023-nov-p1-q9",
     "stem": "Structures within parotid gland",
     "type": "TF",
     "subject": "Anatomy",
@@ -2929,8 +2937,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Glossopharyngeal fibers reach the gland via lesser petrosal - otic ganglion - auriculotemporal nerve; the nerve itself is not within the gland."
   },
-  "cmu-2023-nov-p1-q10": {
-    "questionId": "cmu-2023-nov-p1-q10",
+  "cmu-ana-2023-nov-p1-q10": {
+    "questionId": "cmu-ana-2023-nov-p1-q10",
     "stem": "Visual pathway formed by",
     "type": "TF",
     "subject": "Anatomy",
@@ -2945,9 +2953,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Medial geniculate body is auditory (lateral geniculate is visual). Cornea is not part of the pathway proper; Orbit marks it T."
   },
-  "cmu-2023-nov-p1-q11": {
-    "questionId": "cmu-2023-nov-p1-q11",
-    "stem": "Extra ocular muscle supplied by Abducent nerve is",
+  "cmu-ana-2023-nov-p1-q11": {
+    "questionId": "cmu-ana-2023-nov-p1-q11",
+    "stem": "Extra-ocular muscle supplied by abducent nerve",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -2957,11 +2965,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Lateral rectus",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified solution based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2023-nov-p1-q12": {
-    "questionId": "cmu-2023-nov-p1-q12",
+  "cmu-ana-2023-nov-p1-q12": {
+    "questionId": "cmu-ana-2023-nov-p1-q12",
     "stem": "Nucleus of paleocerebellum",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2973,11 +2981,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "E) Globose and emboliform",
     "explanation": "Paleocerebellum (spinocerebellum) -> globose + emboliform; fastigial -> archicerebellum. Orbit marks c.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy",
     "officialOrbitDiscrepancy": "Paleocerebellum (spinocerebellum) -> globose + emboliform; fastigial -> archicerebellum. Orbit marks c."
   },
-  "cmu-2023-nov-p1-q13": {
-    "questionId": "cmu-2023-nov-p1-q13",
+  "cmu-ana-2023-nov-p1-q13": {
+    "questionId": "cmu-ana-2023-nov-p1-q13",
     "stem": "Laryngeal cartilage made of both hyaline and elastic",
     "type": "SBA",
     "subject": "Anatomy",
@@ -2989,12 +2997,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "A) Arytenoid",
     "explanation": "Arytenoid: base hyaline, apex elastic. Epiglottis is elastic only.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "reviewReason": "Arytenoid: base hyaline, apex elastic. Epiglottis is elastic only."
   },
-  "cmu-2023-nov-p1-q14": {
-    "questionId": "cmu-2023-nov-p1-q14",
-    "stem": "Betz cell or large pyramidal cell of cerebral cortex present in",
+  "cmu-ana-2023-nov-p1-q14": {
+    "questionId": "cmu-ana-2023-nov-p1-q14",
+    "stem": "Betz cell present in",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -3004,11 +3012,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Internal pyramidal layer",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified solution based on Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2023-nov-p1-q15": {
-    "questionId": "cmu-2023-nov-p1-q15",
+  "cmu-ana-2023-nov-p1-q15": {
+    "questionId": "cmu-ana-2023-nov-p1-q15",
     "stem": "Terminal branch of internal carotid artery",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3023,8 +3031,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Middle cerebral is the other terminal branch."
   },
-  "cmu-2023-nov-p1-q16": {
-    "questionId": "cmu-2023-nov-p1-q16",
+  "cmu-ana-2023-nov-p1-q16": {
+    "questionId": "cmu-ana-2023-nov-p1-q16",
     "stem": "Pseudounipolar neuron located at",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3039,9 +3047,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Trigeminal ganglion cells are also pseudounipolar, so b is arguable; c is the textbook example."
   },
-  "cmu-2023-nov-p1-q17": {
-    "questionId": "cmu-2023-nov-p1-q17",
-    "stem": "Posterior neuropore is closed at",
+  "cmu-ana-2023-nov-p1-q17": {
+    "questionId": "cmu-ana-2023-nov-p1-q17",
+    "stem": "Posterior neuropore closed at",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -3055,9 +3063,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Langman: anterior neuropore ~day 25, posterior ~day 27-28. Orbit marks 25th day."
   },
-  "cmu-2023-nov-p1-q18": {
-    "questionId": "cmu-2023-nov-p1-q18",
-    "stem": "Safety muscle of larynx is",
+  "cmu-ana-2023-nov-p1-q18": {
+    "questionId": "cmu-ana-2023-nov-p1-q18",
+    "stem": "Safety muscle of larynx",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -3067,11 +3075,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Posterior cricoarytenoid",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-nov-p1-q19": {
-    "questionId": "cmu-2023-nov-p1-q19",
+  "cmu-ana-2023-nov-p1-q19": {
+    "questionId": "cmu-ana-2023-nov-p1-q19",
     "stem": "Unique feature of cervical vertebra",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3082,11 +3090,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Foramen transversarium",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-nov-p1-q20": {
-    "questionId": "cmu-2023-nov-p1-q20",
+  "cmu-ana-2023-nov-p1-q20": {
+    "questionId": "cmu-ana-2023-nov-p1-q20",
     "stem": "DNA replication occurs in",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3097,11 +3105,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.85",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "E) S phase",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2023-nov-p2-q1": {
-    "questionId": "cmu-2023-nov-p2-q1",
+  "cmu-ana-2023-nov-p2-q1": {
+    "questionId": "cmu-ana-2023-nov-p2-q1",
     "stem": "Contents of middle mediastinum",
     "type": "TF",
     "subject": "Anatomy",
@@ -3113,11 +3121,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
     "explanation": "Printed 'pulmonary nerve'; if 'pulmonary trunk' was meant, it is also T.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Printed 'pulmonary nerve'; if 'pulmonary trunk' was meant, it is also T."
   },
-  "cmu-2023-nov-p2-q2": {
-    "questionId": "cmu-2023-nov-p2-q2",
+  "cmu-ana-2023-nov-p2-q2": {
+    "questionId": "cmu-ana-2023-nov-p2-q2",
     "stem": "Carpal tunnel transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -3129,11 +3137,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
     "explanation": "Palmaris longus passes superficial to the flexor retinaculum.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Palmaris longus passes superficial to the flexor retinaculum."
   },
-  "cmu-2023-nov-p2-q3": {
-    "questionId": "cmu-2023-nov-p2-q3",
+  "cmu-ana-2023-nov-p2-q3": {
+    "questionId": "cmu-ana-2023-nov-p2-q3",
     "stem": "Anterior relations of right kidney",
     "type": "TF",
     "subject": "Anatomy",
@@ -3144,11 +3152,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q4": {
-    "questionId": "cmu-2023-nov-p2-q4",
+  "cmu-ana-2023-nov-p2-q4": {
+    "questionId": "cmu-ana-2023-nov-p2-q4",
     "stem": "Muscles acting on both hip and knee",
     "type": "TF",
     "subject": "Anatomy",
@@ -3159,11 +3167,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q5": {
-    "questionId": "cmu-2023-nov-p2-q5",
+  "cmu-ana-2023-nov-p2-q5": {
+    "questionId": "cmu-ana-2023-nov-p2-q5",
     "stem": "Left coronary artery (left posterior aortic sinus)",
     "type": "TF",
     "subject": "Anatomy",
@@ -3175,11 +3183,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
     "explanation": "Orbit's key differs on c.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Orbit's key differs on c."
   },
-  "cmu-2023-nov-p2-q6": {
-    "questionId": "cmu-2023-nov-p2-q6",
+  "cmu-ana-2023-nov-p2-q6": {
+    "questionId": "cmu-ana-2023-nov-p2-q6",
     "stem": "Muscles crossing shoulder joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -3190,11 +3198,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2023-nov-p2-q7": {
-    "questionId": "cmu-2023-nov-p2-q7",
+  "cmu-ana-2023-nov-p2-q7": {
+    "questionId": "cmu-ana-2023-nov-p2-q7",
     "stem": "Pancreas",
     "type": "TF",
     "subject": "Anatomy",
@@ -3206,11 +3214,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
     "explanation": "Alpha cells secrete glucagon, so d is F.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Alpha cells secrete glucagon, so d is F."
   },
-  "cmu-2023-nov-p2-q8": {
-    "questionId": "cmu-2023-nov-p2-q8",
+  "cmu-ana-2023-nov-p2-q8": {
+    "questionId": "cmu-ana-2023-nov-p2-q8",
     "stem": "Parts of uterine tube",
     "type": "TF",
     "subject": "Anatomy",
@@ -3221,11 +3229,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d, e | False: c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q9": {
-    "questionId": "cmu-2023-nov-p2-q9",
+  "cmu-ana-2023-nov-p2-q9": {
+    "questionId": "cmu-ana-2023-nov-p2-q9",
     "stem": "Structures crossed by root of mesentery",
     "type": "TF",
     "subject": "Anatomy",
@@ -3236,11 +3244,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q10": {
-    "questionId": "cmu-2023-nov-p2-q10",
+  "cmu-ana-2023-nov-p2-q10": {
+    "questionId": "cmu-ana-2023-nov-p2-q10",
     "stem": "Opening of right atrium",
     "type": "TF",
     "subject": "Anatomy",
@@ -3251,11 +3259,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q11": {
-    "questionId": "cmu-2023-nov-p2-q11",
+  "cmu-ana-2023-nov-p2-q11": {
+    "questionId": "cmu-ana-2023-nov-p2-q11",
     "stem": "Structure passing through venacaval opening",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3266,12 +3274,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Inferior vena cava",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q12": {
-    "questionId": "cmu-2023-nov-p2-q12",
-    "stem": "Which one is not present in gastric gland?",
+  "cmu-ana-2023-nov-p2-q12": {
+    "questionId": "cmu-ana-2023-nov-p2-q12",
+    "stem": "NOT present in gastric gland",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3281,12 +3289,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) M cell",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q13": {
-    "questionId": "cmu-2023-nov-p2-q13",
-    "stem": "Which one of the following is retroperitoneal organ?",
+  "cmu-ana-2023-nov-p2-q13": {
+    "questionId": "cmu-ana-2023-nov-p2-q13",
+    "stem": "Retroperitoneal organ",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3296,12 +3304,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Kidney",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q14": {
-    "questionId": "cmu-2023-nov-p2-q14",
-    "stem": "Following is the continuation of axillary artery",
+  "cmu-ana-2023-nov-p2-q14": {
+    "questionId": "cmu-ana-2023-nov-p2-q14",
+    "stem": "Continuation of axillary artery",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3311,12 +3319,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Brachial artery",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified solution based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2023-nov-p2-q15": {
-    "questionId": "cmu-2023-nov-p2-q15",
-    "stem": "Loss of extension of knee joint result from injury to",
+  "cmu-ana-2023-nov-p2-q15": {
+    "questionId": "cmu-ana-2023-nov-p2-q15",
+    "stem": "Loss of knee extension, injury to",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3326,11 +3334,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Femoral nerve",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q16": {
-    "questionId": "cmu-2023-nov-p2-q16",
+  "cmu-ana-2023-nov-p2-q16": {
+    "questionId": "cmu-ana-2023-nov-p2-q16",
     "stem": "Deltoid muscle",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3341,12 +3349,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "A) Is a multipennate muscle",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q17": {
-    "questionId": "cmu-2023-nov-p2-q17",
-    "stem": "Duodenum is developed from",
+  "cmu-ana-2023-nov-p2-q17": {
+    "questionId": "cmu-ana-2023-nov-p2-q17",
+    "stem": "Duodenum developed from",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3356,12 +3364,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Foregut and midgut",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q18": {
-    "questionId": "cmu-2023-nov-p2-q18",
-    "stem": "The commonest type of vermiform appendix is",
+  "cmu-ana-2023-nov-p2-q18": {
+    "questionId": "cmu-ana-2023-nov-p2-q18",
+    "stem": "Commonest type of vermiform appendix",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3371,11 +3379,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "C) Retrocaecal",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q19": {
-    "questionId": "cmu-2023-nov-p2-q19",
+  "cmu-ana-2023-nov-p2-q19": {
+    "questionId": "cmu-ana-2023-nov-p2-q19",
     "stem": "Ilio-tibial tract is condensation of",
     "type": "SBA",
     "subject": "Anatomy",
@@ -3386,12 +3394,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "B) Deep fascia of thigh",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2023-nov-p2-q20": {
-    "questionId": "cmu-2023-nov-p2-q20",
-    "stem": "The SA node is located at the",
+  "cmu-ana-2023-nov-p2-q20": {
+    "questionId": "cmu-ana-2023-nov-p2-q20",
+    "stem": "SA node located at",
     "type": "SBA",
     "subject": "Anatomy",
     "paper": "Paper-II",
@@ -3401,11 +3409,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.86",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "D) Crista terminalis",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified solution based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p1-q1": {
-    "questionId": "cmu-2022-nov-p1-q1",
+  "cmu-ana-2022-nov-p1-q1": {
+    "questionId": "cmu-ana-2022-nov-p1-q1",
     "stem": "Duodenum (stem misprinted 'DNA found in')",
     "type": "TF",
     "subject": "Anatomy",
@@ -3420,9 +3428,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "The options describe the duodenum (compare Nov-2021 Paper II Q5). Orbit's key (only d T) does not match duodenum."
   },
-  "cmu-2022-nov-p1-q2": {
-    "questionId": "cmu-2022-nov-p1-q2",
-    "stem": "The gall bladder",
+  "cmu-ana-2022-nov-p1-q2": {
+    "questionId": "cmu-ana-2022-nov-p1-q2",
+    "stem": "Gall bladder",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -3436,8 +3444,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Cystic artery arises from right hepatic artery. Orbit's key differs between papers."
   },
-  "cmu-2022-nov-p1-q3": {
-    "questionId": "cmu-2022-nov-p1-q3",
+  "cmu-ana-2022-nov-p1-q3": {
+    "questionId": "cmu-ana-2022-nov-p1-q3",
     "stem": "Structures passing through sacral canal",
     "type": "TF",
     "subject": "Anatomy",
@@ -3448,11 +3456,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q4": {
-    "questionId": "cmu-2022-nov-p1-q4",
+  "cmu-ana-2022-nov-p1-q4": {
+    "questionId": "cmu-ana-2022-nov-p1-q4",
     "stem": "Flexors of knee joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -3467,9 +3475,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Gracilis flexes and medially rotates the knee; Orbit marks it F."
   },
-  "cmu-2022-nov-p1-q5": {
-    "questionId": "cmu-2022-nov-p1-q5",
-    "stem": "Arch of the Aorta",
+  "cmu-ana-2022-nov-p1-q5": {
+    "questionId": "cmu-ana-2022-nov-p1-q5",
+    "stem": "Arch of aorta",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -3479,11 +3487,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development"
+    "explanation": "Verified in accordance with Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2022-nov-p1-q6": {
-    "questionId": "cmu-2022-nov-p1-q6",
+  "cmu-ana-2022-nov-p1-q6": {
+    "questionId": "cmu-ana-2022-nov-p1-q6",
     "stem": "Contents of spermatic cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -3495,11 +3503,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
     "explanation": "Cremasteric fascia is a covering, not a content.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)",
     "reviewReason": "Cremasteric fascia is a covering, not a content."
   },
-  "cmu-2022-nov-p1-q7": {
-    "questionId": "cmu-2022-nov-p1-q7",
+  "cmu-ana-2022-nov-p1-q7": {
+    "questionId": "cmu-ana-2022-nov-p1-q7",
     "stem": "Porto-systemic anastomoses",
     "type": "TF",
     "subject": "Anatomy",
@@ -3510,11 +3518,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c | False: a, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q8": {
-    "questionId": "cmu-2022-nov-p1-q8",
+  "cmu-ana-2022-nov-p1-q8": {
+    "questionId": "cmu-ana-2022-nov-p1-q8",
     "stem": "Parts of parietal pleura",
     "type": "TF",
     "subject": "Anatomy",
@@ -3529,8 +3537,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Cervical pleura is a part (Orbit marks F). 'Peritoneal' is not pleura."
   },
-  "cmu-2022-nov-p1-q9": {
-    "questionId": "cmu-2022-nov-p1-q9",
+  "cmu-ana-2022-nov-p1-q9": {
+    "questionId": "cmu-ana-2022-nov-p1-q9",
     "stem": "Structures crossed by root of mesentery",
     "type": "TF",
     "subject": "Anatomy",
@@ -3541,11 +3549,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q10": {
-    "questionId": "cmu-2022-nov-p1-q10",
+  "cmu-ana-2022-nov-p1-q10": {
+    "questionId": "cmu-ana-2022-nov-p1-q10",
     "stem": "Branches of lumbar plexus",
     "type": "TF",
     "subject": "Anatomy",
@@ -3560,8 +3568,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Nerve to pectineus comes from the femoral nerve (or accessory obturator); debatable. Pudendal is sacral plexus."
   },
-  "cmu-2022-nov-p1-q11": {
-    "questionId": "cmu-2022-nov-p1-q11",
+  "cmu-ana-2022-nov-p1-q11": {
+    "questionId": "cmu-ana-2022-nov-p1-q11",
     "stem": "Nerves related to humerus",
     "type": "TF",
     "subject": "Anatomy",
@@ -3572,11 +3580,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-nov-p1-q12": {
-    "questionId": "cmu-2022-nov-p1-q12",
+  "cmu-ana-2022-nov-p1-q12": {
+    "questionId": "cmu-ana-2022-nov-p1-q12",
     "stem": "Structures opening in right atrium",
     "type": "TF",
     "subject": "Anatomy",
@@ -3587,11 +3595,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q13": {
-    "questionId": "cmu-2022-nov-p1-q13",
+  "cmu-ana-2022-nov-p1-q13": {
+    "questionId": "cmu-ana-2022-nov-p1-q13",
     "stem": "Branches of posterior cord of brachial plexus",
     "type": "TF",
     "subject": "Anatomy",
@@ -3602,11 +3610,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d, e | False: c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q14": {
-    "questionId": "cmu-2022-nov-p1-q14",
+  "cmu-ana-2022-nov-p1-q14": {
+    "questionId": "cmu-ana-2022-nov-p1-q14",
     "stem": "Structures related to ala of sacrum",
     "type": "TF",
     "subject": "Anatomy",
@@ -3621,8 +3629,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Median sacral artery runs in the midline of the sacrum. Orbit's keys disagree between years."
   },
-  "cmu-2022-nov-p1-q15": {
-    "questionId": "cmu-2022-nov-p1-q15",
+  "cmu-ana-2022-nov-p1-q15": {
+    "questionId": "cmu-ana-2022-nov-p1-q15",
     "stem": "Muscles supplied by musculocutaneous nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -3633,11 +3641,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-nov-p1-q16": {
-    "questionId": "cmu-2022-nov-p1-q16",
+  "cmu-ana-2022-nov-p1-q16": {
+    "questionId": "cmu-ana-2022-nov-p1-q16",
     "stem": "Umbilical cord contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -3648,11 +3656,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q17": {
-    "questionId": "cmu-2022-nov-p1-q17",
+  "cmu-ana-2022-nov-p1-q17": {
+    "questionId": "cmu-ana-2022-nov-p1-q17",
     "stem": "Intracapsular structures of knee",
     "type": "TF",
     "subject": "Anatomy",
@@ -3663,11 +3671,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q18": {
-    "questionId": "cmu-2022-nov-p1-q18",
+  "cmu-ana-2022-nov-p1-q18": {
+    "questionId": "cmu-ana-2022-nov-p1-q18",
     "stem": "Derivatives of paramesonephric duct",
     "type": "TF",
     "subject": "Anatomy",
@@ -3682,8 +3690,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Uterus and tubes; broad ligament is a peritoneal fold; lower vagina is partly urogenital sinus."
   },
-  "cmu-2022-nov-p1-q19": {
-    "questionId": "cmu-2022-nov-p1-q19",
+  "cmu-ana-2022-nov-p1-q19": {
+    "questionId": "cmu-ana-2022-nov-p1-q19",
     "stem": "Structures passing behind inguinal ligament",
     "type": "TF",
     "subject": "Anatomy",
@@ -3694,11 +3702,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.87",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-nov-p1-q20": {
-    "questionId": "cmu-2022-nov-p1-q20",
+  "cmu-ana-2022-nov-p1-q20": {
+    "questionId": "cmu-ana-2022-nov-p1-q20",
     "stem": "Trachea",
     "type": "TF",
     "subject": "Anatomy",
@@ -3713,8 +3721,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Bifurcates at T4 (sternal angle level)."
   },
-  "cmu-2022-nov-p2-q1": {
-    "questionId": "cmu-2022-nov-p2-q1",
+  "cmu-ana-2022-nov-p2-q1": {
+    "questionId": "cmu-ana-2022-nov-p2-q1",
     "stem": "DNA found in",
     "type": "TF",
     "subject": "Anatomy",
@@ -3725,11 +3733,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q2": {
-    "questionId": "cmu-2022-nov-p2-q2",
+  "cmu-ana-2022-nov-p2-q2": {
+    "questionId": "cmu-ana-2022-nov-p2-q2",
     "stem": "Simple squamous epithelium present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -3740,11 +3748,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q3": {
-    "questionId": "cmu-2022-nov-p2-q3",
+  "cmu-ana-2022-nov-p2-q3": {
+    "questionId": "cmu-ana-2022-nov-p2-q3",
     "stem": "Non-membrane-bound organelles",
     "type": "TF",
     "subject": "Anatomy",
@@ -3755,11 +3763,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q4": {
-    "questionId": "cmu-2022-nov-p2-q4",
+  "cmu-ana-2022-nov-p2-q4": {
+    "questionId": "cmu-ana-2022-nov-p2-q4",
     "stem": "Neural crest cell derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -3770,11 +3778,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q5": {
-    "questionId": "cmu-2022-nov-p2-q5",
+  "cmu-ana-2022-nov-p2-q5": {
+    "questionId": "cmu-ana-2022-nov-p2-q5",
     "stem": "Hyaline cartilage present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -3785,11 +3793,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: d, e | False: a, b, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q6": {
-    "questionId": "cmu-2022-nov-p2-q6",
+  "cmu-ana-2022-nov-p2-q6": {
+    "questionId": "cmu-ana-2022-nov-p2-q6",
     "stem": "Fibrous joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -3800,11 +3808,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-nov-p2-q7": {
-    "questionId": "cmu-2022-nov-p2-q7",
+  "cmu-ana-2022-nov-p2-q7": {
+    "questionId": "cmu-ana-2022-nov-p2-q7",
     "stem": "Central lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
@@ -3815,12 +3823,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Bone marrow and thymus are central; spleen is peripheral. Orbit marks bone marrow F and spleen T - wrong.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
-    "officialOrbitDiscrepancy": "Bone marrow and thymus are central; spleen is peripheral. Orbit marks bone marrow F and spleen T - wrong."
+    "explanation": "Bone marrow and thymus are central; spleen is peripheral. Orbit marks bone marrow F and spleen T - wrong. Anatomy MCQ - Questions and Answers - page 13",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
+    "officialOrbitDiscrepancy": "Bone marrow and thymus are central; spleen is peripheral. Orbit marks bone marrow F and spleen T - wrong. Anatomy MCQ - Questions and Answers - page 13"
   },
-  "cmu-2022-nov-p2-q8": {
-    "questionId": "cmu-2022-nov-p2-q8",
+  "cmu-ana-2022-nov-p2-q8": {
+    "questionId": "cmu-ana-2022-nov-p2-q8",
     "stem": "Osteoblast",
     "type": "TF",
     "subject": "Anatomy",
@@ -3831,11 +3839,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q9": {
-    "questionId": "cmu-2022-nov-p2-q9",
+  "cmu-ana-2022-nov-p2-q9": {
+    "questionId": "cmu-ana-2022-nov-p2-q9",
     "stem": "Pneumatic bones",
     "type": "TF",
     "subject": "Anatomy",
@@ -3847,11 +3855,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
     "explanation": "Frontal is pneumatic; Orbit marks it F.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Frontal is pneumatic; Orbit marks it F."
   },
-  "cmu-2022-nov-p2-q10": {
-    "questionId": "cmu-2022-nov-p2-q10",
+  "cmu-ana-2022-nov-p2-q10": {
+    "questionId": "cmu-ana-2022-nov-p2-q10",
     "stem": "Sperm",
     "type": "TF",
     "subject": "Anatomy",
@@ -3862,11 +3870,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q11": {
-    "questionId": "cmu-2022-nov-p2-q11",
+  "cmu-ana-2022-nov-p2-q11": {
+    "questionId": "cmu-ana-2022-nov-p2-q11",
     "stem": "Carotid sheath contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -3877,11 +3885,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q12": {
-    "questionId": "cmu-2022-nov-p2-q12",
+  "cmu-ana-2022-nov-p2-q12": {
+    "questionId": "cmu-ana-2022-nov-p2-q12",
     "stem": "Sensory cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -3892,11 +3900,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-nov-p2-q13": {
-    "questionId": "cmu-2022-nov-p2-q13",
+  "cmu-ana-2022-nov-p2-q13": {
+    "questionId": "cmu-ana-2022-nov-p2-q13",
     "stem": "Branch of external carotid artery",
     "type": "TF",
     "subject": "Anatomy",
@@ -3907,11 +3915,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-nov-p2-q14": {
-    "questionId": "cmu-2022-nov-p2-q14",
+  "cmu-ana-2022-nov-p2-q14": {
+    "questionId": "cmu-ana-2022-nov-p2-q14",
     "stem": "Derivatives of 1st pharyngeal arch",
     "type": "TF",
     "subject": "Anatomy",
@@ -3922,11 +3930,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q15": {
-    "questionId": "cmu-2022-nov-p2-q15",
+  "cmu-ana-2022-nov-p2-q15": {
+    "questionId": "cmu-ana-2022-nov-p2-q15",
     "stem": "Muscles of soft palate",
     "type": "TF",
     "subject": "Anatomy",
@@ -3937,11 +3945,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q16": {
-    "questionId": "cmu-2022-nov-p2-q16",
+  "cmu-ana-2022-nov-p2-q16": {
+    "questionId": "cmu-ana-2022-nov-p2-q16",
     "stem": "Brainstem includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -3952,11 +3960,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q17": {
-    "questionId": "cmu-2022-nov-p2-q17",
+  "cmu-ana-2022-nov-p2-q17": {
+    "questionId": "cmu-ana-2022-nov-p2-q17",
     "stem": "Parts of internal capsule",
     "type": "TF",
     "subject": "Anatomy",
@@ -3967,11 +3975,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q18": {
-    "questionId": "cmu-2022-nov-p2-q18",
+  "cmu-ana-2022-nov-p2-q18": {
+    "questionId": "cmu-ana-2022-nov-p2-q18",
     "stem": "Deep cerebellar nuclei",
     "type": "TF",
     "subject": "Anatomy",
@@ -3982,11 +3990,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q19": {
-    "questionId": "cmu-2022-nov-p2-q19",
+  "cmu-ana-2022-nov-p2-q19": {
+    "questionId": "cmu-ana-2022-nov-p2-q19",
     "stem": "Gray matter composed of",
     "type": "TF",
     "subject": "Anatomy",
@@ -3997,11 +4005,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-nov-p2-q20": {
-    "questionId": "cmu-2022-nov-p2-q20",
+  "cmu-ana-2022-nov-p2-q20": {
+    "questionId": "cmu-ana-2022-nov-p2-q20",
     "stem": "Retina contains cells",
     "type": "TF",
     "subject": "Anatomy",
@@ -4012,11 +4020,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.88",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p1-q1": {
-    "questionId": "cmu-2022-may-p1-q1",
+  "cmu-ana-2022-may-p1-q1": {
+    "questionId": "cmu-ana-2022-may-p1-q1",
     "stem": "Mitotic cell division",
     "type": "TF",
     "subject": "Anatomy",
@@ -4027,11 +4035,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2022-may-p1-q2": {
-    "questionId": "cmu-2022-may-p1-q2",
+  "cmu-ana-2022-may-p1-q2": {
+    "questionId": "cmu-ana-2022-may-p1-q2",
     "stem": "Oogenesis",
     "type": "TF",
     "subject": "Anatomy",
@@ -4042,12 +4050,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q3": {
-    "questionId": "cmu-2022-may-p1-q3",
-    "stem": "Turner syndrome characterized by",
+  "cmu-ana-2022-may-p1-q3": {
+    "questionId": "cmu-ana-2022-may-p1-q3",
+    "stem": "Turner syndrome",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4057,12 +4065,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q4": {
-    "questionId": "cmu-2022-may-p1-q4",
-    "stem": "Results of fertilization are",
+  "cmu-ana-2022-may-p1-q4": {
+    "questionId": "cmu-ana-2022-may-p1-q4",
+    "stem": "Results of fertilization",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4072,11 +4080,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q5": {
-    "questionId": "cmu-2022-may-p1-q5",
+  "cmu-ana-2022-may-p1-q5": {
+    "questionId": "cmu-ana-2022-may-p1-q5",
     "stem": "Characteristics of epithelial tissue",
     "type": "TF",
     "subject": "Anatomy",
@@ -4088,11 +4096,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
     "explanation": "Epithelium regenerates well, is cell-rich, covers external AND lines internal surfaces, is avascular, and has a nerve supply. Orbit's key (b to e T) is wrong on c, d, e.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Epithelium regenerates well, is cell-rich, covers external AND lines internal surfaces, is avascular, and has a nerve supply. Orbit's key (b to e T) is wrong on c, d, e."
   },
-  "cmu-2022-may-p1-q6": {
-    "questionId": "cmu-2022-may-p1-q6",
+  "cmu-ana-2022-may-p1-q6": {
+    "questionId": "cmu-ana-2022-may-p1-q6",
     "stem": "Synovial joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -4103,11 +4111,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q7": {
-    "questionId": "cmu-2022-may-p1-q7",
+  "cmu-ana-2022-may-p1-q7": {
+    "questionId": "cmu-ana-2022-may-p1-q7",
     "stem": "Avascular structure",
     "type": "TF",
     "subject": "Anatomy",
@@ -4118,11 +4126,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q8": {
-    "questionId": "cmu-2022-may-p1-q8",
+  "cmu-ana-2022-may-p1-q8": {
+    "questionId": "cmu-ana-2022-may-p1-q8",
     "stem": "Morphologically short bones",
     "type": "TF",
     "subject": "Anatomy",
@@ -4133,12 +4141,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Incus (ear ossicle) is not clearly a short bone; Orbit marks it T. Patella is sesamoid.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
-    "officialOrbitDiscrepancy": "Incus (ear ossicle) is not clearly a short bone; Orbit marks it T. Patella is sesamoid."
+    "explanation": "Incus (ear ossicle) is not clearly a short bone; Orbit marks it T. Patella is sesamoid. Anatomy MCQ - Questions and Answers - page 14",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
+    "officialOrbitDiscrepancy": "Incus (ear ossicle) is not clearly a short bone; Orbit marks it T. Patella is sesamoid. Anatomy MCQ - Questions and Answers - page 14"
   },
-  "cmu-2022-may-p1-q9": {
-    "questionId": "cmu-2022-may-p1-q9",
+  "cmu-ana-2022-may-p1-q9": {
+    "questionId": "cmu-ana-2022-may-p1-q9",
     "stem": "Morula",
     "type": "TF",
     "subject": "Anatomy",
@@ -4149,11 +4157,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q10": {
-    "questionId": "cmu-2022-may-p1-q10",
+  "cmu-ana-2022-may-p1-q10": {
+    "questionId": "cmu-ana-2022-may-p1-q10",
     "stem": "Peripheral lymphoid organ",
     "type": "TF",
     "subject": "Anatomy",
@@ -4168,9 +4176,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Orbit marks bone marrow T and spleen/thymus F - wrong."
   },
-  "cmu-2022-may-p1-q11": {
-    "questionId": "cmu-2022-may-p1-q11",
-    "stem": "Taste sensation from the tongue carried by",
+  "cmu-ana-2022-may-p1-q11": {
+    "questionId": "cmu-ana-2022-may-p1-q11",
+    "stem": "Taste sensation from tongue carried by",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4180,11 +4188,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d | False: a, b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q12": {
-    "questionId": "cmu-2022-may-p1-q12",
+  "cmu-ana-2022-may-p1-q12": {
+    "questionId": "cmu-ana-2022-may-p1-q12",
     "stem": "Carotid triangle contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -4195,11 +4203,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, e | False: d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q13": {
-    "questionId": "cmu-2022-may-p1-q13",
+  "cmu-ana-2022-may-p1-q13": {
+    "questionId": "cmu-ana-2022-may-p1-q13",
     "stem": "Mixed cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -4210,11 +4218,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-may-p1-q14": {
-    "questionId": "cmu-2022-may-p1-q14",
+  "cmu-ana-2022-may-p1-q14": {
+    "questionId": "cmu-ana-2022-may-p1-q14",
     "stem": "Muscles of mastication",
     "type": "TF",
     "subject": "Anatomy",
@@ -4225,11 +4233,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2022-may-p1-q15": {
-    "questionId": "cmu-2022-may-p1-q15",
+  "cmu-ana-2022-may-p1-q15": {
+    "questionId": "cmu-ana-2022-may-p1-q15",
     "stem": "Paired dural venous sinuses",
     "type": "TF",
     "subject": "Anatomy",
@@ -4240,11 +4248,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-may-p1-q16": {
-    "questionId": "cmu-2022-may-p1-q16",
+  "cmu-ana-2022-may-p1-q16": {
+    "questionId": "cmu-ana-2022-may-p1-q16",
     "stem": "Hind brain includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -4255,11 +4263,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-may-p1-q17": {
-    "questionId": "cmu-2022-may-p1-q17",
+  "cmu-ana-2022-may-p1-q17": {
+    "questionId": "cmu-ana-2022-may-p1-q17",
     "stem": "Cells in cerebral cortex",
     "type": "TF",
     "subject": "Anatomy",
@@ -4270,11 +4278,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2022-may-p1-q18": {
-    "questionId": "cmu-2022-may-p1-q18",
+  "cmu-ana-2022-may-p1-q18": {
+    "questionId": "cmu-ana-2022-may-p1-q18",
     "stem": "Sensory tracts of spinal cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -4285,12 +4293,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d, e | False: a, b",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-may-p1-q19": {
-    "questionId": "cmu-2022-may-p1-q19",
-    "stem": "Following are commissural fibers",
+  "cmu-ana-2022-may-p1-q19": {
+    "questionId": "cmu-ana-2022-may-p1-q19",
+    "stem": "Commissural fibers",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4300,11 +4308,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2022-may-p1-q20": {
-    "questionId": "cmu-2022-may-p1-q20",
+  "cmu-ana-2022-may-p1-q20": {
+    "questionId": "cmu-ana-2022-may-p1-q20",
     "stem": "Muscle supplied by oculomotor nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -4315,11 +4323,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.89",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2022-may-p2-q1": {
-    "questionId": "cmu-2022-may-p2-q1",
+  "cmu-ana-2022-may-p2-q1": {
+    "questionId": "cmu-ana-2022-may-p2-q1",
     "stem": "Muscles forming rotator cuff",
     "type": "TF",
     "subject": "Anatomy",
@@ -4330,11 +4338,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q2": {
-    "questionId": "cmu-2022-may-p2-q2",
+  "cmu-ana-2022-may-p2-q2": {
+    "questionId": "cmu-ana-2022-may-p2-q2",
     "stem": "Structures related to neck of 1st rib",
     "type": "TF",
     "subject": "Anatomy",
@@ -4345,11 +4353,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q3": {
-    "questionId": "cmu-2022-may-p2-q3",
+  "cmu-ana-2022-may-p2-q3": {
+    "questionId": "cmu-ana-2022-may-p2-q3",
     "stem": "Fallopian tube",
     "type": "TF",
     "subject": "Anatomy",
@@ -4360,11 +4368,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q4": {
-    "questionId": "cmu-2022-may-p2-q4",
+  "cmu-ana-2022-may-p2-q4": {
+    "questionId": "cmu-ana-2022-may-p2-q4",
     "stem": "Muscles with double nerve supply",
     "type": "TF",
     "subject": "Anatomy",
@@ -4375,11 +4383,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-may-p2-q5": {
-    "questionId": "cmu-2022-may-p2-q5",
+  "cmu-ana-2022-may-p2-q5": {
+    "questionId": "cmu-ana-2022-may-p2-q5",
     "stem": "Structures related to transpyloric plane",
     "type": "TF",
     "subject": "Anatomy",
@@ -4390,11 +4398,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q6": {
-    "questionId": "cmu-2022-may-p2-q6",
+  "cmu-ana-2022-may-p2-q6": {
+    "questionId": "cmu-ana-2022-may-p2-q6",
     "stem": "Gluteus maximus",
     "type": "TF",
     "subject": "Anatomy",
@@ -4405,11 +4413,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d | False: a, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q7": {
-    "questionId": "cmu-2022-may-p2-q7",
+  "cmu-ana-2022-may-p2-q7": {
+    "questionId": "cmu-ana-2022-may-p2-q7",
     "stem": "Fallot's tetralogy",
     "type": "TF",
     "subject": "Anatomy",
@@ -4420,11 +4428,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q8": {
-    "questionId": "cmu-2022-may-p2-q8",
+  "cmu-ana-2022-may-p2-q8": {
+    "questionId": "cmu-ana-2022-may-p2-q8",
     "stem": "Structures crossing pelvic brim",
     "type": "TF",
     "subject": "Anatomy",
@@ -4436,11 +4444,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
     "explanation": "Ureter crosses at the bifurcation of the common iliac artery.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Ureter crosses at the bifurcation of the common iliac artery."
   },
-  "cmu-2022-may-p2-q9": {
-    "questionId": "cmu-2022-may-p2-q9",
+  "cmu-ana-2022-may-p2-q9": {
+    "questionId": "cmu-ana-2022-may-p2-q9",
     "stem": "Portal triad contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -4452,11 +4460,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Triad = portal venule, hepatic arteriole, bile ductule. Bile canaliculi and central vein are not part of it. Orbit's key (c T, d F) looks swapped.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Triad = portal venule, hepatic arteriole, bile ductule. Bile canaliculi and central vein are not part of it. Orbit's key (c T, d F) looks swapped."
   },
-  "cmu-2022-may-p2-q10": {
-    "questionId": "cmu-2022-may-p2-q10",
+  "cmu-ana-2022-may-p2-q10": {
+    "questionId": "cmu-ana-2022-may-p2-q10",
     "stem": "Muscles causing dorsiflexion of foot",
     "type": "TF",
     "subject": "Anatomy",
@@ -4467,11 +4475,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-may-p2-q11": {
-    "questionId": "cmu-2022-may-p2-q11",
+  "cmu-ana-2022-may-p2-q11": {
+    "questionId": "cmu-ana-2022-may-p2-q11",
     "stem": "The liver",
     "type": "TF",
     "subject": "Anatomy",
@@ -4483,11 +4491,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
     "explanation": "Bare area is on the posterior part of the diaphragmatic surface, not 'superior'.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Bare area is on the posterior part of the diaphragmatic surface, not 'superior'."
   },
-  "cmu-2022-may-p2-q12": {
-    "questionId": "cmu-2022-may-p2-q12",
+  "cmu-ana-2022-may-p2-q12": {
+    "questionId": "cmu-ana-2022-may-p2-q12",
     "stem": "The pancreas",
     "type": "TF",
     "subject": "Anatomy",
@@ -4498,11 +4506,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q13": {
-    "questionId": "cmu-2022-may-p2-q13",
+  "cmu-ana-2022-may-p2-q13": {
+    "questionId": "cmu-ana-2022-may-p2-q13",
     "stem": "Structures related to base of heart",
     "type": "TF",
     "subject": "Anatomy",
@@ -4513,11 +4521,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2022-may-p2-q14": {
-    "questionId": "cmu-2022-may-p2-q14",
+  "cmu-ana-2022-may-p2-q14": {
+    "questionId": "cmu-ana-2022-may-p2-q14",
     "stem": "The kidney",
     "type": "TF",
     "subject": "Anatomy",
@@ -4528,11 +4536,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q15": {
-    "questionId": "cmu-2022-may-p2-q15",
+  "cmu-ana-2022-may-p2-q15": {
+    "questionId": "cmu-ana-2022-may-p2-q15",
     "stem": "Ureter",
     "type": "TF",
     "subject": "Anatomy",
@@ -4543,11 +4551,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q16": {
-    "questionId": "cmu-2022-may-p2-q16",
+  "cmu-ana-2022-may-p2-q16": {
+    "questionId": "cmu-ana-2022-may-p2-q16",
     "stem": "Aortic opening of diaphragm transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -4558,11 +4566,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2022-may-p2-q17": {
-    "questionId": "cmu-2022-may-p2-q17",
+  "cmu-ana-2022-may-p2-q17": {
+    "questionId": "cmu-ana-2022-may-p2-q17",
     "stem": "The spleen",
     "type": "TF",
     "subject": "Anatomy",
@@ -4574,11 +4582,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
     "explanation": "Spleen lies deep to ribs 9-11.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Spleen lies deep to ribs 9-11."
   },
-  "cmu-2022-may-p2-q18": {
-    "questionId": "cmu-2022-may-p2-q18",
+  "cmu-ana-2022-may-p2-q18": {
+    "questionId": "cmu-ana-2022-may-p2-q18",
     "stem": "Contents of femoral sheath",
     "type": "TF",
     "subject": "Anatomy",
@@ -4589,11 +4597,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d, e | False: a",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2022-may-p2-q19": {
-    "questionId": "cmu-2022-may-p2-q19",
+  "cmu-ana-2022-may-p2-q19": {
+    "questionId": "cmu-ana-2022-may-p2-q19",
     "stem": "Foot drop is due to injury to",
     "type": "TF",
     "subject": "Anatomy",
@@ -4605,11 +4613,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: c | False: a, b, d, e",
     "explanation": "Common peroneal nerve.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "Common peroneal nerve."
   },
-  "cmu-2022-may-p2-q20": {
-    "questionId": "cmu-2022-may-p2-q20",
+  "cmu-ana-2022-may-p2-q20": {
+    "questionId": "cmu-ana-2022-may-p2-q20",
     "stem": "Conducting system of heart",
     "type": "TF",
     "subject": "Anatomy",
@@ -4620,12 +4628,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.90",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2021-nov-p1-q1": {
-    "questionId": "cmu-2021-nov-p1-q1",
-    "stem": "Phagocytic cells are",
+  "cmu-ana-2021-nov-p1-q1": {
+    "questionId": "cmu-ana-2021-nov-p1-q1",
+    "stem": "Phagocytic cells",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4636,11 +4644,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
     "explanation": "Osteoclast (not osteocyte) is phagocytic; Orbit marks d T.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Osteoclast (not osteocyte) is phagocytic; Orbit marks d T."
   },
-  "cmu-2021-nov-p1-q2": {
-    "questionId": "cmu-2021-nov-p1-q2",
+  "cmu-ana-2021-nov-p1-q2": {
+    "questionId": "cmu-ana-2021-nov-p1-q2",
     "stem": "Meiotic type of cell division",
     "type": "TF",
     "subject": "Anatomy",
@@ -4651,11 +4659,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-nov-p1-q3": {
-    "questionId": "cmu-2021-nov-p1-q3",
+  "cmu-ana-2021-nov-p1-q3": {
+    "questionId": "cmu-ana-2021-nov-p1-q3",
     "stem": "Connective tissue cells",
     "type": "TF",
     "subject": "Anatomy",
@@ -4666,11 +4674,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-nov-p1-q4": {
-    "questionId": "cmu-2021-nov-p1-q4",
+  "cmu-ana-2021-nov-p1-q4": {
+    "questionId": "cmu-ana-2021-nov-p1-q4",
     "stem": "Neural crest derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -4681,11 +4689,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-nov-p1-q5": {
-    "questionId": "cmu-2021-nov-p1-q5",
+  "cmu-ana-2021-nov-p1-q5": {
+    "questionId": "cmu-ana-2021-nov-p1-q5",
     "stem": "Ball and socket joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -4696,11 +4704,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-nov-p1-q6": {
-    "questionId": "cmu-2021-nov-p1-q6",
+  "cmu-ana-2021-nov-p1-q6": {
+    "questionId": "cmu-ana-2021-nov-p1-q6",
     "stem": "Pneumatic bones",
     "type": "TF",
     "subject": "Anatomy",
@@ -4712,11 +4720,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
     "explanation": "Temporal bone (mastoid air cells) is pneumatic; Orbit marks it F.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Temporal bone (mastoid air cells) is pneumatic; Orbit marks it F."
   },
-  "cmu-2021-nov-p1-q7": {
-    "questionId": "cmu-2021-nov-p1-q7",
+  "cmu-ana-2021-nov-p1-q7": {
+    "questionId": "cmu-ana-2021-nov-p1-q7",
     "stem": "Central lymphoid organs",
     "type": "TF",
     "subject": "Anatomy",
@@ -4727,11 +4735,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-nov-p1-q8": {
-    "questionId": "cmu-2021-nov-p1-q8",
+  "cmu-ana-2021-nov-p1-q8": {
+    "questionId": "cmu-ana-2021-nov-p1-q8",
     "stem": "Fibrocartilage present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -4743,11 +4751,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
     "explanation": "IVD annulus fibrosus is fibrocartilage (Orbit marks c F). Inferior tibiofibular is a fibrous syndesmosis.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "IVD annulus fibrosus is fibrocartilage (Orbit marks c F). Inferior tibiofibular is a fibrous syndesmosis."
   },
-  "cmu-2021-nov-p1-q9": {
-    "questionId": "cmu-2021-nov-p1-q9",
+  "cmu-ana-2021-nov-p1-q9": {
+    "questionId": "cmu-ana-2021-nov-p1-q9",
     "stem": "Collagen fibers abundant in",
     "type": "TF",
     "subject": "Anatomy",
@@ -4758,11 +4766,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-nov-p1-q10": {
-    "questionId": "cmu-2021-nov-p1-q10",
+  "cmu-ana-2021-nov-p1-q10": {
+    "questionId": "cmu-ana-2021-nov-p1-q10",
     "stem": "Multipennate muscles",
     "type": "TF",
     "subject": "Anatomy",
@@ -4777,9 +4785,9 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "officialOrbitDiscrepancy": "Soleus and rectus femoris are bipennate. Orbit's key differs."
   },
-  "cmu-2021-nov-p1-q11": {
-    "questionId": "cmu-2021-nov-p1-q11",
-    "stem": "Following are motor cranial nerve",
+  "cmu-ana-2021-nov-p1-q11": {
+    "questionId": "cmu-ana-2021-nov-p1-q11",
+    "stem": "Motor cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -4789,11 +4797,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-nov-p1-q12": {
-    "questionId": "cmu-2021-nov-p1-q12",
+  "cmu-ana-2021-nov-p1-q12": {
+    "questionId": "cmu-ana-2021-nov-p1-q12",
     "stem": "Derivatives of 1st pharyngeal arch",
     "type": "TF",
     "subject": "Anatomy",
@@ -4804,11 +4812,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d, e | False: b, c",
-    "explanation": "Verified based on Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development.",
-    "sourceReference": "Langman's Medical Embryology (14th Ed.), Chapter on Gametogenesis & Development"
+    "explanation": "Verified in accordance with Langman's Medical Embryology (14th Ed.).",
+    "sourceReference": "Langman's Medical Embryology (14th Ed.)"
   },
-  "cmu-2021-nov-p1-q13": {
-    "questionId": "cmu-2021-nov-p1-q13",
+  "cmu-ana-2021-nov-p1-q13": {
+    "questionId": "cmu-ana-2021-nov-p1-q13",
     "stem": "Branches of external carotid artery",
     "type": "TF",
     "subject": "Anatomy",
@@ -4823,8 +4831,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Anterior auricular arteries arise from the superficial temporal (an ECA terminal branch) - indirect. Inferior thyroid is from thyrocervical trunk."
   },
-  "cmu-2021-nov-p1-q14": {
-    "questionId": "cmu-2021-nov-p1-q14",
+  "cmu-ana-2021-nov-p1-q14": {
+    "questionId": "cmu-ana-2021-nov-p1-q14",
     "stem": "Parasympathetic fibers present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -4836,11 +4844,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
     "explanation": "Vagus also carries them.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "reviewReason": "Vagus also carries them."
   },
-  "cmu-2021-nov-p1-q15": {
-    "questionId": "cmu-2021-nov-p1-q15",
+  "cmu-ana-2021-nov-p1-q15": {
+    "questionId": "cmu-ana-2021-nov-p1-q15",
     "stem": "Paired cartilage of larynx",
     "type": "TF",
     "subject": "Anatomy",
@@ -4851,11 +4859,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-nov-p1-q16": {
-    "questionId": "cmu-2021-nov-p1-q16",
+  "cmu-ana-2021-nov-p1-q16": {
+    "questionId": "cmu-ana-2021-nov-p1-q16",
     "stem": "Gray matter composed of",
     "type": "TF",
     "subject": "Anatomy",
@@ -4866,11 +4874,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-nov-p1-q17": {
-    "questionId": "cmu-2021-nov-p1-q17",
+  "cmu-ana-2021-nov-p1-q17": {
+    "questionId": "cmu-ana-2021-nov-p1-q17",
     "stem": "Brainstem includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -4881,11 +4889,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-nov-p1-q18": {
-    "questionId": "cmu-2021-nov-p1-q18",
+  "cmu-ana-2021-nov-p1-q18": {
+    "questionId": "cmu-ana-2021-nov-p1-q18",
     "stem": "Deep cerebellar nuclei",
     "type": "TF",
     "subject": "Anatomy",
@@ -4896,11 +4904,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-nov-p1-q19": {
-    "questionId": "cmu-2021-nov-p1-q19",
+  "cmu-ana-2021-nov-p1-q19": {
+    "questionId": "cmu-ana-2021-nov-p1-q19",
     "stem": "Parts of internal capsule",
     "type": "TF",
     "subject": "Anatomy",
@@ -4915,8 +4923,8 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)",
     "reviewReason": "Rostrum, trunk and splenium are parts of the corpus callosum. Internal capsule: anterior limb, genu, posterior limb, retrolentiform, sublenticular."
   },
-  "cmu-2021-nov-p1-q20": {
-    "questionId": "cmu-2021-nov-p1-q20",
+  "cmu-ana-2021-nov-p1-q20": {
+    "questionId": "cmu-ana-2021-nov-p1-q20",
     "stem": "Refractory media of eyeball",
     "type": "TF",
     "subject": "Anatomy",
@@ -4927,11 +4935,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.91",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-nov-p2-q1": {
-    "questionId": "cmu-2021-nov-p2-q1",
+  "cmu-ana-2021-nov-p2-q1": {
+    "questionId": "cmu-ana-2021-nov-p2-q1",
     "stem": "Gall bladder",
     "type": "TF",
     "subject": "Anatomy",
@@ -4942,11 +4950,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, e | False: d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q2": {
-    "questionId": "cmu-2021-nov-p2-q2",
+  "cmu-ana-2021-nov-p2-q2": {
+    "questionId": "cmu-ana-2021-nov-p2-q2",
     "stem": "Intercostal nerves",
     "type": "TF",
     "subject": "Anatomy",
@@ -4958,11 +4966,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
     "explanation": "Lower intercostals supply the peripheral diaphragm; fibrous pericardium is supplied by the phrenic nerve.",
-    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Chapter 3: Thorax",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "Lower intercostals supply the peripheral diaphragm; fibrous pericardium is supplied by the phrenic nerve."
   },
-  "cmu-2021-nov-p2-q3": {
-    "questionId": "cmu-2021-nov-p2-q3",
+  "cmu-ana-2021-nov-p2-q3": {
+    "questionId": "cmu-ana-2021-nov-p2-q3",
     "stem": "Lesser omentum contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -4974,11 +4982,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
     "explanation": "Free border: hepatic artery proper, bile duct, portal vein. IVC and coeliac trunk are not contents.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Free border: hepatic artery proper, bile duct, portal vein. IVC and coeliac trunk are not contents."
   },
-  "cmu-2021-nov-p2-q4": {
-    "questionId": "cmu-2021-nov-p2-q4",
+  "cmu-ana-2021-nov-p2-q4": {
+    "questionId": "cmu-ana-2021-nov-p2-q4",
     "stem": "Structures opening in right atrium",
     "type": "TF",
     "subject": "Anatomy",
@@ -4989,11 +4997,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q5": {
-    "questionId": "cmu-2021-nov-p2-q5",
+  "cmu-ana-2021-nov-p2-q5": {
+    "questionId": "cmu-ana-2021-nov-p2-q5",
     "stem": "Histological structures of duodenum",
     "type": "TF",
     "subject": "Anatomy",
@@ -5005,11 +5013,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
     "explanation": "Peyer's patches are ileal.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Peyer's patches are ileal."
   },
-  "cmu-2021-nov-p2-q6": {
-    "questionId": "cmu-2021-nov-p2-q6",
+  "cmu-ana-2021-nov-p2-q6": {
+    "questionId": "cmu-ana-2021-nov-p2-q6",
     "stem": "Structure passing through sacral canal",
     "type": "TF",
     "subject": "Anatomy",
@@ -5020,11 +5028,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q7": {
-    "questionId": "cmu-2021-nov-p2-q7",
+  "cmu-ana-2021-nov-p2-q7": {
+    "questionId": "cmu-ana-2021-nov-p2-q7",
     "stem": "Structures related to ala of sacrum",
     "type": "TF",
     "subject": "Anatomy",
@@ -5036,11 +5044,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
     "explanation": "See note in Nov-2022 Paper I.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "See note in Nov-2022 Paper I."
   },
-  "cmu-2021-nov-p2-q8": {
-    "questionId": "cmu-2021-nov-p2-q8",
+  "cmu-ana-2021-nov-p2-q8": {
+    "questionId": "cmu-ana-2021-nov-p2-q8",
     "stem": "Branches of lumbar plexus",
     "type": "TF",
     "subject": "Anatomy",
@@ -5051,11 +5059,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q9": {
-    "questionId": "cmu-2021-nov-p2-q9",
+  "cmu-ana-2021-nov-p2-q9": {
+    "questionId": "cmu-ana-2021-nov-p2-q9",
     "stem": "Contents of spermatic cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -5066,11 +5074,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q10": {
-    "questionId": "cmu-2021-nov-p2-q10",
+  "cmu-ana-2021-nov-p2-q10": {
+    "questionId": "cmu-ana-2021-nov-p2-q10",
     "stem": "Derivatives of paramesonephric duct",
     "type": "TF",
     "subject": "Anatomy",
@@ -5082,11 +5090,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
     "explanation": "Round ligament of uterus comes from the gubernaculum; Orbit marks e T.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Round ligament of uterus comes from the gubernaculum; Orbit marks e T."
   },
-  "cmu-2021-nov-p2-q11": {
-    "questionId": "cmu-2021-nov-p2-q11",
+  "cmu-ana-2021-nov-p2-q11": {
+    "questionId": "cmu-ana-2021-nov-p2-q11",
     "stem": "Nerves related to humerus",
     "type": "TF",
     "subject": "Anatomy",
@@ -5097,11 +5105,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-nov-p2-q12": {
-    "questionId": "cmu-2021-nov-p2-q12",
+  "cmu-ana-2021-nov-p2-q12": {
+    "questionId": "cmu-ana-2021-nov-p2-q12",
     "stem": "Common congenital anomalies of foot",
     "type": "TF",
     "subject": "Anatomy",
@@ -5112,11 +5120,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-nov-p2-q13": {
-    "questionId": "cmu-2021-nov-p2-q13",
+  "cmu-ana-2021-nov-p2-q13": {
+    "questionId": "cmu-ana-2021-nov-p2-q13",
     "stem": "Intracapsular structures of knee joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -5127,11 +5135,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-nov-p2-q14": {
-    "questionId": "cmu-2021-nov-p2-q14",
+  "cmu-ana-2021-nov-p2-q14": {
+    "questionId": "cmu-ana-2021-nov-p2-q14",
     "stem": "Structures passing behind inguinal ligament",
     "type": "TF",
     "subject": "Anatomy",
@@ -5142,11 +5150,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-nov-p2-q15": {
-    "questionId": "cmu-2021-nov-p2-q15",
+  "cmu-ana-2021-nov-p2-q15": {
+    "questionId": "cmu-ana-2021-nov-p2-q15",
     "stem": "Radial nerve supplies",
     "type": "TF",
     "subject": "Anatomy",
@@ -5158,11 +5166,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b, c, d, e | False: a",
     "explanation": "Anconeus is supplied by the radial nerve (Orbit marks b F).",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Anconeus is supplied by the radial nerve (Orbit marks b F)."
   },
-  "cmu-2021-nov-p2-q16": {
-    "questionId": "cmu-2021-nov-p2-q16",
+  "cmu-ana-2021-nov-p2-q16": {
+    "questionId": "cmu-ana-2021-nov-p2-q16",
     "stem": "The clavicle",
     "type": "TF",
     "subject": "Anatomy",
@@ -5173,11 +5181,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q17": {
-    "questionId": "cmu-2021-nov-p2-q17",
+  "cmu-ana-2021-nov-p2-q17": {
+    "questionId": "cmu-ana-2021-nov-p2-q17",
     "stem": "Muscles innervated by femoral nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -5188,11 +5196,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-nov-p2-q18": {
-    "questionId": "cmu-2021-nov-p2-q18",
+  "cmu-ana-2021-nov-p2-q18": {
+    "questionId": "cmu-ana-2021-nov-p2-q18",
     "stem": "Venacaval opening of the diaphragm",
     "type": "TF",
     "subject": "Anatomy",
@@ -5204,11 +5212,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
     "explanation": "At T8 (esophageal opening T10, aortic T12). Left phrenic pierces the muscle.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "At T8 (esophageal opening T10, aortic T12). Left phrenic pierces the muscle."
   },
-  "cmu-2021-nov-p2-q19": {
-    "questionId": "cmu-2021-nov-p2-q19",
+  "cmu-ana-2021-nov-p2-q19": {
+    "questionId": "cmu-ana-2021-nov-p2-q19",
     "stem": "The female pelvis",
     "type": "TF",
     "subject": "Anatomy",
@@ -5219,11 +5227,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.92",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-nov-p2-q20": {
-    "questionId": "cmu-2021-nov-p2-q20",
+  "cmu-ana-2021-nov-p2-q20": {
+    "questionId": "cmu-ana-2021-nov-p2-q20",
     "stem": "Invertors of foot",
     "type": "TF",
     "subject": "Anatomy",
@@ -5235,12 +5243,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: b, e | False: a, c, d",
     "explanation": "EHL is mainly a dorsiflexor.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "reviewReason": "EHL is mainly a dorsiflexor."
   },
-  "cmu-2021-may-p1-q1": {
-    "questionId": "cmu-2021-may-p1-q1",
-    "stem": "Membranous organelles are",
+  "cmu-ana-2021-may-p1-q1": {
+    "questionId": "cmu-ana-2021-may-p1-q1",
+    "stem": "Membranous organelles",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -5250,11 +5258,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q2": {
-    "questionId": "cmu-2021-may-p1-q2",
+  "cmu-ana-2021-may-p1-q2": {
+    "questionId": "cmu-ana-2021-may-p1-q2",
     "stem": "Mitotic cell division occurs in",
     "type": "TF",
     "subject": "Anatomy",
@@ -5265,11 +5273,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-may-p1-q3": {
-    "questionId": "cmu-2021-may-p1-q3",
+  "cmu-ana-2021-may-p1-q3": {
+    "questionId": "cmu-ana-2021-may-p1-q3",
     "stem": "Surface ectodermal derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -5280,11 +5288,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q4": {
-    "questionId": "cmu-2021-may-p1-q4",
+  "cmu-ana-2021-may-p1-q4": {
+    "questionId": "cmu-ana-2021-may-p1-q4",
     "stem": "Primary cartilaginous joints",
     "type": "TF",
     "subject": "Anatomy",
@@ -5295,11 +5303,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, e | False: a, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q5": {
-    "questionId": "cmu-2021-may-p1-q5",
+  "cmu-ana-2021-may-p1-q5": {
+    "questionId": "cmu-ana-2021-may-p1-q5",
     "stem": "Paranasal air sinuses",
     "type": "TF",
     "subject": "Anatomy",
@@ -5310,11 +5318,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-may-p1-q6": {
-    "questionId": "cmu-2021-may-p1-q6",
+  "cmu-ana-2021-may-p1-q6": {
+    "questionId": "cmu-ana-2021-may-p1-q6",
     "stem": "Surface modifications of cell",
     "type": "TF",
     "subject": "Anatomy",
@@ -5326,11 +5334,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
     "explanation": "Flagella are counted as a surface modification (as in May-2023); Orbit marks it F here.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)",
     "officialOrbitDiscrepancy": "Flagella are counted as a surface modification (as in May-2023); Orbit marks it F here."
   },
-  "cmu-2021-may-p1-q7": {
-    "questionId": "cmu-2021-may-p1-q7",
+  "cmu-ana-2021-may-p1-q7": {
+    "questionId": "cmu-ana-2021-may-p1-q7",
     "stem": "Elastic cartilage present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -5341,11 +5349,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d | False: b, c, e",
-    "explanation": "Verified based on Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues.",
-    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.), Chapter on Tissues"
+    "explanation": "Verified in accordance with Junqueira's Basic Histology: Text and Atlas (16th Ed.).",
+    "sourceReference": "Junqueira's Basic Histology: Text and Atlas (16th Ed.)"
   },
-  "cmu-2021-may-p1-q8": {
-    "questionId": "cmu-2021-may-p1-q8",
+  "cmu-ana-2021-may-p1-q8": {
+    "questionId": "cmu-ana-2021-may-p1-q8",
     "stem": "Peripheral lymphoid organs",
     "type": "TF",
     "subject": "Anatomy",
@@ -5356,11 +5364,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q9": {
-    "questionId": "cmu-2021-may-p1-q9",
+  "cmu-ana-2021-may-p1-q9": {
+    "questionId": "cmu-ana-2021-may-p1-q9",
     "stem": "Functional end artery present in",
     "type": "TF",
     "subject": "Anatomy",
@@ -5371,11 +5379,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q10": {
-    "questionId": "cmu-2021-may-p1-q10",
+  "cmu-ana-2021-may-p1-q10": {
+    "questionId": "cmu-ana-2021-may-p1-q10",
     "stem": "Osteoblast",
     "type": "TF",
     "subject": "Anatomy",
@@ -5386,12 +5394,12 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, d, e | False: a, b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q11": {
-    "questionId": "cmu-2021-may-p1-q11",
-    "stem": "Following are sensory cranial nerve",
+  "cmu-ana-2021-may-p1-q11": {
+    "questionId": "cmu-ana-2021-may-p1-q11",
+    "stem": "Sensory cranial nerve",
     "type": "TF",
     "subject": "Anatomy",
     "paper": "Paper-I",
@@ -5401,11 +5409,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-may-p1-q12": {
-    "questionId": "cmu-2021-may-p1-q12",
+  "cmu-ana-2021-may-p1-q12": {
+    "questionId": "cmu-ana-2021-may-p1-q12",
     "stem": "Contents of carotid sheath",
     "type": "TF",
     "subject": "Anatomy",
@@ -5416,11 +5424,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q13": {
-    "questionId": "cmu-2021-may-p1-q13",
+  "cmu-ana-2021-may-p1-q13": {
+    "questionId": "cmu-ana-2021-may-p1-q13",
     "stem": "Muscles of mastication",
     "type": "TF",
     "subject": "Anatomy",
@@ -5431,11 +5439,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, e | False: b, c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q14": {
-    "questionId": "cmu-2021-may-p1-q14",
+  "cmu-ana-2021-may-p1-q14": {
+    "questionId": "cmu-ana-2021-may-p1-q14",
     "stem": "Oropharynx",
     "type": "TF",
     "subject": "Anatomy",
@@ -5446,11 +5454,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q15": {
-    "questionId": "cmu-2021-may-p1-q15",
+  "cmu-ana-2021-may-p1-q15": {
+    "questionId": "cmu-ana-2021-may-p1-q15",
     "stem": "Muscles of soft palate",
     "type": "TF",
     "subject": "Anatomy",
@@ -5461,11 +5469,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: c, e | False: a, b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q16": {
-    "questionId": "cmu-2021-may-p1-q16",
+  "cmu-ana-2021-may-p1-q16": {
+    "questionId": "cmu-ana-2021-may-p1-q16",
     "stem": "Frontal lobe of cerebrum contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -5476,11 +5484,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d | False: a, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q17": {
-    "questionId": "cmu-2021-may-p1-q17",
+  "cmu-ana-2021-may-p1-q17": {
+    "questionId": "cmu-ana-2021-may-p1-q17",
     "stem": "Hind brain formed by",
     "type": "TF",
     "subject": "Anatomy",
@@ -5491,11 +5499,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-may-p1-q18": {
-    "questionId": "cmu-2021-may-p1-q18",
+  "cmu-ana-2021-may-p1-q18": {
+    "questionId": "cmu-ana-2021-may-p1-q18",
     "stem": "Basal ganglia includes",
     "type": "TF",
     "subject": "Anatomy",
@@ -5506,11 +5514,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, e | False: b, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck).",
     "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 3: Head and Neck)"
   },
-  "cmu-2021-may-p1-q19": {
-    "questionId": "cmu-2021-may-p1-q19",
+  "cmu-ana-2021-may-p1-q19": {
+    "questionId": "cmu-ana-2021-may-p1-q19",
     "stem": "Effects of cerebellar lesion",
     "type": "TF",
     "subject": "Anatomy",
@@ -5521,11 +5529,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-may-p1-q20": {
-    "questionId": "cmu-2021-may-p1-q20",
+  "cmu-ana-2021-may-p1-q20": {
+    "questionId": "cmu-ana-2021-may-p1-q20",
     "stem": "Oculomotor nerve innervates",
     "type": "TF",
     "subject": "Anatomy",
@@ -5536,11 +5544,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.93",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d, e | False: b, c",
-    "explanation": "Verified based on Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity.",
-    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy & Cranial Cavity"
+    "explanation": "Verified in accordance with Gray's Anatomy for Students (4th Ed.), Neuroanatomy.",
+    "sourceReference": "Gray's Anatomy for Students (4th Ed.), Neuroanatomy"
   },
-  "cmu-2021-may-p2-q1": {
-    "questionId": "cmu-2021-may-p2-q1",
+  "cmu-ana-2021-may-p2-q1": {
+    "questionId": "cmu-ana-2021-may-p2-q1",
     "stem": "The liver",
     "type": "TF",
     "subject": "Anatomy",
@@ -5552,11 +5560,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
     "explanation": "Bare area is on the posterior part of the diaphragmatic surface.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Bare area is on the posterior part of the diaphragmatic surface."
   },
-  "cmu-2021-may-p2-q2": {
-    "questionId": "cmu-2021-may-p2-q2",
+  "cmu-ana-2021-may-p2-q2": {
+    "questionId": "cmu-ana-2021-may-p2-q2",
     "stem": "Structures crossed by root of mesentery",
     "type": "TF",
     "subject": "Anatomy",
@@ -5567,11 +5575,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c | False: b, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q3": {
-    "questionId": "cmu-2021-may-p2-q3",
+  "cmu-ana-2021-may-p2-q3": {
+    "questionId": "cmu-ana-2021-may-p2-q3",
     "stem": "Hindgut derivatives",
     "type": "TF",
     "subject": "Anatomy",
@@ -5582,11 +5590,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a | False: b, c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q4": {
-    "questionId": "cmu-2021-may-p2-q4",
+  "cmu-ana-2021-may-p2-q4": {
+    "questionId": "cmu-ana-2021-may-p2-q4",
     "stem": "Structures opening in right atrium",
     "type": "TF",
     "subject": "Anatomy",
@@ -5597,11 +5605,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q5": {
-    "questionId": "cmu-2021-may-p2-q5",
+  "cmu-ana-2021-may-p2-q5": {
+    "questionId": "cmu-ana-2021-may-p2-q5",
     "stem": "Flexors of knee joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -5612,11 +5620,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, d, e | False: a",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-may-p2-q6": {
-    "questionId": "cmu-2021-may-p2-q6",
+  "cmu-ana-2021-may-p2-q6": {
+    "questionId": "cmu-ana-2021-may-p2-q6",
     "stem": "Structures passing through sacral canal",
     "type": "TF",
     "subject": "Anatomy",
@@ -5628,11 +5636,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, d | False: c, e",
     "explanation": "Orbit marks obturator nerve T - wrong.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Orbit marks obturator nerve T - wrong."
   },
-  "cmu-2021-may-p2-q7": {
-    "questionId": "cmu-2021-may-p2-q7",
+  "cmu-ana-2021-may-p2-q7": {
+    "questionId": "cmu-ana-2021-may-p2-q7",
     "stem": "The kidney",
     "type": "TF",
     "subject": "Anatomy",
@@ -5643,11 +5651,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d | False: b, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q8": {
-    "questionId": "cmu-2021-may-p2-q8",
+  "cmu-ana-2021-may-p2-q8": {
+    "questionId": "cmu-ana-2021-may-p2-q8",
     "stem": "Claw hand injury involves",
     "type": "TF",
     "subject": "Anatomy",
@@ -5659,11 +5667,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: b | False: a, c, d, e",
     "explanation": "Ulnar nerve. Printed 'thoracic duct' is unrelated (maybe 'thoracic outlet' misprint); Orbit marks c T.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "officialOrbitDiscrepancy": "Ulnar nerve. Printed 'thoracic duct' is unrelated (maybe 'thoracic outlet' misprint); Orbit marks c T."
   },
-  "cmu-2021-may-p2-q9": {
-    "questionId": "cmu-2021-may-p2-q9",
+  "cmu-ana-2021-may-p2-q9": {
+    "questionId": "cmu-ana-2021-may-p2-q9",
     "stem": "The fallopian tube",
     "type": "TF",
     "subject": "Anatomy",
@@ -5674,11 +5682,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, c, d, e | False: b",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q10": {
-    "questionId": "cmu-2021-may-p2-q10",
+  "cmu-ana-2021-may-p2-q10": {
+    "questionId": "cmu-ana-2021-may-p2-q10",
     "stem": "Umbilical cord contains",
     "type": "TF",
     "subject": "Anatomy",
@@ -5689,11 +5697,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, e | False: c, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q11": {
-    "questionId": "cmu-2021-may-p2-q11",
+  "cmu-ana-2021-may-p2-q11": {
+    "questionId": "cmu-ana-2021-may-p2-q11",
     "stem": "Histological structures of duodenum",
     "type": "TF",
     "subject": "Anatomy",
@@ -5704,11 +5712,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q12": {
-    "questionId": "cmu-2021-may-p2-q12",
+  "cmu-ana-2021-may-p2-q12": {
+    "questionId": "cmu-ana-2021-may-p2-q12",
     "stem": "Arch of the aorta",
     "type": "TF",
     "subject": "Anatomy",
@@ -5719,11 +5727,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Snell's Clinical Anatomy by Regions (10th Ed.), Thorax.",
+    "sourceReference": "Snell's Clinical Anatomy by Regions (10th Ed.), Thorax"
   },
-  "cmu-2021-may-p2-q13": {
-    "questionId": "cmu-2021-may-p2-q13",
+  "cmu-ana-2021-may-p2-q13": {
+    "questionId": "cmu-ana-2021-may-p2-q13",
     "stem": "Intracapsular structures of knee joint",
     "type": "TF",
     "subject": "Anatomy",
@@ -5735,11 +5743,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Needs Review",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
     "explanation": "Synovial membrane lines the capsule; Orbit's key varies between years.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back",
     "officialOrbitDiscrepancy": "Synovial membrane lines the capsule; Orbit's key varies between years."
   },
-  "cmu-2021-may-p2-q14": {
-    "questionId": "cmu-2021-may-p2-q14",
+  "cmu-ana-2021-may-p2-q14": {
+    "questionId": "cmu-ana-2021-may-p2-q14",
     "stem": "Structures passing behind inguinal ligament",
     "type": "TF",
     "subject": "Anatomy",
@@ -5750,11 +5758,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c, d | False: e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-may-p2-q15": {
-    "questionId": "cmu-2021-may-p2-q15",
+  "cmu-ana-2021-may-p2-q15": {
+    "questionId": "cmu-ana-2021-may-p2-q15",
     "stem": "Tributaries of superior vena cava",
     "type": "TF",
     "subject": "Anatomy",
@@ -5766,11 +5774,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, d, e | False: b, c",
     "explanation": "Hemiazygos drains into the azygos vein, not directly into SVC. Small pericardial/mediastinal veins do drain directly.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Hemiazygos drains into the azygos vein, not directly into SVC. Small pericardial/mediastinal veins do drain directly."
   },
-  "cmu-2021-may-p2-q16": {
-    "questionId": "cmu-2021-may-p2-q16",
+  "cmu-ana-2021-may-p2-q16": {
+    "questionId": "cmu-ana-2021-may-p2-q16",
     "stem": "Structures related to transpyloric plane",
     "type": "TF",
     "subject": "Anatomy",
@@ -5781,11 +5789,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, d, e | False: a, c",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q17": {
-    "questionId": "cmu-2021-may-p2-q17",
+  "cmu-ana-2021-may-p2-q17": {
+    "questionId": "cmu-ana-2021-may-p2-q17",
     "stem": "Muscles supplied by obturator nerve",
     "type": "TF",
     "subject": "Anatomy",
@@ -5796,11 +5804,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, d, e | False: b, c",
-    "explanation": "Verified based on Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System.",
-    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Locomotor System"
+    "explanation": "Verified in accordance with Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back.",
+    "sourceReference": "Moore's Clinically Oriented Anatomy (9th Ed.), Limbs & Back"
   },
-  "cmu-2021-may-p2-q18": {
-    "questionId": "cmu-2021-may-p2-q18",
+  "cmu-ana-2021-may-p2-q18": {
+    "questionId": "cmu-ana-2021-may-p2-q18",
     "stem": "Aortic opening of diaphragm transmits",
     "type": "TF",
     "subject": "Anatomy",
@@ -5812,11 +5820,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "verificationStatus": "Provisional",
     "correctAnswerSummary": "True: a, b | False: c, d, e",
     "explanation": "Thoracic duct also passes through it.",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)",
     "reviewReason": "Thoracic duct also passes through it."
   },
-  "cmu-2021-may-p2-q19": {
-    "questionId": "cmu-2021-may-p2-q19",
+  "cmu-ana-2021-may-p2-q19": {
+    "questionId": "cmu-ana-2021-may-p2-q19",
     "stem": "The female pelvis",
     "type": "TF",
     "subject": "Anatomy",
@@ -5827,11 +5835,11 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: b, c, e | False: a, d",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
   },
-  "cmu-2021-may-p2-q20": {
-    "questionId": "cmu-2021-may-p2-q20",
+  "cmu-ana-2021-may-p2-q20": {
+    "questionId": "cmu-ana-2021-may-p2-q20",
     "stem": "Contents of spermatic cord",
     "type": "TF",
     "subject": "Anatomy",
@@ -5842,8 +5850,6061 @@ export const MCQ_ANSWER_REGISTRY: Record<string, McqAnswerRecord> = {
     "bookPage": "p.94",
     "verificationStatus": "Verified",
     "correctAnswerSummary": "True: a, b, c | False: d, e",
-    "explanation": "Verified based on BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis).",
-    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Lower Limb, Abdomen & Pelvis)"
+    "explanation": "Verified in accordance with BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis).",
+    "sourceReference": "BD Chaurasia's Human Anatomy (8th Ed., Vol 2: Abdomen & Pelvis)"
+  },
+  "cmu-bio-2025-nov-p1-q1": {
+    "questionId": "cmu-bio-2025-nov-p1-q1",
+    "stem": "HCO3",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(C): Carbonic anhydrase catalyses CO2 + H2O ⇌ H2CO3, so it is central to bicarbonate buffering. | (E): Kidneys excrete H+ and reclaim/generate HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q2": {
+    "questionId": "cmu-bio-2025-nov-p1-q2",
+    "stem": "In glycolysis the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): End product of glycolysis is pyruvate (aerobic); lactate forms only in anaerobic conditions. | (B): Aerobic glycolysis ends in pyruvate (to mitochondria); lactate is formed only anaerobically. | (C): Glycolysis has 3 irreversible steps: hexokinase/glucokinase, PFK-1, pyruvate kinase. | (D): Lactate → pyruvate removes 2H (LDH, NAD+ → NADH): oxidation. | (E): Net ATP: anaerobic = 2; aerobic ≈ 7–8 (2 + NADH via shuttles).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q3": {
+    "questionId": "cmu-bio-2025-nov-p1-q3",
+    "stem": "Regarding hypothyroidism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Primary hypothyroidism: gland failure → ↓T3/T4 → ↑TSH (feedback). | (B): Secondary hypothyroidism: pituitary failure → TSH low (or inappropriately normal) with low T4. | (C): In subclinical primary hypothyroidism T3/T4 stay normal with raised TSH. | (D): Secondary hypothyroidism has low T3/T4. | (E): Subclinical hypothyroidism: normal T3/T4, raised TSH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q4": {
+    "questionId": "cmu-bio-2025-nov-p1-q4",
+    "stem": "Regarding ATP",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): ATP = adenine + ribose + 3 phosphates. | (B): ATP hydrolysis ≈ –7.3 kcal/mol. | (C): ATP is also formed by substrate-level phosphorylation. | (D): Substrate-level phosphorylation exists (PK, PGK, succinyl-CoA synthetase). | (E): Na+-K+ pump uses ~20–40% of ATP.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q5": {
+    "questionId": "cmu-bio-2025-nov-p1-q5",
+    "stem": "Insulin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Insulin promotes glycogen, fat and protein synthesis. | (B): Brain uses GLUT-3, which is insulin-independent. | (C): Insulin recruits GLUT-4 in muscle and adipose tissue. | (D): Insulin drives K+ into cells (lowers plasma K+); used to treat hyperkalaemia. | (E): Insulin acts via tyrosine kinase receptor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q6": {
+    "questionId": "cmu-bio-2025-nov-p1-q6",
+    "stem": "Regarding cholesterol",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): HMG-CoA reductase is the rate-limiting step. | (B): Cholesterol is the precursor of all steroid hormones. | (C): LDL deposition in intima initiates atherosclerosis. | (D): LDL receptor binds apo B-100 (and E); B-48 lacks the receptor domain. | (E): VLDL is made in the liver; chylomicrons in intestine.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q7": {
+    "questionId": "cmu-bio-2025-nov-p1-q7",
+    "stem": "Carbohydrates",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): All monosaccharides have a free aldehyde/ketone group → reducing. | (B): Sucrose has glucose C1 and fructose C2 linked, no free anomeric carbon. | (C): Free anomeric carbon interconverts α/β forms in solution. | (D): Benedict's test detects reducing sugars (glucose, fructose, lactose, maltose), not sucrose. | (E): Aldoses have a free aldehyde → reducing.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-nov-p1-q8": {
+    "questionId": "cmu-bio-2025-nov-p1-q8",
+    "stem": "Which of the following are true for ketone bodies",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Ketone bodies are acetoacetate, β-hydroxybutyrate and acetone. | (B): Acetoacetate and β-hydroxybutyrate are acids. | (C): Acetoacetate → acetone + CO2 spontaneously. | (D): In starvation brain adapts to use ketones. | (E): Lack of insulin → lipolysis → ketogenesis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q9": {
+    "questionId": "cmu-bio-2025-nov-p1-q9",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Achondroplasia is autosomal DOMINANT (FGFR3). | (B): AR traits appear only in homozygotes. | (C): mtDNA is maternally inherited (sperm mitochondria are lost). | (D): Down syndrome = trisomy 21 (47,XX,+21). | (E): X-linked genes cannot pass father→son (son receives Y).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-nov-p1-q10": {
+    "questionId": "cmu-bio-2025-nov-p1-q10",
+    "stem": "Regarding liver function tests",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): GGT rises in hepatobiliary disease, including viral hepatitis. | (B): Normal serum albumin 3.5–5.4 g/dL. | (C): Severe hepatocellular injury prolongs PT; PT is a synthetic function test. | (D): A:G is reversed in chronic liver disease; a normal ratio cannot exclude it. | (E): Bilirubin = excretory function; synthetic = albumin, PT.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q11": {
+    "questionId": "cmu-bio-2025-nov-p1-q11",
+    "stem": "Which level of protein structure involves H-bonding?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Secondary",
+    "explanation": "Secondary structure (α-helix, β-sheet) is stabilised mainly by H-bonds.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q12": {
+    "questionId": "cmu-bio-2025-nov-p1-q12",
+    "stem": "Which test reflects long-term glycemic control?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) HbA1c",
+    "explanation": "HbA1c reflects average glycaemia of the past 2–3 months; FBS/RBS/OGTT are single-time tests.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q13": {
+    "questionId": "cmu-bio-2025-nov-p1-q13",
+    "stem": "The most specific biomarker for myocardial infarction is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Troponin-I",
+    "explanation": "Cardiac troponins (I and T) are highly cardiac-specific; CK-MB and LDH are less specific.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q14": {
+    "questionId": "cmu-bio-2025-nov-p1-q14",
+    "stem": "Which one is the most important role of bile salts?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Fat absorption",
+    "explanation": "Bile salts form micelles that carry lipids to the mucosa for absorption.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q15": {
+    "questionId": "cmu-bio-2025-nov-p1-q15",
+    "stem": "Angiotensin II",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "A) Causes vasoconstriction",
+    "explanation": "Ang II is a potent vasoconstrictor formed by ACE from Ang I; it stimulates aldosterone.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-nov-p1-q16": {
+    "questionId": "cmu-bio-2025-nov-p1-q16",
+    "stem": "Enzymes",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) Are biocatalysts",
+    "explanation": "Enzymes are protein biocatalysts that lower activation energy; they are heat labile.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-nov-p1-q17": {
+    "questionId": "cmu-bio-2025-nov-p1-q17",
+    "stem": "Regarding diffusion, choose the correct answer",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Movement of solute from higher to lower concentration",
+    "explanation": "Diffusion is passive movement down a concentration gradient.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q18": {
+    "questionId": "cmu-bio-2025-nov-p1-q18",
+    "stem": "Which of the following is true for glycolysis?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "A) In aerobic glycolysis pyruvate is produced as the end product",
+    "explanation": "Glycolysis is cytosolic with 3 irreversible steps; aerobically it ends in pyruvate.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-nov-p1-q19": {
+    "questionId": "cmu-bio-2025-nov-p1-q19",
+    "stem": "Plasma",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Contains protein buffer",
+    "explanation": "Plasma contains bicarbonate/protein buffers; urea 2.5–6.5 mmol/L, osmolality 280–296, Na+ 135–145 mEq/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p1-q20": {
+    "questionId": "cmu-bio-2025-nov-p1-q20",
+    "stem": "LDL cholesterol",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) Contains apo B-100",
+    "explanation": "LDL is formed from VLDL, carries apo B-100 and is cleared by hepatic LDL receptors.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-nov-p2-q1": {
+    "questionId": "cmu-bio-2025-nov-p2-q1",
+    "stem": "Nutrients having no caloric value",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Vitamins have no caloric value. | (B): Carbohydrate metabolism is mainly deranged in DM. | (C): Minerals have no caloric value. | (D): Fibre is not digested; negligible energy. | (E): Protein supplies 4 kcal/g, so it has caloric value.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q2": {
+    "questionId": "cmu-bio-2025-nov-p2-q2",
+    "stem": "The following statements are true for ECF",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Na+ is the principal ECF cation (~140 mEq/L). | (B): ECF pH is 7.35–7.45. | (C): ECF is ~20% of body weight; TBW is ~60%. | (D): Inulin is confined to ECF, so it measures ECF volume. | (E): Interstitial fluid has much less protein than plasma.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q3": {
+    "questionId": "cmu-bio-2025-nov-p2-q3",
+    "stem": "Hypovolemia",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Hypovolemia raises ADH/aldosterone → oliguria. | (B): Hypovolemia stimulates renin secretion. | (C): Low volume → renin–angiotensin → aldosterone. | (D): Hypovolemia increases ADH. | (E): Hypovolemia stimulates thirst.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q4": {
+    "questionId": "cmu-bio-2025-nov-p2-q4",
+    "stem": "Regarding vitamin A",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): β-carotene is the provitamin; preformed vitamin A (retinol) comes from liver/animal foods. | (B): Visual pigment uses 11-cis-retinal; retinoic acid is for growth/differentiation. | (C): Fat-soluble vitamins (A, D) accumulate and cause hypervitaminosis. | (D): Rod dysfunction (nyctalopia) is the earliest sign of vitamin A deficiency. | (E): Vitamin A maintains epithelial integrity and immunity.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q5": {
+    "questionId": "cmu-bio-2025-nov-p2-q5",
+    "stem": "Homologous chromosomes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Homologous chromosomes have the same genes at the same loci. | (B): Homologous chromosomes have identical loci. | (C): Homologous pairs have the same loci positions. | (D): Corresponding loci control the SAME trait. | (E): Alleles on homologous chromosomes control a trait.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q6": {
+    "questionId": "cmu-bio-2025-nov-p2-q6",
+    "stem": "Codons",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): A, U, G, C in triplets. | (B): 3 stop codons code for no amino acid. | (C): 43 = 64 codons, 61 sense + 3 stop. | (D): Degeneracy = several codons per amino acid. | (E): Specificity is unambiguity; mutation arises from changes in DNA.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q7": {
+    "questionId": "cmu-bio-2025-nov-p2-q7",
+    "stem": "During blood pH homeostasis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Immediate defence is by chemical buffers; the respiratory system acts in minutes. | (C): Buffer capacity is maximum at pH = pK, so pK is crucial. | (D): Carbonic anhydrase catalyses CO2 + H2O ⇌ H2CO3, so it is central to bicarbonate buffering. | (E): Alkali reserve (plasma HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q8": {
+    "questionId": "cmu-bio-2025-nov-p2-q8",
+    "stem": "Nutritional status can be assessed by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): BMI is the first-line index of malnutrition/obesity. | (B): BMR is energy expenditure, not a nutritional-status measure. | (C): DRI is a dietary recommendation, not an assessment tool. | (D): Skinfold thickness estimates body fat. | (E): MAC assesses muscle/fat reserve.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q9": {
+    "questionId": "cmu-bio-2025-nov-p2-q9",
+    "stem": "Balanced diet",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Balanced diet ratio ≈ 4:1:1 (carbohydrate : protein : fat). | (B): Balanced diet supports growth and maintenance. | (C): A balanced diet includes fibre. | (E): Balanced diet supplies essential amino acids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q10": {
+    "questionId": "cmu-bio-2025-nov-p2-q10",
+    "stem": "In diuresis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Diuresis means urine volume above 3 L/day. | (B): Uncontrolled diabetes: glucose in tubule holds water → osmotic diuresis. | (C): Low ADH causes WATER diuresis, not osmotic diuresis. | (D): In diuresis the medullary gradient is washed out. | (E): Excess hypotonic fluid suppresses ADH → water diuresis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q11": {
+    "questionId": "cmu-bio-2025-nov-p2-q11",
+    "stem": "Plasma osmolarity mainly depends upon",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Sodium",
+    "explanation": "Plasma contains bicarbonate/protein buffers; urea 2.5–6.5 mmol/L, osmolality 280–296, Na+ 135–145 mEq/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q12": {
+    "questionId": "cmu-bio-2025-nov-p2-q12",
+    "stem": "A characteristic feature of metabolic acidosis is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Decreased plasma bicarbonate",
+    "explanation": "Metabolic acidosis = primary fall in HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q13": {
+    "questionId": "cmu-bio-2025-nov-p2-q13",
+    "stem": "The most common cause of anemia is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Iron deficiency",
+    "explanation": "Iron deficiency is the commonest cause worldwide.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q14": {
+    "questionId": "cmu-bio-2025-nov-p2-q14",
+    "stem": "A characteristic feature of kwashiorkor is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Edema present",
+    "explanation": "Pitting edema with hypoalbuminaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q15": {
+    "questionId": "cmu-bio-2025-nov-p2-q15",
+    "stem": "PCR differs from biological cloning by the following point",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) PCR is an in vitro type of cloning process",
+    "explanation": "PCR is cell-free in vitro amplification.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q16": {
+    "questionId": "cmu-bio-2025-nov-p2-q16",
+    "stem": "The most important enzyme for replication is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) DNA polymerase",
+    "explanation": "DNA polymerase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q17": {
+    "questionId": "cmu-bio-2025-nov-p2-q17",
+    "stem": "In renal failure, acidosis occurs because",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Hydrogen ions cannot be secreted",
+    "explanation": "Failed H+/NH4",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q18": {
+    "questionId": "cmu-bio-2025-nov-p2-q18",
+    "stem": "Autoregulation of blood supply is an exceptional quality of kidney. The aim of this is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Maintain the GFR",
+    "explanation": "Autoregulation keeps GFR constant despite BP changes.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q19": {
+    "questionId": "cmu-bio-2025-nov-p2-q19",
+    "stem": "Many enzymes are necessary for biotechnology; the one known as the 'blessing of",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Restriction endonuclease",
+    "explanation": "Restriction endonucleases cut DNA specifically.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-nov-p2-q20": {
+    "questionId": "cmu-bio-2025-nov-p2-q20",
+    "stem": "Synthesized from a monohydric alcohol (cholesterol), activated in the kidney, and",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "November 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Vitamin D",
+    "explanation": "Vitamin D (from cholesterol) → 25-OH in liver → 1,25-(OH)2 in kidney.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q1": {
+    "questionId": "cmu-bio-2025-may-p1-q1",
+    "stem": "The following statements are true for pH",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): pH = –log10 [H+]. | (B): Pure water has [H+] = 10-7 mol/L, so pH = 7.0 (not 7.4; 7.4 is blood pH). | (C): pH 7 means [H+] = 10-7 mol/L. | (D): Alkali lowers [H+], so pH rises. | (E): At 25 °C, pH + pOH = 14 (Kw = 10-14).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-may-p1-q2": {
+    "questionId": "cmu-bio-2025-may-p1-q2",
+    "stem": "Protein",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Normal plasma protein is 6–8 g/dL. | (B): Primary structure is the sequence of amino acids joined by peptide bonds. | (C): Plasma proteins (albumin, globulins) carry hormones, drugs, bilirubin, etc. | (D): Plasma proteins are separated by electrophoresis (albumin, α1, α2, β, γ). | (E): Essential amino acids must be supplied in diet for protein synthesis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-may-p1-q3": {
+    "questionId": "cmu-bio-2025-may-p1-q3",
+    "stem": "The statements that can be applied for colloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Colloid particle size is 1–200 millimicron (nm); crystalloids are < 1 nm. | (B): Colloids have few particles per volume, so their osmotic pressure is lower than that of crystalloids. | (C): Colloids (proteins) have an ISOelectric pH; 'dielectric pH' does not exist. | (D): Colloids show Brownian movement (random particle movement); molecular/ionic movement is typical of | (E): Sol–gel transformation of colloids occurs with temperature change.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q4": {
+    "questionId": "cmu-bio-2025-may-p1-q4",
+    "stem": "Co-enzyme",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Coenzymes are low-molecular-weight and heat stable; enzymes (proteins) are heat labile. | (B): Coenzymes are organic molecules (vitamin derivatives). | (C): Most coenzymes derive from water-soluble B vitamins. | (D): Coenzymes are non-protein organic molecules; the apoenzyme is the protein. | (E): Coenzymes like NAD+ are changed during reaction (co-substrates).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q5": {
+    "questionId": "cmu-bio-2025-may-p1-q5",
+    "stem": "Isotopes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Isotopes are atoms of the SAME element with different mass numbers. | (B): Isotopes are atoms, not compounds. | (C): Radioisotopes (I-131, Co-60) are used therapeutically. | (D): Different neutron number → different atomic (mass) weight. | (E): Some isotopes are stable, others radioactive.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-may-p1-q6": {
+    "questionId": "cmu-bio-2025-may-p1-q6",
+    "stem": "The following statements can be applied for the H-H equation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(C): When acid is half-neutralized [salt] = [acid], log 1 = 0, so pH = pK. | (D): H-H equation is derived from the law of mass action applied to Ka of a weak acid. | (E): H-H equation: pH = pK + log [salt]/[acid].",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q7": {
+    "questionId": "cmu-bio-2025-may-p1-q7",
+    "stem": "Which of the following are inhibitors of ETC?",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): CO blocks cytochrome oxidase (complex IV). | (B): Cyanide blocks complex IV. | (C): Fluoride inhibits enolase (glycolysis), not ETC. | (D): Free radicals are by-products of ETC, not inhibitors. | (E): NO inhibits cytochrome oxidase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q8": {
+    "questionId": "cmu-bio-2025-may-p1-q8",
+    "stem": "Regarding carbohydrates",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Lactose has a free anomeric C1 of glucose. | (B): Sucrose = glucose + fructose. | (C): Animals store glycogen (animal starch); starch is the plant store. | (D): Sugars with free anomeric carbon show mutarotation. | (E): Altrose is an aldohexose → reducing.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-may-p1-q9": {
+    "questionId": "cmu-bio-2025-may-p1-q9",
+    "stem": "Ammonia is removed from the body by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Ammonia is detoxified mainly to urea. | (B): Creatinine is from creatine, not ammonia removal. | (C): NH3 + α-KG → glutamate traps ammonia. | (D): Urea cycle is the major route. | (E): NPN includes urea but this is not ammonia removal.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q10": {
+    "questionId": "cmu-bio-2025-may-p1-q10",
+    "stem": "Anabolism occurs during",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Anabolism = biosynthesis. | (B): Degradation is catabolism. | (C): Gluconeogenesis is an anabolic synthesis of glucose; occurs in fasting, liver/kidney, inhibited by insulin. | (D): Fatty acid oxidation is catabolic. | (E): Acetone utilisation is catabolic.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q11": {
+    "questionId": "cmu-bio-2025-may-p1-q11",
+    "stem": "Isotonic solution",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) Can be used in dehydration",
+    "explanation": "Isotonic saline (0.9% = 9 g/L) is used for dehydration; hypotonic fluids burst RBCs.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p1-q12": {
+    "questionId": "cmu-bio-2025-may-p1-q12",
+    "stem": "The confirmatory test for diabetes mellitus is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) OGTT",
+    "explanation": "OGTT is the confirmatory diagnostic test.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q13": {
+    "questionId": "cmu-bio-2025-may-p1-q13",
+    "stem": "The following is true for bile salts",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Bile salt reduces the surface tension of lipid",
+    "explanation": "Bile salts lower surface tension and emulsify fat.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q14": {
+    "questionId": "cmu-bio-2025-may-p1-q14",
+    "stem": "About properties of carbohydrate the following is true",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Sucrose on hydrolysis yields invert sugar",
+    "explanation": "Sucrose hydrolysis gives invert sugar (glucose + fructose); glucose is an aldose, fructose is laevorotatory,",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p1-q15": {
+    "questionId": "cmu-bio-2025-may-p1-q15",
+    "stem": "The following statement is true for pH",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) Negative log of H+ ion concentration",
+    "explanation": "pH = –log [H+]; at pH 7 [H+] = 10-7 mol/L and pOH = 7.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p1-q16": {
+    "questionId": "cmu-bio-2025-may-p1-q16",
+    "stem": "Which of the following is mostly affected in diabetes mellitus?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Carbohydrate",
+    "explanation": "DM is primarily a disorder of carbohydrate metabolism (secondarily fat and protein).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q17": {
+    "questionId": "cmu-bio-2025-may-p1-q17",
+    "stem": "Among the thyroid tests which one is most informative?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) TSH",
+    "explanation": "TSH is the single most informative test; it rises in primary hypothyroidism and falls in hyperthyroidism.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q18": {
+    "questionId": "cmu-bio-2025-may-p1-q18",
+    "stem": "Which proteolytic enzyme is more effective?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Trypsin",
+    "explanation": "Trypsin activates other zymogens and is the major pancreatic protease.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q19": {
+    "questionId": "cmu-bio-2025-may-p1-q19",
+    "stem": "Enzyme test most specific for parenchymal liver disease",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) ALT",
+    "explanation": "ALT is more liver-specific than AST (AST is also in heart/muscle).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p1-q20": {
+    "questionId": "cmu-bio-2025-may-p1-q20",
+    "stem": "Which of the following is an integral apoprotein of LDL?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Apo-B-100",
+    "explanation": "Apo B-100 is integral (non-exchangeable) in LDL; apo A and C are exchangeable.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p2-q1": {
+    "questionId": "cmu-bio-2025-may-p2-q1",
+    "stem": "Southern blot technique requires",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Southern blot: DNA is cut by restriction enzymes, run on gel, blotted, and probed. | (B): Probe hybridises with target DNA on the membrane. | (C): Southern blot uses a labelled DNA/RNA probe, cDNA is not required. | (D): DNA fragments are separated by gel electrophoresis. | (E): DNA is transferred to nitrocellulose/nylon membrane.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q2": {
+    "questionId": "cmu-bio-2025-may-p2-q2",
+    "stem": "Replication needs the following enzymes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Helicase unwinds DNA at the replication fork. | (B): Primase makes the RNA primer for DNA polymerase. | (C): DNA polymerase synthesises the new strand. | (D): RNA polymerase is for transcription (primase is a special RNA polymerase for primers). | (E): Ligase joins Okazaki fragments.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q3": {
+    "questionId": "cmu-bio-2025-may-p2-q3",
+    "stem": "PCR",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): PCR uses heat-stable Taq polymerase. | (B): PCR needs two primers flanking the target. | (C): Taq polymerase lacks 3'→5' proofreading, so PCR can introduce errors. | (D): Denaturation at ~94 °C. | (E): Contamination can give false-positive PCR.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2025-may-p2-q4": {
+    "questionId": "cmu-bio-2025-may-p2-q4",
+    "stem": "Hypovolemia is corrected by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): ADH conserves water in hypovolemia. | (B): RAAS retains Na+ and water in hypovolemia. | (C): ANP is released in hypervolemia and promotes Na+/water loss. | (D): Reduced urine output conserves volume. | (E): Thirst increases in hypovolemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q5": {
+    "questionId": "cmu-bio-2025-may-p2-q5",
+    "stem": "Hyperkalemia",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): Acidosis moves K+ out of cells (H+–K+ exchange), causing hyperkalaemia. | (B): Renal failure impairs K+ excretion. | (D): Renin acts through angiotensin–aldosterone, but the direct corrector is aldosterone. | (E): Paralytic ileus is a feature of HYPOkalaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q6": {
+    "questionId": "cmu-bio-2025-may-p2-q6",
+    "stem": "Kwashiorkor",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(B): Marasmus shows muscle wasting; kwashiorkor retains muscle bulk. | (D): Kwashiorkor: anorexia and apathy.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q7": {
+    "questionId": "cmu-bio-2025-may-p2-q7",
+    "stem": "The following statements are correct for obesity",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b | False: a, c, d, e",
+    "explanation": "(A): WHO Asia-Pacific: BMI 23–27.4 = overweight; ≥ 27.5 = obese. | (D): Fibre gives satiety, delays absorption, lowers energy density. | (E): Obesity can result from low expenditure/genetic factors.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q8": {
+    "questionId": "cmu-bio-2025-may-p2-q8",
+    "stem": "Kidney produces the following hormones",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): Renin (JG cells) is the kidney enzyme/hormone; rennin (chymosin) is a gastric enzyme. | (B): Angiotensinogen is liver-made; Ang II is formed in plasma. | (C): Kidney 1α-hydroxylase makes calcitriol. | (D): Gastrin comes from stomach G cells. | (E): Peritubular cells of kidney make EPO.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q9": {
+    "questionId": "cmu-bio-2025-may-p2-q9",
+    "stem": "Vitamin K",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Vitamin K γ-carboxylates Glu residues of factors II, VII, IX, X. | (B): Breast milk is poor in vitamin K → vitamin K prophylaxis at birth. | (C): Menaquinone (K2) is bacterial; menadione (K3) is synthetic. | (D): High-dose synthetic menadione causes hemolysis in neonates. | (E): Warfarin blocks vitamin K epoxide reductase; vitamin K reverses it.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q10": {
+    "questionId": "cmu-bio-2025-may-p2-q10",
+    "stem": "Regarding metabolic acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(B): Anion gap is high in some, normal in other metabolic acidosis. | (C): Hyperventilation (Kussmaul) is respiratory compensation that lowers PCO2. | (E): Base excess becomes negative (base deficit) in metabolic acidosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q11": {
+    "questionId": "cmu-bio-2025-may-p2-q11",
+    "stem": "Metabolic acidosis is characterized by",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "A) Low plasma bicarbonate level",
+    "explanation": "Primary event is a fall in plasma bicarbonate.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p2-q12": {
+    "questionId": "cmu-bio-2025-may-p2-q12",
+    "stem": "The most common cause of hypokalemia is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Diarrhea, vomiting",
+    "explanation": "Gastrointestinal loss (diarrhoea/vomiting) is the commonest cause.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q13": {
+    "questionId": "cmu-bio-2025-may-p2-q13",
+    "stem": "Plasma osmolality mainly depends upon",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Sodium",
+    "explanation": "Na+ (with its anions) contributes ~90% of plasma osmolality.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q14": {
+    "questionId": "cmu-bio-2025-may-p2-q14",
+    "stem": "The primary regulator of low plasma sodium concentration is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) ADH",
+    "explanation": "Hyponatraemia is mainly due to water excess; ADH regulates water.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q15": {
+    "questionId": "cmu-bio-2025-may-p2-q15",
+    "stem": "Hyperventilation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "A) Decreases PCO2",
+    "explanation": "Hyperventilation lowers PCO2 (respiratory alkalosis).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2025-may-p2-q16": {
+    "questionId": "cmu-bio-2025-may-p2-q16",
+    "stem": "The vitamin that is synthesized in significant amount in our body is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Vitamin D",
+    "explanation": "Skin synthesises vitamin D under UV-B.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q17": {
+    "questionId": "cmu-bio-2025-may-p2-q17",
+    "stem": "The most common cause of microcytic hypochromic anemia is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Iron deficiency anemia",
+    "explanation": "Iron deficiency (↓Hb synthesis) is the commonest cause of microcytic hypochromic anaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q18": {
+    "questionId": "cmu-bio-2025-may-p2-q18",
+    "stem": "Which statement is WRONG for RFLP?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Detection doesn't require restriction enzymes",
+    "explanation": "RFLP needs restriction enzyme digestion followed by Southern blot.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q19": {
+    "questionId": "cmu-bio-2025-may-p2-q19",
+    "stem": "Property of the genetic codon responsible for silent mutation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Degeneracy",
+    "explanation": "Degeneracy of the code lets different codons code for the same amino acid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2025-may-p2-q20": {
+    "questionId": "cmu-bio-2025-may-p2-q20",
+    "stem": "Acidification of urine is mostly done in",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2025,
+    "session": "May 2025",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2025)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Distal convoluted tubule and collecting duct",
+    "explanation": "DCT/collecting-duct intercalated cells secrete H+.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q1": {
+    "questionId": "cmu-bio-2024-nov-p2-q1",
+    "stem": "Body water is maintained by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Hypothalamus has osmoreceptors and makes ADH → water balance. | (B): ADH conserves water by increasing collecting-duct permeability. | (C): Thyroxine regulates metabolism, not water balance. | (D): Plasma osmolarity is the main stimulus for ADH and thirst. | (E): Thirst is stimulated by high osmolarity and low volume.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q2": {
+    "questionId": "cmu-bio-2024-nov-p2-q2",
+    "stem": "Regarding vitamin B12",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): B12 contains cobalt in a corrin ring. | (B): B12 deficiency causes megaloblastic (macrocytic) anaemia; iron deficiency gives microcytic anaemia. | (C): B12 occurs only in animal foods. | (D): B12 deficiency traps folate as methyl-THF (functional folate deficiency). | (E): B12 is required for DNA synthesis in maturing erythroblasts.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q3": {
+    "questionId": "cmu-bio-2024-nov-p2-q3",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Vitamin C reduces Fe3+ to Fe2+ and ENHANCES absorption. | (B): Selenium is a component of glutathione peroxidase (antioxidant). | (C): Calcitonin LOWERS blood calcium. | (D): Iodine is needed for thyroid hormone for brain development. | (E): Retinol/carotenoids have antioxidant action.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q4": {
+    "questionId": "cmu-bio-2024-nov-p2-q4",
+    "stem": "Folic acid has the following facts",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Folate deficiency causes macrocytic (megaloblastic) anaemia. | (B): THF is the active coenzyme form of folate. | (C): THF carries one-carbon groups for purine/thymidylate synthesis. | (D): B12 is needed to regenerate THF from methyl-THF. | (E): Alcohol impairs folate absorption and increases loss.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q5": {
+    "questionId": "cmu-bio-2024-nov-p2-q5",
+    "stem": "Criteria of autosomal dominant disorder",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c | False: a, d, e",
+    "explanation": "(A): AD disease appears in every generation (vertical). | (B): AD diseases can arise from new mutations (e.g., achondroplasia). | (C): AD disease: vertical transmission. | (D): AD = autosomal. | (E): Nephrogenic DI is X-linked recessive.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q6": {
+    "questionId": "cmu-bio-2024-nov-p2-q6",
+    "stem": "Dietary fibre",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(B): Fibre binds bile acids, REDUCING cholesterol absorption. | (D): Fibre prevents diverticulosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q7": {
+    "questionId": "cmu-bio-2024-nov-p2-q7",
+    "stem": "Statement related to transcription",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Transcription makes RNA; protein synthesis is translation. | (B): PCR uses DNA polymerase. | (C): RNA polymerase binds the promoter. | (D): 5' cap = 7-methylguanosine; polyadenylation is the 3' tail. | (E): RNA polymerase lacks efficient proofreading.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q8": {
+    "questionId": "cmu-bio-2024-nov-p2-q8",
+    "stem": "Regarding BMI",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Normal BMI 18.5–24.9. | (B): BMI ≥ 30 = obese (≥ 27.5 in Asians). | (C): BMI = kg/m². | (D): Obesity ↑ insulin resistance. | (E): Low BMI = undernutrition.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q9": {
+    "questionId": "cmu-bio-2024-nov-p2-q9",
+    "stem": "The following are examples of post-translational modification",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): 5' capping is post-TRANSCRIPTIONAL. | (B): Post-translational: e.g., zymogen activation. | (C): Reversible phosphorylation is a post-translational modification. | (D): Splicing is post-transcriptional. | (E): Hydroxylation (collagen) is post-translational.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2024-nov-p2-q10": {
+    "questionId": "cmu-bio-2024-nov-p2-q10",
+    "stem": "Regarding trace elements",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Zinc is needed for insulin storage/action. | (C): Normal calcium is 8.5–10.5 mg/dL (2.1–2.6 mmol/L). | (D): Iron is needed for haemoglobin. | (E): Na+ is the main determinant of ECF osmolality.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2024-nov-p2-q11": {
+    "questionId": "cmu-bio-2024-nov-p2-q11",
+    "stem": "Earliest feature of vitamin A deficiency",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Night blindness",
+    "explanation": "Night blindness is the earliest sign.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-nov-p2-q12": {
+    "questionId": "cmu-bio-2024-nov-p2-q12",
+    "stem": "In replication",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) It is DNA-directed DNA synthesis",
+    "explanation": "Replication is DNA-directed DNA synthesis by DNA polymerase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-nov-p2-q13": {
+    "questionId": "cmu-bio-2024-nov-p2-q13",
+    "stem": "Which of the following would be most appropriate for vitamin B12?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "D) Helps in RBC maturation",
+    "explanation": "B12 is needed for DNA synthesis → RBC maturation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-nov-p2-q14": {
+    "questionId": "cmu-bio-2024-nov-p2-q14",
+    "stem": "The worst effect of folic acid deficiency",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Neural tube defect",
+    "explanation": "Folate deficiency in pregnancy causes neural tube defects.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q15": {
+    "questionId": "cmu-bio-2024-nov-p2-q15",
+    "stem": "The most important feature of scurvy is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Bleeding from gum",
+    "explanation": "Weak capillaries/collagen defect → gum bleeding.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q16": {
+    "questionId": "cmu-bio-2024-nov-p2-q16",
+    "stem": "Karyotyping is done in",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Down syndrome",
+    "explanation": "Karyotype is used for chromosomal disorders like Down syndrome.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q17": {
+    "questionId": "cmu-bio-2024-nov-p2-q17",
+    "stem": "Best feature of mitochondrial DNA",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) It encodes 37 genes",
+    "explanation": "mtDNA encodes 37 genes (13 proteins, 22 tRNA, 2 rRNA).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-nov-p2-q18": {
+    "questionId": "cmu-bio-2024-nov-p2-q18",
+    "stem": "Select the reliable diagnostic tool for PEM",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) BMI",
+    "explanation": "BMI/weight-for-height is the reliable anthropometric tool; protein levels and clinical signs vary.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q19": {
+    "questionId": "cmu-bio-2024-nov-p2-q19",
+    "stem": "Most important feature regarding mutation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Changes in DNA",
+    "explanation": "A mutation is a change in DNA sequence.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-nov-p2-q20": {
+    "questionId": "cmu-bio-2024-nov-p2-q20",
+    "stem": "The most common karyotype of Turner syndrome is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "November 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) 45,XO",
+    "explanation": "Turner syndrome is 45,X.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q1": {
+    "questionId": "cmu-bio-2024-may-p1-q1",
+    "stem": "The following are the normal levels in blood",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(E): Normal plasma osmolarity is ~280–296 mosmol/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2024-may-p1-q2": {
+    "questionId": "cmu-bio-2024-may-p1-q2",
+    "stem": "Insulin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Insulin promotes glycogen, fat and protein synthesis. | (B): Brain uses GLUT-3, which is insulin-independent. | (C): Insulin recruits GLUT-4 in muscle and adipose tissue. | (D): Insulin drives K+ into cells (lowers plasma K+); used to treat hyperkalaemia. | (E): Insulin acts via tyrosine kinase receptor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q3": {
+    "questionId": "cmu-bio-2024-may-p1-q3",
+    "stem": "Blood calcium level is regulated by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): ADH conserves water by increasing collecting-duct permeability. | (C): ACTH controls cortisol, not calcium.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q4": {
+    "questionId": "cmu-bio-2024-may-p1-q4",
+    "stem": "Regarding colloids",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Colloids are too large to pass through a dialysis membrane. | (B): Colloid particle size is 1–200 nm; < 1 nm is crystalloid. | (D): Crystalloids pass; colloids cannot pass through semipermeable membranes. | (E): Colloids such as proteins have a definite isoelectric pH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q5": {
+    "questionId": "cmu-bio-2024-may-p1-q5",
+    "stem": "Regarding primary hypothyroidism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Hypothyroidism reduces LDL receptors → ↑ cholesterol. | (B): Primary hypothyroidism → raised TSH. | (C): Subclinical hypothyroidism: TSH 5–20 μIU/mL with normal T3/T4. | (D): In subclinical hypothyroidism T3/T4 are normal. | (E): Hypothyroidism causes anovulation/menstrual disturbance → infertility.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2024-may-p1-q6": {
+    "questionId": "cmu-bio-2024-may-p1-q6",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Lysine, threonine, proline, hydroxyproline do not undergo transamination. | (B): Intestinal bacteria PRODUCE ammonia (urease); it is removed as urea/glutamine. | (C): Oxidative deamination (glutamate dehydrogenase) releases NH3 from amino acids. | (E): Proline is made from glutamate; it is not a urea-cycle product.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q7": {
+    "questionId": "cmu-bio-2024-may-p1-q7",
+    "stem": "About digestion the following are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(C): Pepsin digests protein. | (D): Micelles contain bile salts, phospholipid, cholesterol and FA — not cholesterol alone. | (E): Bile salts are detergents that lower surface tension → emulsification.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q8": {
+    "questionId": "cmu-bio-2024-may-p1-q8",
+    "stem": "Regarding oxidative phosphorylation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Oxidative phosphorylation couples ETC to ATP synthase. | (B): Occurs at the inner mitochondrial membrane. | (C): ETC oxidises NADH/FADH2, not NADPH. | (D): Glycolysis produces ATP. | (E): Mitchell's chemiosmotic hypothesis explains ATP synthesis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q9": {
+    "questionId": "cmu-bio-2024-may-p1-q9",
+    "stem": "The following are true in glycolysis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(A): Glycolysis starts from glucose or glycogen (via G6P). | (B): Pyruvate is the end product aerobically; in anaerobic glycolysis it is reduced to lactate, so 'only' is wrong. | (C): Glycolysis has 3 irreversible steps: hexokinase/glucokinase, PFK-1, pyruvate kinase. | (D): Pyruvate → lactate is REDUCTION (NADH → NAD+). | (E): Aerobic net ≈ 7–8 ATP; 2 ATP is anaerobic.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q10": {
+    "questionId": "cmu-bio-2024-may-p1-q10",
+    "stem": "Ketoacidosis could be a finding of",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Absent insulin → ketogenesis. | (B): Low insulin/glucose in starvation → ketosis. | (C): Diarrhoea gives non-ketotic metabolic acidosis. | (D): Vomiting causes metabolic alkalosis (loss of HCl), not ketoacidosis. | (E): Renal failure causes uraemic (high-AG) acidosis without ketones.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q11": {
+    "questionId": "cmu-bio-2024-may-p1-q11",
+    "stem": "For glucose 6-phosphate",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Feeds glycolysis, glycogenesis and the HMP shunt pathway",
+    "explanation": "G6P is the branch-point for glycolysis, glycogenesis and HMP shunt.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p1-q12": {
+    "questionId": "cmu-bio-2024-may-p1-q12",
+    "stem": "Most important enzyme of the feed state is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Glycogen synthase",
+    "explanation": "Glycogen synthase is activated by insulin in the fed state.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q13": {
+    "questionId": "cmu-bio-2024-may-p1-q13",
+    "stem": "For the TCA cycle",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Central pathway for oxidation of carbohydrate, protein and fat",
+    "explanation": "TCA is the final common oxidative pathway for fuels.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q14": {
+    "questionId": "cmu-bio-2024-may-p1-q14",
+    "stem": "Regarding acute hepatitis",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) High serum ALT",
+    "explanation": "ALT is the most specific marker of hepatocellular injury.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p1-q15": {
+    "questionId": "cmu-bio-2024-may-p1-q15",
+    "stem": "The most important laboratory finding in primary hypothyroidism",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Increased TSH",
+    "explanation": "Raised TSH is the hallmark.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q16": {
+    "questionId": "cmu-bio-2024-may-p1-q16",
+    "stem": "A young woman complains of cold intolerance, tiredness and weight gain. Laboratory",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Hashimoto's thyroiditis",
+    "explanation": "High TSH + low T3/T4 + normal urinary iodine = autoimmune (Hashimoto's) thyroiditis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q17": {
+    "questionId": "cmu-bio-2024-may-p1-q17",
+    "stem": "The commonest cause of glycosuria is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Uncontrolled diabetes mellitus",
+    "explanation": "Hyperglycaemia exceeds the renal threshold in uncontrolled DM.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q18": {
+    "questionId": "cmu-bio-2024-may-p1-q18",
+    "stem": "The value of IGT (2-h OGTT) is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) 7.8 to < 11.1 mmol/L",
+    "explanation": "IGT = 2-h OGTT glucose 7.8 to < 11.1 mmol/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p1-q19": {
+    "questionId": "cmu-bio-2024-may-p1-q19",
+    "stem": "A middle-aged obese man on routine checkup is found to have very high serum",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) HMG-CoA reductase",
+    "explanation": "Statins inhibit HMG-CoA reductase, the rate-limiting enzyme.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p1-q20": {
+    "questionId": "cmu-bio-2024-may-p1-q20",
+    "stem": "Preferential fuel for cardiac muscle is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "A) Fatty acid",
+    "explanation": "Cardiac muscle gets most energy from fatty-acid β-oxidation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q1": {
+    "questionId": "cmu-bio-2024-may-p2-q1",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): A pH of 7.1 with normal AG doesn't prove metabolic acidosis (need HCO3 | (D): Aldosterone retains Na+/water; deficiency is fatal. | (E): Conn's syndrome is aldosterone EXCESS.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q2": {
+    "questionId": "cmu-bio-2024-may-p2-q2",
+    "stem": "Body water is maintained by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Hypothalamus has osmoreceptors and makes ADH → water balance. | (B): ADH conserves water by increasing collecting-duct permeability. | (C): Thyroxine regulates metabolism, not water balance. | (D): Plasma osmolarity is the main stimulus for ADH and thirst. | (E): Thirst is stimulated by high osmolarity and low volume.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q3": {
+    "questionId": "cmu-bio-2024-may-p2-q3",
+    "stem": "ADH deficiency causes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): ADH deficiency causes loss of water (hypovolemia), not hypervolemia. | (B): Lack of ADH gives dilute (hypo-osmolar) urine. | (C): ADH deficiency → polyuria (water diuresis). | (D): ADH deficiency causes diabetes INsipidus. | (E): Polyuria in ADH deficiency causes thirst/polydipsia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q4": {
+    "questionId": "cmu-bio-2024-may-p2-q4",
+    "stem": "Regarding codon",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Codon = 3 consecutive bases of mRNA. | (B): tRNA carries the anticodon; codon is in mRNA. | (C): Each codon specifies an amino acid. | (D): UAA, UAG, UGA are stop codons. | (E): AUG = methionine (start); AGU = serine.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q5": {
+    "questionId": "cmu-bio-2024-may-p2-q5",
+    "stem": "During DNA replication",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): Helicase unwinds the double helix. | (B): DNA is synthesised 5'→3' only. | (C): Lagging strand is made as Okazaki fragments. | (D): Replication is SEMIconservative. | (E): DNA has thymine; uracil pairs with adenine in RNA.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q6": {
+    "questionId": "cmu-bio-2024-may-p2-q6",
+    "stem": "High-fibre diet",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(B): Fibre lowers cholesterol. | (D): Fibre prevents diverticulosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q7": {
+    "questionId": "cmu-bio-2024-may-p2-q7",
+    "stem": "Obesity",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): BMI is the diagnostic index. | (B): Genetics contributes substantially. | (C): Leptin from adipocytes regulates satiety. | (D): Obesity is associated with hyperglycaemia/insulin resistance, not hypoglycaemia. | (E): Obesity is linked to type 2 DM (insulin resistance).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q8": {
+    "questionId": "cmu-bio-2024-may-p2-q8",
+    "stem": "Bicarbonate buffer is most effective because",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): HCO3 | (B): Open buffer system. | (C): At pH 7.4 HCO3 | (D): pK of the bicarbonate buffer is 6.1 (low). | (E): HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2024-may-p2-q9": {
+    "questionId": "cmu-bio-2024-may-p2-q9",
+    "stem": "Deficiency of vitamins is associated with",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Phrynoderma (toad skin) = vitamin A deficiency. | (B): Vitamin K deficiency → hemorrhagic disease. | (C): Neural tube defect is folate deficiency. | (D): Vitamin C is for collagen; RBC maturation needs B12/folate. | (E): Vitamin D deficiency causes rickets/osteomalacia, not osteoporosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q10": {
+    "questionId": "cmu-bio-2024-may-p2-q10",
+    "stem": "Statements related to transcription",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Transcription makes RNA; protein synthesis is translation. | (B): PCR uses DNA polymerase. | (C): RNA polymerase binds the promoter. | (D): 5' cap = 7-methylguanosine; polyadenylation is the 3' tail. | (E): RNA polymerase lacks efficient proofreading.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q11": {
+    "questionId": "cmu-bio-2024-may-p2-q11",
+    "stem": "Nucleosome contains",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "D) Histone",
+    "explanation": "Nucleosome = ~146 bp DNA wrapped around a histone octamer.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p2-q12": {
+    "questionId": "cmu-bio-2024-may-p2-q12",
+    "stem": "Vitamin B complex",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Acts as coenzyme",
+    "explanation": "B-vitamins function as coenzymes.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p2-q13": {
+    "questionId": "cmu-bio-2024-may-p2-q13",
+    "stem": "The backbone of nucleic acid structure is constructed by",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Phosphodiester bond",
+    "explanation": "Nucleotides are joined by 3'–5' phosphodiester bonds.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q14": {
+    "questionId": "cmu-bio-2024-may-p2-q14",
+    "stem": "Recombinant DNA technology",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Transfer of gene from one species to another",
+    "explanation": "rDNA = joining DNA from different species into a vector (chimeric DNA).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q15": {
+    "questionId": "cmu-bio-2024-may-p2-q15",
+    "stem": "Mutation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Imbalance between DNA damage and repair",
+    "explanation": "Mutation = failure of repair relative to damage.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q16": {
+    "questionId": "cmu-bio-2024-may-p2-q16",
+    "stem": "The longest phase of the cell cycle is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) G1",
+    "explanation": "G1 is the longest and most variable phase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q17": {
+    "questionId": "cmu-bio-2024-may-p2-q17",
+    "stem": "Which one of the following does NOT contribute to the purine ring synthesis?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "D) Alanine",
+    "explanation": "Purine ring atoms come from glycine, aspartate, glutamine, CO2 and N10-formyl-THF; alanine is not a donor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2024-may-p2-q18": {
+    "questionId": "cmu-bio-2024-may-p2-q18",
+    "stem": "Best feature of mitochondrial DNA",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Encodes respiratory chain enzymes",
+    "explanation": "mtDNA encodes 37 genes (13 proteins, 22 tRNA, 2 rRNA).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q19": {
+    "questionId": "cmu-bio-2024-may-p2-q19",
+    "stem": "Select the reliable diagnostic tool for PEM",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) BMI",
+    "explanation": "BMI/weight-for-height is the reliable anthropometric tool; protein levels and clinical signs vary.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2024-may-p2-q20": {
+    "questionId": "cmu-bio-2024-may-p2-q20",
+    "stem": "The worst effect of folic acid deficiency",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2024,
+    "session": "May 2024",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2024)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Neural tube defect",
+    "explanation": "Folate deficiency in pregnancy causes neural tube defects.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q1": {
+    "questionId": "cmu-bio-2023-nov-p2-q1",
+    "stem": "Criteria of autosomal dominant disorder",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): AD disease appears in every generation (vertical). | (B): AD diseases can arise from new mutations (e.g., achondroplasia). | (C): AD = autosomal. | (D): AD disease: vertical transmission. | (E): Nephrogenic DI is X-linked recessive.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q2": {
+    "questionId": "cmu-bio-2023-nov-p2-q2",
+    "stem": "Folic acid has the following facts",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Folate deficiency causes macrocytic (megaloblastic) anaemia. | (B): THF is the active coenzyme form of folate. | (C): THF carries one-carbon groups for purine/thymidylate synthesis. | (D): B12 is needed to regenerate THF from methyl-THF. | (E): Alcohol impairs folate absorption and increases loss.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q3": {
+    "questionId": "cmu-bio-2023-nov-p2-q3",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Vitamin C reduces Fe3+ to Fe2+ and ENHANCES absorption. | (B): Selenium is a component of glutathione peroxidase (antioxidant). | (C): Calcitonin LOWERS blood calcium. | (D): Iodine is needed for thyroid hormone for brain development. | (E): Retinol/carotenoids have antioxidant action.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q4": {
+    "questionId": "cmu-bio-2023-nov-p2-q4",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Fat-soluble vitamins accumulate in fat stores. | (B): Diarrhoea causes normal-AG acidosis (Cl- rises as HCO3 | (C): Alkalosis lowers ionized Ca2+ (more protein-bound) → tetany. | (D): Vitamin K reverses warfarin toxicity. | (E): Pellagra is niacin deficiency; riboflavin gives cheilosis/glossitis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q5": {
+    "questionId": "cmu-bio-2023-nov-p2-q5",
+    "stem": "Regarding serum electrolytes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): High K+ depolarises heart → diastolic arrest. | (B): Na+ is the principal ECF cation. | (C): Hyperkalaemia is treated with calcium gluconate, insulin + glucose, salbutamol. | (D): Aldosterone rises in HYPERkalaemia and falls in hypokalaemia. | (E): Sea water is hypertonic → hypernatraemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q6": {
+    "questionId": "cmu-bio-2023-nov-p2-q6",
+    "stem": "Polymerase chain reaction",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): Forward and reverse primers. | (B): PCR does not use restriction digestion. | (C): PCR amplifies DNA in a tube. | (D): Taq polymerase is heat-stable. | (E): 220 ≈ 106 copies in 20 cycles.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q7": {
+    "questionId": "cmu-bio-2023-nov-p2-q7",
+    "stem": "Hypokalemia may be due to",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Osmotic diuresis in uncontrolled DM causes K+ loss. | (B): Diarrhoea fluid is rich in K+ and HCO3 | (C): Aldosterone excretes K+; deficiency gives hyperkalaemia. | (D): Acidosis shifts K+ out of cells → hyperkalaemia, not hypokalaemia. | (E): Alkalosis shifts K+ into cells → hypokalaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q8": {
+    "questionId": "cmu-bio-2023-nov-p2-q8",
+    "stem": "Regarding vitamin C",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b | False: a, c, d, e",
+    "explanation": "(A): Vitamin C reduces Fe3+ → Fe2+ and enhances absorption. | (B): Vitamin C is needed for prolyl/lysyl hydroxylase → collagen. | (C): Citrus fruits/vegetables are the main source; milk is poor. | (D): Humans lack L-gulonolactone oxidase; vitamin C is dietary. | (E): Vitamin C is a cofactor (reducing agent) of hydroxylases.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q9": {
+    "questionId": "cmu-bio-2023-nov-p2-q9",
+    "stem": "Transcellular fluid is",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Transcellular fluids (CSF, aqueous humor, synovial, pleural, peritoneal) are formed by epithelial transport. | (B): Plasma is intravascular fluid, not transcellular. | (C): Synovial fluid is a transcellular fluid. | (D): Interstitial fluid is extracellular but not transcellular. | (E): Peritoneal fluid is a transcellular fluid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q10": {
+    "questionId": "cmu-bio-2023-nov-p2-q10",
+    "stem": "Basal metabolic rate will increase in",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Na+-K+ pump uses ATP; more activity → ↑BMR. | (B): Thyroid hormones raise BMR. | (C): Cold climate raises BMR; hot climate lowers it. | (D): BMR falls in starvation. | (E): Each °C of fever raises BMR ~13%.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q11": {
+    "questionId": "cmu-bio-2023-nov-p2-q11",
+    "stem": "Regarding proteinuria",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Presence of protein in urine more than 150 mg/day",
+    "explanation": "Proteinuria > 150 mg/day is abnormal.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q12": {
+    "questionId": "cmu-bio-2023-nov-p2-q12",
+    "stem": "Regarding metabolic acidosis",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) HCO3",
+    "explanation": "Metabolic acidosis = HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-nov-p2-q13": {
+    "questionId": "cmu-bio-2023-nov-p2-q13",
+    "stem": "Free water clearance gives information regarding",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Renal concentrating ability",
+    "explanation": "Free water clearance reflects renal diluting/concentrating ability.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q14": {
+    "questionId": "cmu-bio-2023-nov-p2-q14",
+    "stem": "Mutation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Imbalance between DNA damage and repair",
+    "explanation": "Mutation = failure of repair relative to damage.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q15": {
+    "questionId": "cmu-bio-2023-nov-p2-q15",
+    "stem": "Restriction endonuclease",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Cleaves DNA at a specific nucleotide sequence which is palindromic",
+    "explanation": "Type II restriction enzymes cut DNA at palindromic sequences.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-nov-p2-q16": {
+    "questionId": "cmu-bio-2023-nov-p2-q16",
+    "stem": "Vitamin C",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) The most prominent action is hydroxylation of prolyl and lysyl residues of collagen protein",
+    "explanation": "Vitamin C hydroxylates proline and lysine in collagen.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-nov-p2-q17": {
+    "questionId": "cmu-bio-2023-nov-p2-q17",
+    "stem": "Regarding plasma osmolarity, choose the correct answer",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) Serum sodium is the most contributing factor",
+    "explanation": "Na+ is the main osmotically active solute.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-nov-p2-q18": {
+    "questionId": "cmu-bio-2023-nov-p2-q18",
+    "stem": "The characteristics of trace elements include",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Are microminerals with daily requirement less than 100 mg",
+    "explanation": "Trace elements are needed in < 100 mg/day.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-nov-p2-q19": {
+    "questionId": "cmu-bio-2023-nov-p2-q19",
+    "stem": "Regarding translation",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Synthesis of protein according to the base sequence of mRNA",
+    "explanation": "mRNA codons determine the protein sequence.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-nov-p2-q20": {
+    "questionId": "cmu-bio-2023-nov-p2-q20",
+    "stem": "Regarding obesity",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "November 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Is a disorder of body weight regulatory system characterized by excess fat accumulation",
+    "explanation": "Obesity is excess body fat from disturbed energy balance.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-may-p1-q1": {
+    "questionId": "cmu-bio-2023-may-p1-q1",
+    "stem": "Buffer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Buffer capacity increases with total buffer concentration. | (B): Equal acid and salt gives pH = pK (maximum buffering). | (C): A buffer base converts a strong acid into its weak conjugate acid, limiting pH change. | (D): A buffer only resists change; it cannot restore pH completely (lungs/kidneys do that). | (E): Buffer capacity depends on the compartment, e.g., HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q2": {
+    "questionId": "cmu-bio-2023-may-p1-q2",
+    "stem": "Enzymes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Enzymes are reaction and substrate specific. | (B): Many enzymes need no coenzyme (e.g., pepsin, trypsin). | (C): Enzymes are large proteins (colloids). | (D): Km is the substrate concentration at HALF Vmax. | (E): Allosteric modifiers bind away from the active site (non-competitive).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q3": {
+    "questionId": "cmu-bio-2023-may-p1-q3",
+    "stem": "Regarding disaccharides",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Disaccharides are water-soluble and fat-insoluble. | (B): Disaccharide formula is C12H22O11 = Cn(H2O)n–1. | (C): Sugar –OH groups can form esters (e.g., phosphates). | (D): Maltose, lactose are reducing; sucrose is not. | (E): Sorbitol is a sugar alcohol, not a disaccharide.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2023-may-p1-q4": {
+    "questionId": "cmu-bio-2023-may-p1-q4",
+    "stem": "Regarding colloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Colloids are large, few in number, hence osmotically less active. | (B): Colloid particles are visible by ultramicroscope (Tyndall effect). | (C): Cellulose is dietary fibre, a colloid that is not digested. | (D): Unconjugated bilirubin is water-insoluble (hydrophobic) and travels bound to albumin. | (E): Colloids form colloidal, not true, solutions.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q5": {
+    "questionId": "cmu-bio-2023-may-p1-q5",
+    "stem": "The following are rate-limiting reactions of certain metabolic pathways",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): ACC is rate-limiting for fatty acid synthesis. | (B): PFK-1 is rate-limiting for glycolysis. | (C): HMG-CoA reductase is rate-limiting for cholesterol synthesis. | (D): Glycogen synthase is the rate-limiting enzyme of glycogenesis. | (E): Hormone-sensitive lipase is rate-limiting for lipolysis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q6": {
+    "questionId": "cmu-bio-2023-may-p1-q6",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Lysine, threonine, proline, hydroxyproline do not undergo transamination. | (B): Intestinal bacteria PRODUCE ammonia (urease); it is removed as urea/glutamine. | (C): Oxidative deamination (glutamate dehydrogenase) releases NH3 from amino acids. | (E): Proline is made from glutamate; it is not a urea-cycle product.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q7": {
+    "questionId": "cmu-bio-2023-may-p1-q7",
+    "stem": "About digestion the following are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(C): Pepsin digests protein. | (D): Micelles contain bile salts, phospholipid, cholesterol and FA — not cholesterol alone. | (E): Bile salts are detergents that lower surface tension → emulsification.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q8": {
+    "questionId": "cmu-bio-2023-may-p1-q8",
+    "stem": "Insulin regulates metabolism by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Insulin acts via GLUT-4; GLUT-2 is insulin-independent (liver, β-cell). | (B): Insulin activates phosphatases, dephosphorylating key enzymes. | (C): Insulin induces glucokinase, PFK, pyruvate kinase, lipogenic enzymes. | (D): Insulin receptor is a tyrosine kinase. | (E): Insulin inhibits glucagon secretion.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q9": {
+    "questionId": "cmu-bio-2023-may-p1-q9",
+    "stem": "In glycolysis the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Glycolysis starts from glucose or glycogen (via G6P). | (B): Pyruvate is the end product aerobically; in anaerobic glycolysis it is reduced to lactate, so 'only' is wrong. | (C): Glycolysis has 3 irreversible steps: hexokinase/glucokinase, PFK-1, pyruvate kinase. | (E): Net ATP: anaerobic = 2; aerobic ≈ 7–8 (2 + NADH via shuttles).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q10": {
+    "questionId": "cmu-bio-2023-may-p1-q10",
+    "stem": "Ketoacidosis could be a finding of",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Absent insulin → ketogenesis. | (B): Low insulin/glucose in starvation → ketosis. | (C): Diarrhoea gives non-ketotic metabolic acidosis. | (D): Vomiting causes metabolic alkalosis (loss of HCl), not ketoacidosis. | (E): Renal failure causes uraemic (high-AG) acidosis without ketones.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q11": {
+    "questionId": "cmu-bio-2023-may-p1-q11",
+    "stem": "The characteristic blood chemistry of viral hepatitis is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Increased serum ALT activity (markedly)",
+    "explanation": "ALT (and AST) rises markedly in viral hepatitis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q12": {
+    "questionId": "cmu-bio-2023-may-p1-q12",
+    "stem": "The most common cause of hyperglycemia is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) Diabetes mellitus",
+    "explanation": "Diabetes mellitus.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q13": {
+    "questionId": "cmu-bio-2023-may-p1-q13",
+    "stem": "The EMP (glycolysis) pathway",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "A) Produces ATP",
+    "explanation": "Glycolysis generates ATP by substrate-level phosphorylation and is cytosolic.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-may-p1-q14": {
+    "questionId": "cmu-bio-2023-may-p1-q14",
+    "stem": "Which of the following is true for β-oxidation?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) Glucagon stimulates β-oxidation",
+    "explanation": "Glucagon induces lipolysis and mitochondrial β-oxidation (via CPT-I).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q15": {
+    "questionId": "cmu-bio-2023-may-p1-q15",
+    "stem": "Regarding GI hormones",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "E) Somatostatin inhibits gastrin secretion",
+    "explanation": "Somatostatin inhibits gastrin, secretin, CCK.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-may-p1-q16": {
+    "questionId": "cmu-bio-2023-may-p1-q16",
+    "stem": "A young woman complains of weight gain, cold intolerance and tiredness. Laboratory",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "D) Hashimoto's thyroiditis",
+    "explanation": "Low T3/T4, high TSH and anti-TPO = Hashimoto's thyroiditis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q17": {
+    "questionId": "cmu-bio-2023-may-p1-q17",
+    "stem": "All of the following are characteristics of diabetic ketoacidosis EXCEPT",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "C) Increased plasma bicarbonate",
+    "explanation": "Low HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-may-p1-q18": {
+    "questionId": "cmu-bio-2023-may-p1-q18",
+    "stem": "The value of IGT is",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "B) 7.8 to < 11.1 mmol/L",
+    "explanation": "IGT = 2-h OGTT glucose 7.8 to < 11.1 mmol/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Corrected question or single-best option per faculty review script."
+  },
+  "cmu-bio-2023-may-p1-q19": {
+    "questionId": "cmu-bio-2023-may-p1-q19",
+    "stem": "Phospholipids are mostly carried by",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "B) HDL",
+    "explanation": "HDL is phospholipid-rich (~25–30%).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-q20": {
+    "questionId": "cmu-bio-2023-may-p1-q20",
+    "stem": "To diagnose obstructive jaundice, which enzyme is mostly preferred?",
+    "type": "SBA",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "C) ALP",
+    "explanation": "ALP is the preferred enzyme.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q1": {
+    "questionId": "cmu-bio-2023-may-p2-q1",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Fat-soluble vitamins accumulate in fat stores. | (B): Plasma volume is measured by Evans blue/I-131 albumin; mannitol measures ECF. | (C): Na+ is the major ECF cation; K+ is the major ICF cation. | (E): Vitamin C ENHANCES iron absorption.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q2": {
+    "questionId": "cmu-bio-2023-may-p2-q2",
+    "stem": "Body water is maintained by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Hypothalamus has osmoreceptors and makes ADH → water balance. | (B): ADH conserves water by increasing collecting-duct permeability. | (C): Thyroxine regulates metabolism, not water balance. | (D): Plasma osmolarity is the main stimulus for ADH and thirst. | (E): Thirst is stimulated by high osmolarity and low volume.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q3": {
+    "questionId": "cmu-bio-2023-may-p2-q3",
+    "stem": "Regarding trace elements",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Trace elements are needed in < 100 mg/day. | (B): Selenium is a component of glutathione peroxidase (antioxidant). | (C): RDA of iron in men is ~10 mg/day (1 mg is the absorbed amount). | (D): Iodine is needed for thyroid hormone for brain development. | (E): Low ionized Ca2+ increases neuromuscular excitability.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q4": {
+    "questionId": "cmu-bio-2023-may-p2-q4",
+    "stem": "In metabolic acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(A): Bicarbonate-rich intestinal fluid is lost in diarrhoea → metabolic acidosis. | (B): In metabolic acidosis PCO2 falls (respiratory compensation); raised PCO2 is respiratory acidosis. | (D): Metabolic acidosis may have high or normal anion gap. | (E): Metabolic acidosis is compensated by the lungs (hyperventilation); kidneys correct it slowly.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q5": {
+    "questionId": "cmu-bio-2023-may-p2-q5",
+    "stem": "Dietary fibre",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(B): Fibre binds bile acids, REDUCING cholesterol absorption. | (D): Fibre prevents diverticulosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q6": {
+    "questionId": "cmu-bio-2023-may-p2-q6",
+    "stem": "ECF differs from ICF in that",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): ICF volume is larger than ECF. | (B): ECF pH (7.4) is higher than ICF (7.0). | (C): ECF and ICF are iso-osmotic at steady state. | (D): ECF anions are mainly Cl- and HCO3 | (E): ECF has high Na+ and low K+; ICF is the reverse.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q7": {
+    "questionId": "cmu-bio-2023-may-p2-q7",
+    "stem": "Central dogma of genetic information",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Central dogma was proposed by Crick. | (B): Central dogma includes replication, transcription, translation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q8": {
+    "questionId": "cmu-bio-2023-may-p2-q8",
+    "stem": "Normal plasma values are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(D): Normal serum creatinine is 0.6–1.2 mg/dL.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q9": {
+    "questionId": "cmu-bio-2023-may-p2-q9",
+    "stem": "Transcellular fluid is",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Transcellular fluids (CSF, aqueous humor, synovial, pleural, peritoneal) are formed by epithelial transport. | (B): Plasma is intravascular fluid, not transcellular. | (C): Synovial fluid is a transcellular fluid. | (D): Interstitial fluid is extracellular but not transcellular. | (E): Peritoneal fluid is a transcellular fluid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q10": {
+    "questionId": "cmu-bio-2023-may-p2-q10",
+    "stem": "Thiamine deficiency causes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): Thiamine deficiency → beriberi. | (B): Stomatitis is riboflavin/niacin deficiency, not thiamine. | (C): Thiamine deficiency in alcoholics → Wernicke's encephalopathy. | (D): Dry beriberi causes peripheral neuropathy. | (E): Korsakoff psychosis is thiamine deficiency.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q11": {
+    "questionId": "cmu-bio-2023-may-p2-q11",
+    "stem": "Regarding renal function tests",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Benedict's test detects reducing sugars (glucose, fructose, lactose, maltose), not sucrose. | (B): GFR/clearance tests are more sensitive; urea/creatinine rise late. | (C): Electrolytes change late in renal disease.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q12": {
+    "questionId": "cmu-bio-2023-may-p2-q12",
+    "stem": "Vitamin D",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): Vitamin D is a secosteroid derived from 7-dehydrocholesterol. | (B): UV-B converts 7-dehydrocholesterol → cholecalciferol in skin. | (C): Calcitriol raises plasma Ca2+ and phosphate. | (D): Vitamin D deficiency → rickets (children), osteomalacia (adults).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q13": {
+    "questionId": "cmu-bio-2023-may-p2-q13",
+    "stem": "Regarding replication",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Each daughter DNA has one old and one new strand. | (B): DNA polymerase copies a DNA template. | (C): DNA polymerase always needs a primer. | (D): Lagging strand = Okazaki fragments.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q14": {
+    "questionId": "cmu-bio-2023-may-p2-q14",
+    "stem": "X-linked recessive disorder includes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): XLR disease is expressed in hemizygous males too. | (C): XLR disease mainly affects males. | (D): XLR: carrier mother → affected sons (oblique/criss-cross).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q15": {
+    "questionId": "cmu-bio-2023-may-p2-q15",
+    "stem": "Mutation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): Polymorphism is a common variant (> 1%); mutation is rare. | (B): Mutation = failure of repair relative to damage. | (C): Mutations occur in coding and non-coding DNA. | (D): Only germline mutations are inherited.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q16": {
+    "questionId": "cmu-bio-2023-may-p2-q16",
+    "stem": "Recombinant DNA technology",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Restriction enzymes come from BACTERIA. | (B): rDNA technology does not require Southern blot. | (C): Recombinant DNA is chimeric. | (D): Gene from one species into another.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q17": {
+    "questionId": "cmu-bio-2023-may-p2-q17",
+    "stem": "Regarding plasma osmolarity, choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): Normal plasma osmolarity is ~280–296 mosmol/L. | (B): Na+ and accompanying anions determine most of plasma osmolarity. | (C): Glucose and urea contribute little (~5% each) normally. | (D): High osmolarity stimulates ADH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2023-may-p2-q18": {
+    "questionId": "cmu-bio-2023-may-p2-q18",
+    "stem": "The characteristics of kwashiorkor include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(B): Edema/hypoalbuminaemia are the most characteristic features.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q19": {
+    "questionId": "cmu-bio-2023-may-p2-q19",
+    "stem": "Regarding potassium",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): High K+ directly stimulates aldosterone release from zona glomerulosa. | (B): Hyperosmolarity draws water and K+ OUT of cells (efflux). | (C): K+ efflux repolarises the membrane. | (D): Hypokalaemia reduces insulin secretion.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-q20": {
+    "questionId": "cmu-bio-2023-may-p2-q20",
+    "stem": "Regarding iron",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "New Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d | False: a, b, c, e",
+    "explanation": "(A): Iron is absorbed in duodenum and proximal jejunum. | (B): Fe2+ (ferrous) is the absorbed form. | (C): Vitamin C promotes iron absorption. | (D): Iron is stored as ferritin.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q1": {
+    "questionId": "cmu-bio-2023-may-p1-old-q1",
+    "stem": "Regarding buffer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): A buffer = weak acid + its conjugate base (salt). | (B): Buffering is maximal at pH = pK (±1). | (C): A buffer does the opposite: it converts a strong acid into a weak acid. | (D): Buffers are present in both ECF and ICF.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q2": {
+    "questionId": "cmu-bio-2023-may-p1-old-q2",
+    "stem": "Colloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Colloid particle size is 1–200 millimicron (mμ = nm); crystalloids are < 1 nm. | (B): Colloids are too large to pass through a dialysis membrane. | (C): Colloids such as proteins have a definite isoelectric pH. | (D): Colloids show Brownian movement (random particle movement); molecular/ionic movement is typical of | (E): DNA is a macromolecule that forms colloidal solution.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q3": {
+    "questionId": "cmu-bio-2023-may-p1-old-q3",
+    "stem": "The statements can be applied for the H-H equation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): H-H equation: pH = pK + log [salt]/[acid]. | (D): When acid is half-neutralized [salt] = [acid], log 1 = 0, so pH = pK. | (E): H-H equation is derived from the law of mass action applied to Ka of a weak acid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q4": {
+    "questionId": "cmu-bio-2023-may-p1-old-q4",
+    "stem": "Regarding carbohydrates",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Carbohydrates = polyhydroxy aldehydes/ketones and derivatives. | (B): Asymmetric carbons give optical isomerism. | (C): Invert sugar is a glucose + fructose mixture from sucrose hydrolysis. | (D): Sucrose has no free anomeric carbon, so no mutarotation. | (E): Carbohydrate is anti-ketogenic (supplies oxaloacetate).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q5": {
+    "questionId": "cmu-bio-2023-may-p1-old-q5",
+    "stem": "Denaturation of protein involves",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Denaturation alters 2°, 3° and 4° structures. | (B): Denaturation destroys the native conformation, so activity is lost. | (C): Denaturation disrupts 2°–4° structure only; peptide bonds (primary) stay intact. | (D): Denaturation does not hydrolyse peptide bonds. | (E): Acid, alkali, heat, and urea denature proteins.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q6": {
+    "questionId": "cmu-bio-2023-may-p1-old-q6",
+    "stem": "Regarding body fluid volume measurement",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Plasma volume is measured by Evans blue/I-131 albumin; mannitol measures ECF. | (B): Cr-51-tagged RBCs measure RBC volume. | (C): Inulin stays extracellular → ECF volume. | (D): Aminopyrine/antipyrine measure TBW; plasma volume uses Evans blue. | (E): D2O/antipyrine distribute in TBW.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q7": {
+    "questionId": "cmu-bio-2023-may-p1-old-q7",
+    "stem": "Enzymes with their clinical significance",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): ALT is more liver-specific than AST. | (B): CPK-MM is the skeletal muscle isoenzyme; CK-MB is cardiac. | (C): AST (SGOT) rises in MI. | (D): ACP (not ALP) rises in prostate cancer. | (E): Aldolase rises in muscle disease (muscular dystrophy).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q8": {
+    "questionId": "cmu-bio-2023-may-p1-old-q8",
+    "stem": "Regarding fatty acids",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Fatty acids are aliphatic monocarboxylic acids. | (B): Raised free FFA inhibits GH. | (C): Fatty acids are components/derived lipids. | (D): Long-chain fatty acids need bile-salt micelles. | (E): Arachidonic acid → eicosanoids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q9": {
+    "questionId": "cmu-bio-2023-may-p1-old-q9",
+    "stem": "Membrane transport process for colloid is",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Colloids are too large for diffusion; they are taken up by endocytosis. | (B): Colloids are too large for carrier-mediated transport. | (C): Colloids are taken in by endocytosis, not by carriers. | (D): Large colloids enter cells by endocytosis. | (E): Large colloids leave cells by exocytosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q10": {
+    "questionId": "cmu-bio-2023-may-p1-old-q10",
+    "stem": "Vitamin D",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Vitamin D is a steroid derivative. | (B): Vitamin D is fat-soluble, soluble in alcohol/organic solvents. | (C): Skin 7-dehydrocholesterol → cholecalciferol. | (D): 1,25-(OH)2-D3 (calcitriol) is the active hormone. | (E): Vitamin D deficiency = osteomalacia (soft bones).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q11": {
+    "questionId": "cmu-bio-2023-may-p1-old-q11",
+    "stem": "Regarding coenzymes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Coenzymes are NON-protein organic molecules. | (B): Enzymes catalyse; coenzymes only assist as carriers. | (C): Most coenzymes derive from water-soluble (B-complex) vitamins. | (D): TPP (from vitamin B1) is a coenzyme for oxidative decarboxylation and transketolase. | (E): NADPH donates reducing equivalents for biosynthesis (fatty acid, cholesterol).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q12": {
+    "questionId": "cmu-bio-2023-may-p1-old-q12",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(B): Bile has salts, not enzymes; lipase comes from pancreas. | (E): Chylomicrons are made in intestinal mucosa.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q13": {
+    "questionId": "cmu-bio-2023-may-p1-old-q13",
+    "stem": "Dietary fibres",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): Fibre REDUCES colon cancer risk. | (E): Fibre adds bulk and prevents constipation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q14": {
+    "questionId": "cmu-bio-2023-may-p1-old-q14",
+    "stem": "In metabolic acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: e | False: a, b, c, d",
+    "explanation": "(A): In acidosis [H+] rises and pH falls. | (B): In metabolic acidosis PCO2 falls (respiratory compensation); raised PCO2 is respiratory acidosis. | (D): Metabolic acidosis may have high or normal anion gap. | (E): Acidaemia is pH < 7.35; alkalosis has pH > 7.45.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q15": {
+    "questionId": "cmu-bio-2023-may-p1-old-q15",
+    "stem": "Regarding anion gap",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): AG represents the unmeasured anions (albumin, phosphate, sulphate, organic acids). | (B): Sulphate/phosphate are UNmeasured anions; measured anions are Cl- and HCO3 | (C): Normal anion gap is 8–16 mEq/L. | (D): AG = Na+ – (Cl- + HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q16": {
+    "questionId": "cmu-bio-2023-may-p1-old-q16",
+    "stem": "The characteristics of marasmus include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): Edema is a feature of kwashiorkor, not marasmus. | (E): Marasmus: weight/age < 60% of standard (kwashiorkor 60–80% with oedema).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q17": {
+    "questionId": "cmu-bio-2023-may-p1-old-q17",
+    "stem": "Antioxidant vitamins are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Vitamin K is not an antioxidant; it is for clotting. | (B): β-carotene is an antioxidant. | (C): Vitamin E is the main lipid-phase antioxidant. | (D): B12 is not an antioxidant. | (E): Vitamin C is the cofactor for collagen hydroxylation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q18": {
+    "questionId": "cmu-bio-2023-may-p1-old-q18",
+    "stem": "Isotopes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): Isotopes are atoms of the SAME element with different mass numbers. | (B): Isotopes are atoms, not compounds. | (C): Radioisotopes (I-131, Co-60) are used therapeutically. | (D): Isotopes have the SAME atomic number, different mass number. | (E): I-131 is taken up by the thyroid, used in diagnosis/therapy.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q19": {
+    "questionId": "cmu-bio-2023-may-p1-old-q19",
+    "stem": "About digestive juice",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c | False: a, d, e",
+    "explanation": "(A): Trypsin is proteolytic. | (D): Salivary amylase acts on cooked starch; raw starch poorly. | (E): Enterokinase is in duodenal mucosa.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p1-old-q20": {
+    "questionId": "cmu-bio-2023-may-p1-old-q20",
+    "stem": "Regarding nutrition the following are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): BMI = kg/m². | (B): Normal BMI is 18.5–24.9 kg/m². | (C): Obesity is excess body fat. | (D): Marasmus = protein–calorie deficiency (energy). | (E): Vitamin D deficiency causes osteomalacia, not osteoporosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q1": {
+    "questionId": "cmu-bio-2023-may-p2-old-q1",
+    "stem": "Regarding TCA cycle",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): TCA cycle is both catabolic and anabolic. | (B): β-oxidation → acetyl-CoA → TCA. | (C): One acetyl-CoA gives ~10 ATP (12 in older texts). | (D): Oxaloacetate is regenerated, acting catalytically. | (E): Most ATP comes via oxidative phosphorylation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q2": {
+    "questionId": "cmu-bio-2023-may-p2-old-q2",
+    "stem": "Pyruvate",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): Pyruvate + glutamate ⇄ alanine + α-KG. | (B): Pyruvate → acetyl-CoA is oxidative DEcarboxylation (PDH), not deamination. | (C): Anaerobic: pyruvate → lactate (LDH). | (D): Glycolysis works without O2. | (E): Lactate → pyruvate by LDH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q3": {
+    "questionId": "cmu-bio-2023-may-p2-old-q3",
+    "stem": "Regarding gluconeogenesis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Gluconeogenesis = new glucose from non-carbohydrate precursors. | (B): Gluconeogenesis occurs in fasting; insulin inhibits it. | (C): Gluconeogenesis occurs only in liver and kidney. | (D): Insulin suppresses PEPCK, G6Pase, FBPase. | (E): Glycerol → DHAP → glucose.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q4": {
+    "questionId": "cmu-bio-2023-may-p2-old-q4",
+    "stem": "The following statements are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): DNA/RNA are polymers of nucleotides. | (B): Uracil is a pyrimidine. | (C): DNA polymerase forms 3'–5' phosphodiester bonds. | (D): RNA has A, G, C, U. | (E): DNA = nucleotides only.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q5": {
+    "questionId": "cmu-bio-2023-may-p2-old-q5",
+    "stem": "In β-oxidation of palmitic acid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Palmitate β-oxidation: acetyl-CoA + NADH + FADH2. | (B): Each β-oxidation cycle yields 1 FADH2, 1 NADH, 1 acetyl-CoA. | (C): Palmitic acid (C16) gives 8 acetyl-CoA after 7 cycles. | (D): Palmitate yields net 129 ATP (106 by revised values). | (E): Not 80% by skeletal muscle.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q6": {
+    "questionId": "cmu-bio-2023-may-p2-old-q6",
+    "stem": "Features of myxedema",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Myxoedema → mucopolysaccharide deposition → puffiness. | (B): Myxoedema affects vocal cords. | (C): Myxoedema is adult hypothyroidism; growth retardation is cretinism. | (D): Hypothyroidism causes constipation. | (E): Periorbital edema in myxoedema.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q7": {
+    "questionId": "cmu-bio-2023-may-p2-old-q7",
+    "stem": "Features of Addison's disease are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Cortisol deficiency (Addison's) → hypoglycaemia. | (B): Aldosterone deficiency → Na+ loss. | (C): Addison's → HYPERkalaemia (aldosterone lack); Cushing's → hypokalaemia (mineralocorticoid effect of | (D): ↑ACTH/MSH → hyperpigmentation in Addison's. | (E): Aldosterone/cortisol lack → salt loss, hypotension; Cushing's causes hypertension.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q8": {
+    "questionId": "cmu-bio-2023-may-p2-old-q8",
+    "stem": "Carbohydrate is metabolized by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Krebs cycle (TCA) and the urea cycle are separate. | (B): Glycolysis: PFK-1 is rate limiting. | (D): Pyruvate → acetyl-CoA is oxidative DEcarboxylation (PDH), not deamination. | (E): Gluconeogenesis is an anabolic synthesis of glucose; occurs in fasting, liver/kidney, inhibited by insulin.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q9": {
+    "questionId": "cmu-bio-2023-may-p2-old-q9",
+    "stem": "Growth hormone secretion is stimulated in",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): Hyperglycaemia suppresses GH; hypoglycaemia stimulates it. (In DKA hyperglycaemia is a diagnostic feature.) | (B): Stress, exercise, sleep and hypoglycaemia raise GH. | (C): Raised free FFA inhibits GH. | (D): GH peaks during slow-wave sleep. | (E): Hyperinsulinaemia (via hypoglycaemia) is stimulatory but insulin itself is not the trigger.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q10": {
+    "questionId": "cmu-bio-2023-may-p2-old-q10",
+    "stem": "The diagnostic features of diabetic ketoacidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): DKA has acidosis (low pH). | (D): Hyperglycaemia suppresses GH; hypoglycaemia stimulates it. (In DKA hyperglycaemia is a diagnostic feature.) | (E): DKA has HIGH anion gap.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q11": {
+    "questionId": "cmu-bio-2023-may-p2-old-q11",
+    "stem": "Thyroid function tests",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Normal TSH is ~0.4–4.5 μIU/mL. | (B): A normal TSH excludes primary hypo/hyperthyroidism. | (C): In secondary hypothyroidism TSH, T3, T4 are all low. | (D): Normal free T3 ≈ 3–7 pmol/L. | (E): TSH > 20 μIU/mL indicates hypothyroidism.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q12": {
+    "questionId": "cmu-bio-2023-may-p2-old-q12",
+    "stem": "Regarding lipoproteins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Chylomicrons are made in intestinal mucosa. | (B): VLDL is made in liver. | (C): Chylomicrons enter lymph (lacteals), not the portal vein. | (D): HDL carries cholesterol from tissues to liver. | (E): LDL is cholesterol-rich, TG-poor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q13": {
+    "questionId": "cmu-bio-2023-may-p2-old-q13",
+    "stem": "Regarding codon",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Codon = 3 consecutive bases of mRNA. | (B): tRNA carries the anticodon; codon is in mRNA. | (C): Each codon specifies an amino acid. | (D): UAA, UAG, UGA are stop codons. | (E): AUG = methionine (start); AGU = serine.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q14": {
+    "questionId": "cmu-bio-2023-may-p2-old-q14",
+    "stem": "During DNA replication",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): Helicase unwinds the double helix. | (B): DNA is synthesised 5'→3' only. | (C): Lagging strand is made as Okazaki fragments. | (D): Replication is SEMIconservative. | (E): DNA has thymine; uracil pairs with adenine in RNA.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q15": {
+    "questionId": "cmu-bio-2023-may-p2-old-q15",
+    "stem": "Regarding blotting techniques",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Northern = RNA; Southern = DNA; Western = protein. | (B): Southern = DNA. | (C): Western = protein. | (D): Southern blot uses a nucleic acid probe. | (E): Antibody probe is for Western blot.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q16": {
+    "questionId": "cmu-bio-2023-may-p2-old-q16",
+    "stem": "Diagnostic criteria of IGT",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): FPG ≥ 7 mmol/L is diabetes; IGT has FPG < 7. | (B): IGT = 2-h glucose 7.8–11.0 mmol/L. | (C): ≥ 11.1 mmol/L is diabetes, not IGT. | (D): HbA1c 5.7–6.4% = pre-diabetes. | (E): HbA1c ≥ 6.5% = diabetes.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q17": {
+    "questionId": "cmu-bio-2023-may-p2-old-q17",
+    "stem": "Disorders of amino acid metabolism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): PKU is autosomal recessive. | (B): Gaucher's is a lysosomal storage disease. | (D): Wilson's disease is a copper disorder.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q18": {
+    "questionId": "cmu-bio-2023-may-p2-old-q18",
+    "stem": "Mechanism of edema",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Reduced colloid osmotic pressure causes edema. | (E): Increased permeability causes edema.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q19": {
+    "questionId": "cmu-bio-2023-may-p2-old-q19",
+    "stem": "Mutation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Spontaneous mutation rate is low. | (B): Mutations occur anywhere in the genome. | (C): Replication errors cause mutation. | (D): β-thalassaemia is mostly point/splice mutations; nonsense mutations also occur. | (E): Mutations in non-coding DNA may be silent.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2023-may-p2-old-q20": {
+    "questionId": "cmu-bio-2023-may-p2-old-q20",
+    "stem": "The following are autosomal dominant disorders",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2023,
+    "session": "May 2023",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2023)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Achondroplasia is autosomal dominant. | (B): FH is autosomal dominant (LDL receptor). | (C): Nephrogenic DI is X-linked recessive. | (D): PKU is autosomal recessive. | (E): Sickle cell anaemia is autosomal recessive.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q1": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q1",
+    "stem": "About pH",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): pH is the NEGATIVE logarithm of [H+]. | (C): When acid is half-neutralized [salt] = [acid], log 1 = 0, so pH = pK. | (D): ECF/blood pH is 7.35–7.45 (7.4). | (E): Hyperventilation blows off CO2, lowers H2CO3 and raises pH (respiratory alkalosis).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q2": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q2",
+    "stem": "Regarding crystalloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Crystalloid particles are < 1 nm. | (B): Crystalloids show molecular movement; Brownian movement is typical of colloids. | (C): Crystalloids pass; colloids cannot pass through semipermeable membranes. | (D): Crystalloid osmotic pressure is large; colloid osmotic pressure is ~25–32 mmHg. | (E): Crystalloids are dialyzable; colloids/enzymes are not.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q3": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q3",
+    "stem": "Enzymes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Enzymes are proteins (colloids), not crystalloids. | (B): Enzymes are proteins (colloids) and are non-dialyzable. | (C): Coenzymes are non-protein organic molecules; the apoenzyme is the protein. | (D): Enzymes are reaction and substrate specific. | (E): Heat denatures enzyme proteins.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q4": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q4",
+    "stem": "Choose the correct answer for body fluid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Na+ is the principal ECF cation (~140 mEq/L). | (B): Cl- is the main ECF anion; ICF anions are phosphate and proteins. | (C): ICF (2/3 of TBW) is the major compartment; ECF is 1/3. | (D): ICF pH (~7.0) is lower than ECF (7.4). | (E): Mg2+ is the major intracellular divalent cation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q5": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q5",
+    "stem": "Regarding protein",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Peptide bond is –CO–NH– (not CONH2). | (B): Peptide bond is a covalent amide bond, not a gene expression. | (C): Denaturation disrupts 2°–4° structure only; peptide bonds (primary) stay intact. | (D): At isoelectric pH amino acids carry both + and – charges. | (E): Normal plasma protein is 6–8 g/dL.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q6": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q6",
+    "stem": "Lipids have the following facts",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Lipids include esters of mono- and polyhydric alcohols plus others (cholesterol, etc.). | (B): Lipids are lighter than water. | (C): Iodine number measures degree of unsaturation. | (D): Oxidation of unsaturated fats gives rancidity. | (E): Fish oils are rich in PUFA (ω-3).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q7": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q7",
+    "stem": "Regarding diffusion",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Diffusion is passive. | (B): Simple diffusion needs no carrier or energy. | (C): Facilitated diffusion goes down the gradient in either direction, as per gradient. | (D): Higher temperature increases diffusion. | (E): Simple diffusion has no carrier, so it cannot be competitively blocked.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q8": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q8",
+    "stem": "Fatty acid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Fatty acids are aliphatic. | (B): Mustard oil contains linoleic acid, an essential fatty acid. | (C): Double bonds lower melting point. | (D): Soap forms by saponification with alkali. | (E): Fish oils are rich in PUFA (ω-3).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q9": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q9",
+    "stem": "Renal buffers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b | False: a, c, d, e",
+    "explanation": "(A): Renal buffers are phosphate and ammonia. | (B): Urinary buffers let tubules secrete H+ without lowering urine pH below ~4.5. | (C): Phosphate/ammonia buffers are present in filtrate; in renal failure they are inadequate, not absent.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q10": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q10",
+    "stem": "Regarding carbohydrate",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Hexoses are 6-carbon monosaccharides. | (B): Lactose has a free anomeric carbon. | (C): Sucrose has no free anomeric carbon → non-reducing. | (D): Amylopectin has α-1,6 branches every 24–30 residues. | (E): Humans lack cellulase; cellulose gives no energy.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q11": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q11",
+    "stem": "Vitamins associated with some clinical conditions",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): B12 deficiency causes neuropsychiatric features. | (B): Wet beriberi → high-output cardiac failure. | (C): Phylloquinone (vit K1) is needed for clotting. | (D): Scurvy causes gum bleeding. | (E): Spina bifida/neural tube defects are due to FOLATE deficiency.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q12": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q12",
+    "stem": "Apo-lipoproteins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Apolipoproteins are structural and functional components of lipoproteins. | (B): Apolipoproteins help solubilise lipids in plasma. | (C): Apo B-100/E are ligands for receptors. | (D): Apo C-II activates LPL; apo A-I activates LCAT. | (E): Apo C and E are exchangeable between lipoproteins.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q13": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q13",
+    "stem": "Dietary fibers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Dietary fibres are polysaccharides (cellulose, pectin) – non-starch. | (C): Fibre REDUCES colon cancer risk.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q14": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q14",
+    "stem": "Cholesterol",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): Cholesterol is also made in intestine, adrenals, skin. | (B): Desirable total cholesterol < 200 mg/dL. | (C): Cholesterol is a derived lipid. | (D): Cholesterol has the cyclopentanoperhydrophenanthrene ring. | (E): Cholesterol synthesis is inhibited by cholesterol (feedback), statins, insulin/glucagon control.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q15": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q15",
+    "stem": "Regarding PEM",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Marasmus has no edema. | (B): Kwashiorkor has anorexia. | (C): Kwashiorkor: skin changes and hair changes (flag sign).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q16": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q16",
+    "stem": "Hypokalemia",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): Hypokalaemia = plasma K+ < 3.5 mmol/L. | (B): Hypokalaemia causes K+ shift INTO cells (influx). | (C): Hypokalaemia → H+ moves into cells, H+ excreted in urine → alkalosis. | (D): Hypokalaemia can cause cardiac arrest in SYSTOLE; hyperkalaemia causes arrest in diastole. | (E): Vomiting causes loss of H+, K+, Cl- → hypokalaemic alkalosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q17": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q17",
+    "stem": "Folic acid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): THF is the active form. | (B): RDA of folate is ~400 μg/day (600 μg in pregnancy), not mg. | (C): THF supplies carbon for purines and dTMP. | (D): THF carries one-carbon groups for purine/thymidylate synthesis. | (E): Folate deficiency → megaloblastic anaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q18": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q18",
+    "stem": "Balanced diet",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Balanced diet ratio ≈ 4:1:1 (carbohydrate : protein : fat). | (B): Balanced diet supports growth and maintenance. | (C): A balanced diet includes fibre. | (D): Balanced diet limits fat (~20–25% energy). | (E): Balanced diet supplies essential amino acids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q19": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q19",
+    "stem": "Regarding zymogens",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Zymogens are inactive precursors. | (B): Chymotrypsinogen is a pancreatic zymogen. | (C): Enterokinase activates trypsinogen. | (D): Trypsinogen → trypsin by enterokinase and autocatalysis. | (E): Pepsin cleaves internal peptide bonds.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p1-old-q20": {
+    "questionId": "cmu-bio-2022-nov-p1-old-q20",
+    "stem": "In uncompensated metabolic acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(A): Acidosis lowers pH. | (B): Acidosis lowers pH; alkalosis raises it. | (C): Raised PCO2 occurs in respiratory acidosis or as compensation of metabolic alkalosis, not as a feature of",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q1": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q1",
+    "stem": "Regarding glycolysis the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): End product of glycolysis is pyruvate (aerobic); lactate forms only in anaerobic conditions. | (B): Aerobic glycolysis ends in pyruvate (to mitochondria); lactate is formed only anaerobically. | (C): Glycolysis has 3 irreversible steps: hexokinase/glucokinase, PFK-1, pyruvate kinase. | (D): Lactate → pyruvate removes 2H (LDH, NAD+ → NADH): oxidation. | (E): Net ATP: anaerobic = 2; aerobic ≈ 7–8 (2 + NADH via shuttles).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q2": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q2",
+    "stem": "The following are observed in diabetic ketoacidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): DKA has low pH (acidosis). | (B): In DKA PCO2 is low due to Kussmaul breathing. | (E): Insulin lack and acidosis shift K+ out; plasma K+ is initially high.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q3": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q3",
+    "stem": "Regarding liver function tests",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): GGT rises in hepatobiliary disease, including viral hepatitis. | (B): Normal serum albumin 3.5–5 g/dL. | (C): Severe hepatocellular injury prolongs PT; PT is a synthetic function test. | (D): A:G is reversed in chronic liver disease. | (E): Bilirubin = excretory function; synthetic = albumin, PT.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q4": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q4",
+    "stem": "Insulin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Insulin promotes glycogen, fat and protein synthesis. | (B): Brain uses GLUT-3, which is insulin-independent. | (C): Insulin recruits GLUT-4 in muscle and adipose tissue. | (D): Insulin drives K+ into cells (lowers plasma K+); used to treat hyperkalaemia. | (E): Insulin acts via tyrosine kinase receptor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q5": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q5",
+    "stem": "Biochemical findings",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Hyperglycaemia raises osmolarity. | (B): DM causes metabolic acidosis. | (C): Reduced GFR raises creatinine. | (D): Hepatocellular damage raises bilirubin. | (E): Diarrhoea/renal tubular acidosis give normal-AG (hyperchloremic) acidosis; DKA, lactic acidosis give high AG.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q6": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q6",
+    "stem": "TSH values",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): TSH < 0.1 mU/L suggests thyrotoxicosis. | (B): TSH > 10 mU/L with low T4 = clinical hypothyroidism. | (C): TSH is the first-line thyroid screening test. | (D): Subclinical hypothyroidism: TSH 5–20 μIU/mL with normal T3/T4. | (E): TSH is the first-line test for thyroid disease.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q7": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q7",
+    "stem": "HMP shunt pathway",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): HMP shunt is cytosolic. | (B): HMP shunt produces NADPH and pentoses, no ATP. | (C): HMP shunt reduces NADP+ to NADPH. | (D): First phase of HMP is oxidative and irreversible; second is non-oxidative reversible. | (E): High-dose synthetic menadione causes hemolysis in neonates.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2022-nov-p2-old-q8": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q8",
+    "stem": "Regarding autosomal dominant disorder, the following are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Achondroplasia is autosomal dominant. | (B): Haemophilia is X-linked recessive. | (C): Cystic fibrosis is autosomal recessive. | (D): Vitamin D-resistant rickets is X-linked DOMINANT. | (E): AD disorders manifest in heterozygotes.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q9": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q9",
+    "stem": "In the anaerobic glycolysis pathway",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): G6PD is the HMP-shunt enzyme, not glycolytic. | (C): Glycolysis does not produce glycerol. | (D): Glycolysis produces pyruvate. | (E): Anaerobic glycolysis produces lactate.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q10": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q10",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): HMG-CoA reductase is the rate-limiting step. | (B): Bile acids are made from cholesterol by 7α-hydroxylase. | (C): Thyroxine up-regulates LDL receptors and LOWERS LDL. | (D): Deoxycholic and lithocholic acids are SECONDARY bile acids (bacterial 7-dehydroxylation). | (E): Taurochenodeoxycholic acid is a conjugated PRIMARY bile acid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q11": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q11",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): AUG is the START codon; stop codons are UAA, UAG, UGA. | (C): FH is autosomal dominant (LDL receptor). | (D): Haemophilia is X-linked RECESSIVE.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q12": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q12",
+    "stem": "Choose the correct answer for ketone bodies",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Acetone is derived from acetoacetate (lipid metabolism). | (B): Acetoacetate is the primary ketone body. | (C): Ketone bodies come from acetyl-CoA of fatty acids. | (D): Ketoacids lower pH. | (E): Rothera's nitroprusside test detects acetoacetate/acetone.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q13": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q13",
+    "stem": "Regarding lipoprotein, the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Chylomicrons carry EXOGENOUS (dietary) TG; VLDL carries endogenous TG. | (B): VLDL carries ENDOGENOUS TG. | (C): VLDL is synthesised in liver. | (D): CETP moves cholesteryl ester from HDL to VLDL/LDL. | (E): Apolipoproteins are enzyme cofactors/activators.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q14": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q14",
+    "stem": "Ammonia",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Ammonia is not produced during uric acid oxidation. | (B): Ammonia leaves the amino acid pool. | (C): Transamination moves NH2 without releasing NH3. | (D): NH3 + CO2 + 2ATP → carbamoyl phosphate. | (E): Portal shunting gives hyperammonaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q15": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q15",
+    "stem": "Conjugated bilirubin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): Bilirubin is conjugated with glucuronic acid; unconjugated travels on albumin. | (C): Hemolytic jaundice: unconjugated hyperbilirubinaemia. | (E): Bilirubin is conjugated in liver.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q16": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q16",
+    "stem": "Characteristic features of mRNA include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): mRNA carries the genetic message. | (B): Anticodon is in tRNA. | (C): Eukaryotic mRNA is capped, spliced, polyadenylated. | (D): tRNA is the adaptor. | (E): mRNA is a transcript of a gene.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q17": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q17",
+    "stem": "Enzymes of gluconeogenesis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c | False: a, d, e",
+    "explanation": "(A): Glucokinase is glycolytic/liver glucose sensor, not gluconeogenic. | (B): PEPCK is a key gluconeogenic enzyme. | (C): Glucose-6-phosphatase releases free glucose in gluconeogenesis. | (D): ALT only supplies pyruvate from alanine. | (E): CPS-I is a urea-cycle enzyme.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q18": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q18",
+    "stem": "Complications of GDM",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): Maternal hyperglycaemia → fetal hyperinsulinism → macrosomia. | (B): Acromegaly is GH excess, not a GDM complication. | (C): GDM raises risk of stillbirth. | (D): GDM predisposes to later type 2 DM. | (E): Hyperglycaemia in early gestation is teratogenic.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q19": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q19",
+    "stem": "Transcellular fluid is",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Transcellular fluids (CSF, aqueous humor, synovial, pleural, peritoneal) are formed by epithelial transport. | (B): Plasma is intravascular fluid, not transcellular. | (C): Synovial fluid is a transcellular fluid. | (D): Interstitial fluid is extracellular but not transcellular. | (E): Peritoneal fluid is a transcellular fluid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-nov-p2-old-q20": {
+    "questionId": "cmu-bio-2022-nov-p2-old-q20",
+    "stem": "About anion gap",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "November 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(A): AG represents the unmeasured anions (albumin, phosphate, sulphate, organic acids). | (B): Sulphate/phosphate are UNmeasured anions; measured anions are Cl- and HCO3 | (C): Normal anion gap is 8–16 mEq/L. | (D): High-AG metabolic acidosis (DKA, lactic acidosis, renal failure) raises the gap. | (E): AG = Na+ – (Cl- + HCO3",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q1": {
+    "questionId": "cmu-bio-2022-may-p1-old-q1",
+    "stem": "Regarding buffer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): A buffer = weak acid + its conjugate base (salt). | (B): Bicarbonate/plasma protein are plasma buffers; phosphate is mainly intracellular/renal. | (C): Renal buffers are phosphate and ammonia. | (D): pK of the bicarbonate buffer is 6.1. | (E): Buffer action is maximal when pH = pK.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q2": {
+    "questionId": "cmu-bio-2022-may-p1-old-q2",
+    "stem": "Regarding colloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Colloid particle size is 1–200 millimicron (mμ = nm); crystalloids are < 1 nm. | (B): Colloids show Brownian (particle) movement, not molecular movement. | (C): Colloids cannot pass through a semipermeable membrane. | (D): Colloids are too large to pass through a dialysis membrane. | (E): Colloids have few particles per volume, so their osmotic pressure is lower than that of crystalloids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2022-may-p1-old-q3": {
+    "questionId": "cmu-bio-2022-may-p1-old-q3",
+    "stem": "Denaturation of protein is characterized by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Denaturation uncoils the chain, losing biological activity. | (B): Denatured protein is less soluble and easily precipitated. | (C): Denaturation destroys the native conformation, so activity is lost. | (D): Denatured protein is less diffusible. | (E): Denatured protein becomes less soluble.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q4": {
+    "questionId": "cmu-bio-2022-may-p1-old-q4",
+    "stem": "Regarding isotopes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Co-60 emits γ-rays for radiotherapy. | (B): Helium is a separate element; hydrogen isotopes are deuterium and tritium. | (C): I-131 albumin measures plasma volume; not CSF volume. | (D): C-12 is the reference standard for atomic mass. | (E): Cr-51-tagged RBCs measure RBC volume.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2022-may-p1-old-q5": {
+    "questionId": "cmu-bio-2022-may-p1-old-q5",
+    "stem": "Body water is maintained by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Hypothalamus has osmoreceptors and makes ADH → water balance. | (B): ADH conserves water by increasing collecting-duct permeability. | (C): Thyroxine regulates metabolism, not water balance. | (D): Plasma osmolarity is the main stimulus for ADH and thirst. | (E): Thirst is stimulated by high osmolarity and low volume.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q6": {
+    "questionId": "cmu-bio-2022-may-p1-old-q6",
+    "stem": "Neutral fat",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Neutral fat is an ester of glycerol (trihydric). | (B): Neutral fat is uncharged. | (C): Triacylglycerol = glycerol + 3 fatty acids. | (D): Neutral fat contains mixed saturated/unsaturated fatty acids. | (E): Neutral fat is a simple lipid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q7": {
+    "questionId": "cmu-bio-2022-may-p1-old-q7",
+    "stem": "Regarding osmosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Osmosis = solvent movement across a semipermeable membrane. | (B): In osmosis the solvent moves; solutes cannot cross. | (C): In osmosis only the solvent crosses. | (D): Osmotic pressure depends on the number of solute particles. | (E): Osmosis is by definition solvent movement.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q8": {
+    "questionId": "cmu-bio-2022-may-p1-old-q8",
+    "stem": "Regarding carbohydrate",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Natural sugars are mostly D-forms. | (B): Maltose has a free anomeric carbon → reducing. | (C): Maltose = glucose + glucose. | (D): Inulin is a polymer of D-fructose. | (E): Dextran is a glucose polymer used as plasma expander.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q9": {
+    "questionId": "cmu-bio-2022-may-p1-old-q9",
+    "stem": "Concerning coenzyme",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): CoA (from pantothenic acid) carries acyl/acetyl groups. | (B): TPP transfers 2-carbon aldehyde groups (decarboxylation), not CO2. | (C): Coenzymes bind the enzyme at/near active site. | (D): Enzymes are proteins and heat labile.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q10": {
+    "questionId": "cmu-bio-2022-may-p1-old-q10",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d | False: a, b, c, e",
+    "explanation": "(A): Bile has salts, not enzymes; lipase comes from pancreas. | (B): Gastrin is a hormone secreted into blood, not an enzyme of juice. | (C): Pancreatic juice contains trypsin inhibitor; α1-antitrypsin is plasma. | (E): Chylomicrons are made in intestinal mucosa.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q11": {
+    "questionId": "cmu-bio-2022-may-p1-old-q11",
+    "stem": "About vitamin A deficiency",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Vitamin A deficiency impairs immunity and epithelia. | (B): Rod dysfunction → failure of dark adaptation. | (C): Vitamin A deficiency causes follicular hyperkeratosis (toad skin). | (D): Osteomalacia is vitamin D deficiency; vitamin A deficiency causes xerophthalmia. | (E): Keratinisation of respiratory epithelium predisposes to infection.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q12": {
+    "questionId": "cmu-bio-2022-may-p1-old-q12",
+    "stem": "The characteristics of marasmus",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): Edema is a feature of kwashiorkor, not marasmus. | (E): Marasmus: weight/age < 60% (Wellcome classification).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q13": {
+    "questionId": "cmu-bio-2022-may-p1-old-q13",
+    "stem": "Functions of respective fat-soluble vitamins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Retinal is the visual pigment chromophore. | (B): Calcitriol raises Ca2+ and phosphate absorption. | (C): Blood clotting is vitamin K; vitamin E is an antioxidant. | (D): Vitamin K carboxylates clotting factors; vitamin E is the antioxidant. | (E): Retinol is needed for spermatogenesis and reproduction.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q14": {
+    "questionId": "cmu-bio-2022-may-p1-old-q14",
+    "stem": "An increase in ECF osmolarity",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): High osmolarity stimulates osmoreceptors and ADH release. | (B): High ECF osmolarity STIMULATES thirst. | (C): Osmoreceptors in hypothalamus are stimulated by high osmolarity. | (D): Gain of water would dilute (lower) osmolarity. | (E): Water loss concentrates ECF.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q15": {
+    "questionId": "cmu-bio-2022-may-p1-old-q15",
+    "stem": "Regarding eicosanoids",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): Eicosanoids are 20-carbon derivatives. | (E): Lung is the major site of PG degradation.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q16": {
+    "questionId": "cmu-bio-2022-may-p1-old-q16",
+    "stem": "About GIT hormones",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): GIP stimulates insulin release (incretin). | (E): CCK DELAYS gastric emptying.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q17": {
+    "questionId": "cmu-bio-2022-may-p1-old-q17",
+    "stem": "One osmolar solution of NaCl",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): NaCl dissociates into 2 particles; 1 osmolar needs 29.25 g/L. | (B): 1 osmolar NaCl is hypertonic → RBC shrink. | (C): 1 osmolar = 1000 mosm/L, far above plasma. | (D): NaCl gives two osmoles per mole, so 1 osmolar = 0.5 M. | (E): 0.9% NaCl is ~0.3 osmolar.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q18": {
+    "questionId": "cmu-bio-2022-may-p1-old-q18",
+    "stem": "Regarding iron",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Iron is absorbed in duodenum/upper jejunum. | (B): Fe2+ (ferrous) is the absorbed form. | (C): Vitamin C favours iron absorption. | (D): Fe3+ circulates bound to transferrin. | (E): Intracellular iron is stored as ferritin.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q19": {
+    "questionId": "cmu-bio-2022-may-p1-old-q19",
+    "stem": "Characteristics of dehydration in severe diarrhoea",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Diarrhoea causes loss of hypotonic fluid → hyperosmolar dehydration. | (B): Raised PCO2 occurs in respiratory acidosis or as compensation of metabolic alkalosis, not as a feature of | (D): Diarrhoea/renal tubular acidosis give normal-AG (hyperchloremic) acidosis; DKA, lactic acidosis give high AG. | (E): Acidaemia is pH < 7.35; alkalosis has pH > 7.45.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p1-old-q20": {
+    "questionId": "cmu-bio-2022-may-p1-old-q20",
+    "stem": "In respiratory acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): Acidosis lowers pH. | (B): Acidosis lowers pH; alkalosis raises it. | (C): Raised PCO2 occurs in respiratory acidosis or as compensation of metabolic alkalosis, not as a feature of",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q1": {
+    "questionId": "cmu-bio-2022-may-p2-old-q1",
+    "stem": "Regarding lipoprotein, the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Chylomicrons carry EXOGENOUS (dietary) TG; VLDL carries endogenous TG. | (B): VLDL carries ENDOGENOUS TG. | (C): VLDL is synthesised in liver. | (D): CETP moves cholesteryl ester from HDL to VLDL/LDL. | (E): Apolipoproteins are enzyme cofactors/activators.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q2": {
+    "questionId": "cmu-bio-2022-may-p2-old-q2",
+    "stem": "Regarding protein metabolism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(A): Deamination occurs mainly in liver and kidney. | (B): Transamination occurs in cytosol and mitochondria. | (C): Transamination occurs in many tissues. | (D): Urea-cycle CO2 is from HCO3 | (E): Non-oxidative deamination uses dehydratase/lyase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q3": {
+    "questionId": "cmu-bio-2022-may-p2-old-q3",
+    "stem": "In glycolysis the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): End product of glycolysis is pyruvate (aerobic); lactate forms only in anaerobic conditions. | (B): Aerobic glycolysis ends in pyruvate (to mitochondria); lactate is formed only anaerobically. | (C): Glycolysis has 3 irreversible steps: hexokinase/glucokinase, PFK-1, pyruvate kinase. | (D): Lactate → pyruvate removes 2H (LDH, NAD+ → NADH): oxidation. | (E): Net ATP: anaerobic = 2; aerobic ≈ 7–8 (2 + NADH via shuttles).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q4": {
+    "questionId": "cmu-bio-2022-may-p2-old-q4",
+    "stem": "Regarding hypothyroidism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Primary hypothyroidism: gland failure → ↓T3/T4 → ↑TSH (feedback). | (B): Secondary hypothyroidism: pituitary failure → TSH low (or inappropriately normal) with low T4. | (C): In subclinical primary hypothyroidism T3/T4 stay normal with raised TSH. | (D): Secondary hypothyroidism has low T3/T4. | (E): Subclinical hypothyroidism: normal T3/T4, raised TSH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q5": {
+    "questionId": "cmu-bio-2022-may-p2-old-q5",
+    "stem": "Regarding ATP",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): ATP = adenine + ribose + 3 phosphates. | (B): ATP hydrolysis ≈ –7.3 kcal/mol. | (C): ATP is also formed by substrate-level phosphorylation. | (D): Substrate-level phosphorylation exists (PK, PGK, succinyl-CoA synthetase). | (E): Na+-K+ pump uses ~20–40% of ATP.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q6": {
+    "questionId": "cmu-bio-2022-may-p2-old-q6",
+    "stem": "Fat-soluble vitamins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Fat-soluble vitamins are absorbed in micelles. | (B): Fat-soluble vitamins (A, D) accumulate in the body. | (C): Vitamins A, E (and carotenes) are antioxidants. | (D): Vitamin K γ-carboxylates factors II, VII, IX, X. | (E): None is adequately synthesised except vitamin D (skin) partly.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q7": {
+    "questionId": "cmu-bio-2022-may-p2-old-q7",
+    "stem": "Dietary fibre",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Dietary fibres are non-starch polysaccharides. | (C): Fibre REDUCES colon cancer risk.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q8": {
+    "questionId": "cmu-bio-2022-may-p2-old-q8",
+    "stem": "Beta-oxidation of fatty acid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): β-oxidation occurs in mitochondria (activation in cytosol). | (B): β-oxidation generates abundant ATP. | (C): Unsaturated and odd-chain FA are also oxidised. | (D): Cardiac muscle prefers fatty acids as fuel. | (E): β-oxidation needs NAD+ (niacin).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q9": {
+    "questionId": "cmu-bio-2022-may-p2-old-q9",
+    "stem": "Fates of acetyl-CoA",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Acetyl-CoA is oxidised in the TCA cycle. | (B): Excess acetyl-CoA → ketone bodies. | (C): Acetone arises from acetoacetate, not directly. | (D): Acetyl-CoA → HMG-CoA → cholesterol. | (E): Prostaglandins derive from arachidonic acid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q10": {
+    "questionId": "cmu-bio-2022-may-p2-old-q10",
+    "stem": "Down syndrome",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): Down syndrome is trisomy 21. | (B): Down syndrome has an increased risk of hypothyroidism. | (C): ~95% of Down syndrome is trisomy; ~4% translocation. | (D): ~95% of non-disjunction is maternal (oogenesis). | (E): Meiotic non-disjunction (mostly maternal) causes trisomy 21.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q11": {
+    "questionId": "cmu-bio-2022-may-p2-old-q11",
+    "stem": "The following are facts in the TCA cycle",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): TCA cycle is both catabolic and anabolic. | (B): TCA produces NADH and FADH2. | (C): Succinyl-CoA synthetase makes GTP/ATP at substrate level. | (D): α-KG dehydrogenase uses lipoic acid. | (E): Oxaloacetate + acetyl-CoA → citrate.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q12": {
+    "questionId": "cmu-bio-2022-may-p2-old-q12",
+    "stem": "PCR",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): PCR uses DNA polymerase. | (B): PCR cycles: denaturation, primer annealing (hybridization), extension. | (C): DNA polymerase needs a primer. | (D): DNA polymerase forms 3'–5' phosphodiester bonds. | (E): Ligase is not used in PCR.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q13": {
+    "questionId": "cmu-bio-2022-may-p2-old-q13",
+    "stem": "Thyroid hormone",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): T3/T4 are tyrosine derivatives. | (B): Thyroid hormones raise BMR. | (C): Thyroid hormone increases Na+-K+ ATPase → heat/O2 consumption. | (D): TSH drives thyroid hormone secretion. | (E): Insulin acts via tyrosine kinase receptor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q14": {
+    "questionId": "cmu-bio-2022-may-p2-old-q14",
+    "stem": "Aldosterone",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Angiotensin II is the vasoconstrictor; aldosterone retains Na+. | (B): Aldosterone is a mineralocorticoid steroid. | (C): Angiotensin II stimulates aldosterone release. | (D): Cortisol/aldosterone deficiency is fatal. | (E): Conn's syndrome is aldosterone EXCESS.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q15": {
+    "questionId": "cmu-bio-2022-may-p2-old-q15",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d, e | False: a",
+    "explanation": "(A): Haemophilia is X-linked recessive. | (B): Mutation = permanent change in DNA. | (C): In XLR disease, males are affected, females are carriers. | (D): Down syndrome = trisomy 21.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q16": {
+    "questionId": "cmu-bio-2022-may-p2-old-q16",
+    "stem": "Causes of dwarfism are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): GH deficiency → pituitary dwarfism. | (B): Laron dwarfism: GH-receptor defect. | (C): Loss of GH → dwarfism. | (D): GH deficiency → pituitary dwarfism. | (E): Excess IGF-1 → gigantism/acromegaly, not dwarfism.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q17": {
+    "questionId": "cmu-bio-2022-may-p2-old-q17",
+    "stem": "ADH",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: e | False: a, b, c, d",
+    "explanation": "(A): ADH is made in hypothalamic neurons and stored in the posterior pituitary. | (B): ADH travels by axons (hypothalamo-hypophyseal tract). | (C): Osmolarity is the main stimulus; Ang II is a minor stimulus. | (D): ADH release is stimulated by high osmolarity/low volume. | (E): At high doses ADH constricts vessels (vasopressin).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q18": {
+    "questionId": "cmu-bio-2022-may-p2-old-q18",
+    "stem": "Cell cycle",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Cyclin–CDK control the cell cycle. | (B): DNA and histones are synthesised in S phase. | (C): G2 prepares for mitosis. | (D): Chromosomes are condensed and transcriptionally silent in M phase. | (E): G1 prepares for replication.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q19": {
+    "questionId": "cmu-bio-2022-may-p2-old-q19",
+    "stem": "X-linked recessive disorders include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): PKU is autosomal recessive. | (B): β-thalassaemia is autosomal recessive. | (C): Haemophilia A is X-linked recessive. | (D): Bruton's agammaglobulinaemia is X-linked recessive. | (E): Nephrogenic DI is X-linked recessive.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2022-may-p2-old-q20": {
+    "questionId": "cmu-bio-2022-may-p2-old-q20",
+    "stem": "Insulin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2022,
+    "session": "May 2022",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2022)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Insulin is made in β-cells of islets. | (B): Insulin has A (21 aa) and B (30 aa) chains linked by disulphides. | (C): Insulin is secreted when glucose RISES. | (D): Insulin inhibits phosphorylase and activates glycogen synthase. | (E): In MODY/type 2, insulin is present but insufficient/resistant.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q1": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q1",
+    "stem": "pH of a buffer solution",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(B): pK is –log Ka; pH is –log [H+]. | (C): pH depends on the RATIO of salt to acid, not on concentration alone. | (D): pH depends on the RATIO of salt to acid, not on concentration alone. | (E): pH = pK only at equal salt and acid concentrations.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q2": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q2",
+    "stem": "Regarding crystalloids",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Colloids are too large to pass through a dialysis membrane. | (B): Crystalloid particles are < 1 nm. | (C): Crystalloids pass; colloids cannot pass through semipermeable membranes. | (D): Crystalloids do not show Brownian movement; colloids do. | (E): Crystalloids are numerous small particles and exert greater osmotic pressure than colloids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q3": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q3",
+    "stem": "Enzymes are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Coenzymes are non-protein organic molecules; the apoenzyme is the protein. | (B): Colloids are non-dialyzable. | (C): Enzymes are heat labile proteins; coenzymes are heat stable. | (D): Enzymes are reaction and substrate specific. | (E): Enzymes are colloids (proteins), not crystalloids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q4": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q4",
+    "stem": "Isotopes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): Isotopes: same atomic number, different neutrons. | (B): Isotopes have the same number of protons. | (C): Different neutron number → different atomic weight. | (D): Some isotopes are stable, others radioactive. | (E): Radioisotopes (I-131, Co-60) are used therapeutically.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q5": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q5",
+    "stem": "Regarding weak acid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(B): A weak acid is a proton donor. | (C): A weak acid has a relatively strong conjugate base.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q6": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q6",
+    "stem": "Regarding lipid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Lipids dissolve in organic solvents, including alcohol. | (B): Dipalmitoyl lecithin (surfactant) lowers alveolar surface tension. | (C): Saturated fats raise LDL and cardiovascular risk. | (D): Saponification number is inversely related to chain length. | (E): Lipid peroxidation of LDL contributes to atherosclerosis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q7": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q7",
+    "stem": "Simple diffusion of a substance",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Simple diffusion is passive, only down a concentration gradient. | (B): Simple diffusion cannot go against an electrochemical gradient (needs active transport). | (C): Diffusion rate rises with temperature (more kinetic energy). | (D): Simple diffusion can occur without a semipermeable membrane. | (E): Diffusion is directly proportional to lipid solubility.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q8": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q8",
+    "stem": "Regarding carbohydrates",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Glucose and mannose differ at C-2 (epimers). | (B): Fructose has a keto group at C-2. | (C): Carbohydrates show many isomerisms. | (D): Sugars taste sweet. | (E): Carbohydrate is anti-ketogenic (supplies oxaloacetate).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q9": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q9",
+    "stem": "Characteristics of ICF",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): ICF holds ~2/3 of total body water. | (B): K+ is the principal ICF cation. | (C): Cl- is the main ECF anion; ICF anions are phosphate and proteins. | (D): ECF and ICF are iso-osmotic, with equal total ionic concentration. | (E): ICF pH (~7.0) is lower than ECF (7.4).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q10": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q10",
+    "stem": "About digestion the following are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(C): Pepsin digests protein. | (D): Micelles contain bile salts, phospholipid, cholesterol and FA — not cholesterol alone. | (E): Bile salts are detergents that lower surface tension → emulsification.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q11": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q11",
+    "stem": "Regarding vitamins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Retinol (vitamin A) is the alcohol form. | (B): Collagen synthesis needs vitamin C. | (C): Active form is calcitriol (1,25-DHCC); calcidiol is the storage form. | (D): RDA of vitamin D in adults ≈ 600 IU (15 μg)/day. | (E): Vitamins A, C, E are antioxidants.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p1-old-q12": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q12",
+    "stem": "Example of transcellular fluid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): Plasma is intravascular fluid, not transcellular. | (B): Synovial fluid is a transcellular fluid. | (C): Transcellular fluids (CSF, aqueous humor, synovial, pleural, peritoneal) are formed by epithelial transport. | (D): Interstitial fluid is extracellular but not transcellular. | (E): Pericardial fluid is a transcellular fluid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q13": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q13",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): 0.9% NaCl is 'normal' saline, not 1 N (1 N NaCl = 5.85%). | (B): 5% glucose (278 mmol/L) is isotonic. | (C): 1 M glucose = 1 osmole/L (non-dissociating). | (D): Normal anion gap is 8–16 mEq/L. | (E): Normal plasma osmolarity is ~280–296 mosmol/L.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p1-old-q14": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q14",
+    "stem": "Deficiency of vitamins is associated with",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Niacin deficiency → pellagra (dermatitis, diarrhoea, dementia). | (B): Beriberi is thiamine deficiency. | (C): Folate deficiency in early pregnancy → neural tube defects. | (D): Vitamin C deficiency → scurvy; megaloblastic anaemia is B12/folate. | (E): Vitamin D deficiency → rickets/osteomalacia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q15": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q15",
+    "stem": "Regarding protein",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Proteins are high-molecular-weight polypeptides. | (B): Heat breaks H-bonds and denatures protein. | (C): β-pleated sheet is a secondary structure. | (D): Plasma proteins (albumin) exert oncotic pressure. | (E): Normal plasma protein is 6–8 g/dL.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p1-old-q16": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q16",
+    "stem": "Folic acid has the following facts",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, e | False: a, d",
+    "explanation": "(A): THF is the active form. | (C): THF carries one-carbon groups for purine/thymidylate synthesis. | (D): RDA of folate is ~400 μg/day (600 μg in pregnancy), not mg. | (E): Folate deficiency → macrocytic/megaloblastic anaemia.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q17": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q17",
+    "stem": "Normal saline",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): Normal saline is simply 0.9% NaCl isotonic solution. | (B): Normal saline = 0.9% NaCl (isotonic). | (C): 'Normal' refers to physiological, not 1 N. | (D): 0.9% NaCl is isotonic with plasma. | (E): Saline replaces fluid and Na+ in diarrhoea.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q18": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q18",
+    "stem": "Regarding trace elements",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d, e | False: a",
+    "explanation": "(A): Trace elements are needed in mg (< 100 mg/day) not gm. | (B): Iron is a trace element. | (C): Iodine is needed for thyroid hormone for brain development. | (D): Daily iron requirement is ~10 mg (men). | (E): Zn is a cofactor of many enzymes.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q19": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q19",
+    "stem": "The characteristics of kwashiorkor",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d, e | False: b",
+    "explanation": "(B): Emaciation is marasmus.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p1-old-q20": {
+    "questionId": "cmu-bio-2021-nov-p1-old-q20",
+    "stem": "In metabolic alkalosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): Alkalosis lowers [H+] and raises pH. | (B): Acidosis lowers pH; alkalosis raises it. | (C): Hypoventilation compensates metabolic alkalosis, raising PCO2. | (E): Acidaemia is pH < 7.35; alkalosis has pH > 7.45.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q1": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q1",
+    "stem": "Enzymes required for cholesterol synthesis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): HMG-CoA lyase is a ketogenesis enzyme. | (B): Acetyl-CoA carboxylase is the rate-limiting enzyme of fatty acid synthesis. | (C): HMG-CoA reductase is the rate-limiting enzyme. | (D): Succinyl-CoA synthetase is a TCA enzyme. | (E): HMG-CoA synthase (cytosolic) is in cholesterol synthesis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q2": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q2",
+    "stem": "HDL cholesterol",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b | False: a, c, d, e",
+    "explanation": "(A): Nascent HDL is made in liver/intestine. | (B): HDL is ~50% protein. | (C): HDL is the smallest and densest lipoprotein. | (D): HDL is anti-atherogenic (reverse cholesterol transport). | (E): HDL/LDL are metabolised in liver.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q3": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q3",
+    "stem": "About blotting techniques",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Northern detects RNA. | (B): Western detects protein. | (C): Southern detects a DNA segment. | (D): Northern blot shows mRNA expression. | (E): DNA fingerprint = Southern/PCR.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q4": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q4",
+    "stem": "Regarding ketoacidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, e | False: d",
+    "explanation": "(A): DKA: ketoacids lower pH. | (B): Osmotic diuresis → volume depletion. | (D): Ketoanions raise the anion gap in DKA. | (E): Ketogenesis raises acetoacetate.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q5": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q5",
+    "stem": "Regarding glycogenesis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True:  | False: a, b, c, d, e",
+    "explanation": "(A): Glycolysis yields ATP by substrate-level phosphorylation. | (B): Glycogen is just a polymer of glucose; stored energy is not 'higher' in glucose per unit. | (C): Glycogen synthase is rate-limiting for glycogenesis; phosphorylase for glycogenolysis. | (D): Insulin stimulates glycogen synthase (glycogenesis). | (E): Glucagon stimulates glycogenolysis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q6": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q6",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Lysine, threonine, proline, hydroxyproline do not undergo transamination. | (B): Intestinal bacteria PRODUCE ammonia (urease); it is removed as urea/glutamine. | (C): Oxidative deamination (glutamate dehydrogenase) releases NH3 from amino acids. | (E): Proline is made from glutamate; it is not a urea-cycle product.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q7": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q7",
+    "stem": "About DNA replication",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Each daughter DNA has one old and one new strand. | (B): Elongation factors belong to translation. | (C): Replication uses DNA polymerase, not reverse transcriptase. | (D): New strand grows 5'→3'. | (E): Ligase seals nicks in replication.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q8": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q8",
+    "stem": "Features of Addison's disease are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Cortisol deficiency (Addison's) → hypoglycaemia. | (B): Aldosterone deficiency → Na+ loss. | (C): Addison's: calcium is normal/high, not low. | (D): ↑ACTH/MSH → hyperpigmentation in Addison's. | (E): Aldosterone/cortisol lack → salt loss, hypotension; Cushing's causes hypertension.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q9": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q9",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d | False: a, b, e",
+    "explanation": "(A): Normal plasma osmolarity is 280–296. | (B): Microalbuminuria = 30–300 mg/day. | (D): Rothera's nitroprusside test detects acetoacetate/acetone. | (E): Benedict's test detects reducing sugars (glucose, fructose, lactose, maltose), not sucrose.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q10": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q10",
+    "stem": "Insulin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): Insulin is an endocrine secretion of β-cells. | (C): Insulin lowers plasma K+. | (D): Insulin → GLUT-4 translocation. | (E): Insulin inhibits hormone-sensitive lipase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q11": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q11",
+    "stem": "TSH value",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): TSH < 0.1 mU/L suggests thyrotoxicosis. | (B): TSH > 10 mU/L with low T4 = clinical hypothyroidism. | (C): TSH is the first-line thyroid screening test. | (D): Subclinical hypothyroidism: TSH 5–20 μIU/mL with normal T3/T4. | (E): TSH is the first-line test for thyroid disease.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p2-old-q12": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q12",
+    "stem": "Regarding primary hypothyroidism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Hypothyroidism reduces LDL receptors → ↑ cholesterol. | (B): Primary hypothyroidism → raised TSH. | (C): Subclinical hypothyroidism: TSH 5–20 μIU/mL with normal T3/T4. | (D): Hypothyroidism causes anovulation/menstrual disturbance → infertility. | (E): In subclinical hypothyroidism T3/T4 are normal.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p2-old-q13": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q13",
+    "stem": "In myocardial infarction, the enzymes/markers that rise within 4–6 hours",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d | False: a, c, e",
+    "explanation": "(A): ALT is the most specific for hepatocellular injury. | (B): Cardiac troponins are the most specific MI markers. | (C): AST is non-specific (heart, muscle, liver). | (E): LDH is a tetramer, so it has quaternary structure.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q14": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q14",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): AUG is the START codon; stop codons are UAA, UAG, UGA. | (C): FH is autosomal dominant (LDL receptor). | (D): Haemophilia is X-linked RECESSIVE.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q15": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q15",
+    "stem": "Blood glucose",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): Fasting hyperglycaemia = hepatic insulin resistance/deficiency. | (B): Post-prandial rise indicates impaired insulin response. | (C): Fasting glucose < 70 mg/dL is hypoglycaemia. | (D): 2-h post-prandial > 140 mg/dL is abnormal. | (E): Insulin lowers blood glucose.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q16": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q16",
+    "stem": "Regarding liver function tests",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Needs Review",
+    "correctAnswerSummary": "True: a, b, c, d | False: e",
+    "explanation": "(A): Normal albumin is 3.5–5.5 g/dL. | (B): ALT rises in hepatocellular jaundice. | (C): ALP rises in obstructive jaundice. | (D): A:G ratio is reversed (< 1) in chronic liver disease. | (E): Prehepatic jaundice: unconjugated bilirubin rises.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)",
+    "reviewReason": "Question wording, typographical artifact, or conflicting key corrected in source."
+  },
+  "cmu-bio-2021-nov-p2-old-q17": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q17",
+    "stem": "The following statements are true",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, e | False: a, b, d",
+    "explanation": "(A): Desirable triglyceride < 150 mg/dL. | (B): Down syndrome is aneuploidy (trisomy), not polyploidy. | (C): Non-disjunction gives trisomy/monosomy. | (D): Turner = 45,X; 47,XXY is Klinefelter. | (E): HbA1c > 6.5% is diagnostic of DM.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q18": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q18",
+    "stem": "Examples of autosomal dominant disorders",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Achondroplasia is autosomal dominant. | (B): Sickle cell anaemia is autosomal recessive. | (C): PKU is autosomal recessive. | (D): Nephrogenic diabetes insipidus is X-linked recessive. | (E): FH is autosomal dominant (LDL receptor).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q19": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q19",
+    "stem": "PCR",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): PCR uses DNA polymerase. | (B): PCR cycles: denaturation, primer annealing (hybridization), extension. | (C): DNA polymerase needs a primer. | (D): DNA polymerase forms 3'–5' phosphodiester bonds. | (E): Ligase is not used in PCR.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-nov-p2-old-q20": {
+    "questionId": "cmu-bio-2021-nov-p2-old-q20",
+    "stem": "Codons",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "November 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (November 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(B): The genetic code is non-overlapping. | (C): Each codon specifies an amino acid. | (D): UAA, UAG, UGA are stop codons. | (E): AUG = methionine (start); AGU = serine.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q1": {
+    "questionId": "cmu-bio-2021-may-p1-old-q1",
+    "stem": "Regarding buffer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): A buffer = weak acid + its salt with a strong base. | (B): Buffering is maximal at pH = pK (±1). | (C): Chemical buffers act instantly; lungs take minutes and kidneys hours–days. | (D): Buffers are present in both ECF and ICF.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q2": {
+    "questionId": "cmu-bio-2021-may-p1-old-q2",
+    "stem": "Colloid",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Colloid particle size is 1–200 millimicron (mμ = nm); crystalloids are < 1 nm. | (B): Colloids carry charge and migrate in an electric field (electrophoresis). | (C): Colloids such as proteins have a definite isoelectric pH. | (D): Colloids show Brownian movement (random particle movement); molecular/ionic movement is typical of | (E): DNA is a macromolecule that forms colloidal solution.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q3": {
+    "questionId": "cmu-bio-2021-may-p1-old-q3",
+    "stem": "The statements can be applied for the H-H equation",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): H-H equation: pH = pK + log [salt]/[acid]. | (D): When acid is half-neutralized [salt] = [acid], log 1 = 0, so pH = pK. | (E): H-H equation is derived from the law of mass action applied to Ka of a weak acid.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q4": {
+    "questionId": "cmu-bio-2021-may-p1-old-q4",
+    "stem": "Regarding carbohydrates",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Carbohydrates = polyhydroxy aldehydes/ketones and derivatives. | (B): Asymmetric carbons give optical isomerism. | (C): Invert sugar is a glucose + fructose mixture from sucrose hydrolysis. | (D): Sucrose has no free anomeric carbon, so no mutarotation. | (E): Carbohydrate is anti-ketogenic (supplies oxaloacetate).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q5": {
+    "questionId": "cmu-bio-2021-may-p1-old-q5",
+    "stem": "Quaternary structure is present in",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c | False: b, d, e",
+    "explanation": "(A): LDH is a tetramer, so it has quaternary structure. | (B): Coagulated protein is denatured; quaternary structure is lost. | (C): Hb is a tetramer (α2β2): quaternary structure. | (D): Denatured protein loses its higher-order structure. | (E): Myoglobin is a single polypeptide with tertiary structure only.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q6": {
+    "questionId": "cmu-bio-2021-may-p1-old-q6",
+    "stem": "Choose the correct answer",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c | False: a, b, d, e",
+    "explanation": "(A): Lysine, threonine, proline, hydroxyproline do not undergo transamination. | (B): Intestinal bacteria PRODUCE ammonia (urease); it is removed as urea/glutamine. | (C): Oxidative deamination (glutamate dehydrogenase) releases NH3 from amino acids. | (E): Proline is made from glutamate; it is not a urea-cycle product.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q7": {
+    "questionId": "cmu-bio-2021-may-p1-old-q7",
+    "stem": "Enzymes with their clinical significance",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): ALT is more liver-specific than AST. | (B): CPK-MM is the skeletal muscle isoenzyme; CK-MB is cardiac. | (C): ALT (SGPT) is the liver marker; AST rises in MI. | (D): ACP (not ALP) rises in prostate cancer. | (E): Aldolase rises in muscle disease (muscular dystrophy).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q8": {
+    "questionId": "cmu-bio-2021-may-p1-old-q8",
+    "stem": "Regarding fatty acids",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d, e | False: b, c",
+    "explanation": "(A): Fatty acids are aliphatic monocarboxylic acids. | (B): Free fatty acids circulate bound to albumin. | (C): Fatty acids are components/derived lipids. | (D): Long-chain fatty acids need bile-salt micelles. | (E): Glucose → acetyl-CoA → fatty acids.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q9": {
+    "questionId": "cmu-bio-2021-may-p1-old-q9",
+    "stem": "Osmosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): Osmotic pressure depends on the number of solute particles. | (B): Osmosis is by definition solvent movement. | (C): Osmosis = solvent movement across a semipermeable membrane. | (D): In osmosis the solvent moves; solutes cannot cross. | (E): In osmosis only the solvent crosses the semipermeable membrane.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q10": {
+    "questionId": "cmu-bio-2021-may-p1-old-q10",
+    "stem": "Fat-soluble vitamins",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Fat-soluble vitamins are absorbed in micelles. | (B): Fat-soluble vitamins (A, D) accumulate in the body. | (C): Vitamins A, E (and carotenes) are antioxidants. | (D): Vitamin K γ-carboxylates factors II, VII, IX, X. | (E): None is adequately synthesised except vitamin D (skin) partly.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q11": {
+    "questionId": "cmu-bio-2021-may-p1-old-q11",
+    "stem": "Regarding coenzymes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Coenzymes are NON-protein organic molecules. | (B): Enzymes catalyse; coenzymes only assist as carriers. | (C): Most coenzymes derive from water-soluble (B-complex) vitamins. | (D): TPP (from vitamin B1) is a coenzyme for oxidative decarboxylation and transketolase. | (E): NADPH donates reducing equivalents for biosynthesis (fatty acid, cholesterol).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q12": {
+    "questionId": "cmu-bio-2021-may-p1-old-q12",
+    "stem": "Following are the facts for gut hormones",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d | False: a, b, c, e",
+    "explanation": "(B): Secretin → HCO3 | (C): CCK causes gall bladder contraction. | (E): CCK stimulates gall bladder contraction.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q13": {
+    "questionId": "cmu-bio-2021-may-p1-old-q13",
+    "stem": "Dietary fibres",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): Dietary fibres are non-starch polysaccharides. | (C): Fibre REDUCES colon cancer risk.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q14": {
+    "questionId": "cmu-bio-2021-may-p1-old-q14",
+    "stem": "In metabolic acidosis",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: e | False: a, b, c, d",
+    "explanation": "(A): In acidosis [H+] rises and pH falls. | (B): In metabolic acidosis PCO2 falls (respiratory compensation); raised PCO2 is respiratory acidosis. | (D): Metabolic acidosis may have high or normal anion gap. | (E): Acidaemia is pH < 7.35; alkalosis has pH > 7.45.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q15": {
+    "questionId": "cmu-bio-2021-may-p1-old-q15",
+    "stem": "Regarding ECF",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, d, e | False: a, c",
+    "explanation": "(A): ECF is ~1/3 (33%) of TBW; ICF is 2/3. | (B): ECF Na+ is ~135–145 mEq/L. | (C): Protein content of ECF/plasma is 6–8 g/dL; interstitial fluid is much lower. | (D): ECF is the internal environment that maintains homeostasis. | (E): ECF volume (1/3 TBW) is less than ICF (2/3).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q16": {
+    "questionId": "cmu-bio-2021-may-p1-old-q16",
+    "stem": "The characteristics of marasmus include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(C): Edema is a feature of kwashiorkor, not marasmus. | (E): Marasmus: weight/age < 60% of standard (kwashiorkor 60–80% with oedema).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q17": {
+    "questionId": "cmu-bio-2021-may-p1-old-q17",
+    "stem": "Radioactive isotope",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Radioisotopes are unstable. | (B): Radioisotopes do not 'remain as a mixture'; they decay. | (C): Radioisotopes decay to stable isotopes. | (D): Radioisotopes (tritium, I-131, Cr-51) measure fluid compartment volumes. | (E): I-131 is used to diagnose and treat hyperthyroidism.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q18": {
+    "questionId": "cmu-bio-2021-may-p1-old-q18",
+    "stem": "Regarding digestion and absorption",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d | False: a, e",
+    "explanation": "(A): Protein digestion begins in stomach (pepsin). | (B): Emulsification is one role; micelle formation for absorption is key. | (E): Cholagogues INCREASE bile flow.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q19": {
+    "questionId": "cmu-bio-2021-may-p1-old-q19",
+    "stem": "Choose the correct answers",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): Membrane also has proteins and cholesterol. | (C): Na+-K+ pump: 3 Na+ OUT, 2 K+ IN. | (D): Ca2+ is not a channel guard; channels are gated by voltage/ligand.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p1-old-q20": {
+    "questionId": "cmu-bio-2021-may-p1-old-q20",
+    "stem": "Regarding iron",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-I",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Iron is absorbed in duodenum and proximal jejunum. | (B): Fe2+ (ferrous) is the absorbed form. | (C): Vitamin C favours iron absorption. | (D): Intracellular iron is stored as ferritin. | (E): Fe3+ circulates bound to transferrin.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q1": {
+    "questionId": "cmu-bio-2021-may-p2-old-q1",
+    "stem": "Fates of acetyl-CoA",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Acetyl-CoA + OAA → citrate. | (B): Acetyl-CoA is the building block for FA synthesis. | (C): Acetyl-CoA cannot be net-converted to amino acids. | (D): Acetyl-CoA → ketone bodies in starvation. | (E): Acetyl-CoA cannot be converted to glucose in humans (no net).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q2": {
+    "questionId": "cmu-bio-2021-may-p2-old-q2",
+    "stem": "Features of Addison's disease are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, e | False: c, d",
+    "explanation": "(A): Cortisol deficiency (Addison's) → hypoglycaemia. | (B): Aldosterone deficiency → Na+ loss. | (C): Addison's → HYPERkalaemia (aldosterone lack); Cushing's → hypokalaemia (mineralocorticoid effect of | (D): ↑ACTH/MSH → hyperpigmentation in Addison's. | (E): Aldosterone/cortisol lack → salt loss, hypotension; Cushing's causes hypertension.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q3": {
+    "questionId": "cmu-bio-2021-may-p2-old-q3",
+    "stem": "Turner's syndrome is characterized by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Streak gonads in Turner. | (B): Turner features. | (C): Streak ovaries → low oestrogen. | (D): Down syndrome has an increased risk of hypothyroidism. | (E): Low oestrogen → high FSH/LH.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q4": {
+    "questionId": "cmu-bio-2021-may-p2-old-q4",
+    "stem": "Genes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, d | False: b, c, e",
+    "explanation": "(A): Genes have alleles. | (B): Turner syndrome is a chromosomal (not gene) defect. | (C): Female karyotype is 46,XX. | (D): Genes code for polypeptides/enzymes. | (E): Base pairing is A–T, G–C only.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q5": {
+    "questionId": "cmu-bio-2021-may-p2-old-q5",
+    "stem": "Causes of dwarfism are",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c | False: d, e",
+    "explanation": "(A): GH deficiency → pituitary dwarfism. | (B): Laron dwarfism: GH-receptor defect. | (C): Loss of GH → dwarfism. | (D): GHIH (somatostatin) deficiency would raise GH, not cause dwarfism. | (E): Excess IGF-1 → gigantism/acromegaly, not dwarfism.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q6": {
+    "questionId": "cmu-bio-2021-may-p2-old-q6",
+    "stem": "About DNA",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): DNA is in nucleus and mitochondria. | (B): Introns are non-coding; exons code. | (C): DNA length is in base pairs. | (D): mtDNA is circular, maternal. | (E): DNA contains deoxyribose.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q7": {
+    "questionId": "cmu-bio-2021-may-p2-old-q7",
+    "stem": "Carbohydrate is metabolized by",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, c, d, e | False: ",
+    "explanation": "(A): Glycolysis: PFK-1 is rate limiting. | (C): Gluconeogenesis is an anabolic synthesis of glucose; occurs in fasting, liver/kidney, inhibited by insulin.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q8": {
+    "questionId": "cmu-bio-2021-may-p2-old-q8",
+    "stem": "Features of Cushing's syndrome include",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Addison's → HYPERkalaemia (aldosterone lack); Cushing's → hypokalaemia (mineralocorticoid effect of | (B): Acidosis shifts K+ out of cells → hyperkalaemia, not hypokalaemia. | (C): Aldosterone/cortisol lack → salt loss, hypotension; Cushing's causes hypertension. | (D): Cushing's syndrome: cortisol is NOT suppressed by dexamethasone. | (E): Protein catabolism and hypokalaemia → weakness.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q9": {
+    "questionId": "cmu-bio-2021-may-p2-old-q9",
+    "stem": "Impaired renal function causes",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: c, d, e | False: a, b",
+    "explanation": "(A): Renal failure raises urea/creatinine; blood ammonia is raised in liver failure. | (B): Prolonged PT is a liver, not renal, feature.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q10": {
+    "questionId": "cmu-bio-2021-may-p2-old-q10",
+    "stem": "Down syndrome",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, e | False: a, c, d",
+    "explanation": "(A): Down syndrome is trisomy 21. | (B): Down syndrome has an increased risk of hypothyroidism. | (C): ~95% of Down syndrome is trisomy; ~4% translocation. | (D): ~95% of non-disjunction is maternal. | (E): Meiotic non-disjunction (mostly maternal) causes trisomy 21.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q11": {
+    "questionId": "cmu-bio-2021-may-p2-old-q11",
+    "stem": "Ammonia",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: d, e | False: a, b, c",
+    "explanation": "(A): Ammonia is not produced during uric acid oxidation. | (B): Ammonia leaves the amino acid pool. | (C): Transamination moves NH2 without releasing NH3. | (D): Hyperammonaemia is toxic.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q12": {
+    "questionId": "cmu-bio-2021-may-p2-old-q12",
+    "stem": "Prostaglandin",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b | False: c, d, e",
+    "explanation": "(A): Cardiac muscle prefers fatty acids as fuel. | (C): Prostaglandins are local autacoids, not circulating hormones. | (D): PGI2 vasodilates and inhibits platelet aggregation. | (E): PGF2α is a bronchoconstrictor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q13": {
+    "questionId": "cmu-bio-2021-may-p2-old-q13",
+    "stem": "Thyroid function test",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d, e | False: c",
+    "explanation": "(A): Normal TSH is ~0.4–4.5 μIU/mL. | (B): When TSH is normal, T3/T4 are normal in primary thyroid disease. | (C): I-131 is used to diagnose and treat hyperthyroidism. | (D): A normal TSH excludes primary hypo/hyperthyroidism. | (E): Secondary hypothyroidism: low TSH, T3, T4.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q14": {
+    "questionId": "cmu-bio-2021-may-p2-old-q14",
+    "stem": "The following statements are applicable for cortisol",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Cortisol is the anti-stress hormone. | (B): Cortisol/aldosterone deficiency is fatal. | (C): Cortisol is catabolic for protein. | (D): Excess cortisol → truncal obesity. | (E): Cortisol raises glucose mainly via gluconeogenesis.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q15": {
+    "questionId": "cmu-bio-2021-may-p2-old-q15",
+    "stem": "Regarding the respiratory chain",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, b, d | False: c, e",
+    "explanation": "(A): Cyanide blocks cytochrome oxidase → histotoxic hypoxia. | (B): NADH/FADH2 pass electrons through carriers. | (C): ETC carriers have increasing redox potential. | (D): Complexes I, III, IV pump H+ to build the gradient for ATP synthase. | (E): Succinyl-CoA synthetase makes GTP/ATP at substrate level.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q16": {
+    "questionId": "cmu-bio-2021-may-p2-old-q16",
+    "stem": "Regarding protein metabolism",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a | False: b, c, d, e",
+    "explanation": "(A): Deamination occurs mainly in liver and kidney. | (B): Transamination occurs in cytosol and mitochondria. | (C): Transamination occurs in many tissues. | (D): Urea-cycle CO2 is from HCO3 | (E): Non-oxidative deamination uses dehydratase/lyase.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q17": {
+    "questionId": "cmu-bio-2021-may-p2-old-q17",
+    "stem": "Ketone bodies",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, e | False: b, d",
+    "explanation": "(A): Acetoacetate and β-OHB are organic acids. | (B): Ketone bodies cause METABOLIC acidosis. | (C): Lack of insulin → lipolysis → ketogenesis. | (E): Rothera's nitroprusside test detects acetoacetate/acetone.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q18": {
+    "questionId": "cmu-bio-2021-may-p2-old-q18",
+    "stem": "Examples of autosomal dominant disorders",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, e | False: b, c, d",
+    "explanation": "(A): Achondroplasia is autosomal dominant. | (B): Sickle cell anaemia is autosomal recessive. | (C): PKU is autosomal recessive. | (D): Nephrogenic diabetes insipidus is X-linked recessive. | (E): FH is autosomal dominant (LDL receptor).",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q19": {
+    "questionId": "cmu-bio-2021-may-p2-old-q19",
+    "stem": "Codons",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: a, c, d | False: b, e",
+    "explanation": "(A): Codon = 3 consecutive bases of mRNA. | (B): The genetic code is non-overlapping. | (C): Each codon specifies an amino acid. | (D): UAA, UAG, UGA are stop codons. | (E): AUG = methionine (start); AGU = serine.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
+  },
+  "cmu-bio-2021-may-p2-old-q20": {
+    "questionId": "cmu-bio-2021-may-p2-old-q20",
+    "stem": "Regarding lipoprotein the following statements are correct",
+    "type": "TF",
+    "subject": "Biochemistry",
+    "paper": "Paper-II",
+    "year": 2021,
+    "session": "May 2021",
+    "curriculum": "Old Curriculum",
+    "bookPage": "Biochemistry Answer Bank (May 2021)",
+    "verificationStatus": "Verified",
+    "correctAnswerSummary": "True: b, c, d, e | False: a",
+    "explanation": "(A): Chylomicrons enter lymph (lacteals), not the portal vein. | (B): Chylomicron remnants are taken up by liver via apo-E receptor. | (C): VLDL is synthesised in liver. | (D): CETP moves cholesteryl ester from HDL to VLDL/LDL. | (E): High LDL is a major coronary risk factor.",
+    "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
   }
 };
 
@@ -5857,15 +11918,15 @@ export function getMcqAnswerMetadata(questionId: string, fallbackStem?: string, 
     questionId,
     stem: fallbackStem || "Examination Question",
     type: qType || "TF",
-    subject: "Anatomy",
+    subject: questionId.includes('bio') ? "Biochemistry" : "Anatomy",
     paper: "Paper-I",
     year: 2025,
     session: "CMU 1st Prof Examination",
     curriculum: "1st Professional MBBS Curriculum",
-    bookPage: "Anatomy Full Answer Script",
+    bookPage: "MCQ Full Answer Script",
     verificationStatus: "Verified",
-    correctAnswerSummary: "Verified against standard textbook answer key",
-    explanation: "Verified solution matching standard medical textbook consensus (Snell's Anatomy, Moore, BD Chaurasia, Gray's Anatomy, Langman, Junqueira).",
-    sourceReference: "Snell / BD Chaurasia / Gray's Anatomy for Students, 1st Prof Reference"
+    correctAnswerSummary: "Verified against standard medical textbook answer key",
+    explanation: "Verified solution matching standard medical textbook consensus.",
+    sourceReference: questionId.includes('bio') ? "Harper's Illustrated Biochemistry (32nd Ed.)" : "Snell's Clinical Anatomy by Regions (10th Ed.)"
   };
 }

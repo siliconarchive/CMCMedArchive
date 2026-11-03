@@ -1,38 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none" width="280" height="64">
   <defs>
-    <linearGradient id="cmcGradFull" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0e4b3c" />
-      <stop offset="100%" stop-color="#126b56" />
+    <linearGradient id="cmcEmblemBg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
     </linearGradient>
-    <linearGradient id="accentGradFull" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2dd4bf" />
-      <stop offset="100%" stop-color="#0d9488" />
+    <linearGradient id="cmcTealAccent" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
     </linearGradient>
   </defs>
 
-  <!-- Left Icon Mark -->
+  <!-- High-Contrast Vector Insignia -->
   <g transform="translate(6, 8)">
-    <rect width="48" height="48" rx="13" fill="url(#cmcGradFull)" stroke="#1a8a70" stroke-width="1.2" />
-    <path d="M10 38C15 35 20 34 24 34C28 34 33 35 38 38" stroke="url(#accentGradFull)" stroke-width="2.2" stroke-linecap="round" opacity="0.9" />
-    <path d="M12 36C17 33.5 21.5 33.5 24 35C26.5 33.5 31 33.5 36 36V38C31 35.5 26.5 35.5 24 37C21.5 35.5 17 35.5 12 38V36Z" fill="#ffffff" fill-opacity="0.25" />
-    <rect x="21" y="11" width="6" height="20" rx="2" fill="#ffffff" />
-    <rect x="14" y="18" width="20" height="6" rx="2" fill="#ffffff" />
-    <circle cx="24" cy="21" r="1.5" fill="#0e4b3c" />
-    <circle cx="24" cy="10" r="1.5" fill="#5eead4" />
+    <!-- Base Shield Frame -->
+    <rect width="48" height="48" rx="14" fill="url(#cmcEmblemBg)" stroke="#0284c7" stroke-width="1.8" />
+    
+    <!-- Open Archive Folio at Base -->
+    <path d="M11 36C16 33.5 20.5 33.5 24 35C27.5 33.5 32 33.5 37 36V37.5C32 35 27.5 35 24 36.5C20.5 35 16 35 11 37.5V36Z" fill="#38bdf8" />
+    
+    <!-- Pure White Medical Cross Core (High Visibility) -->
+    <rect x="21" y="10" width="6" height="21" rx="2" fill="#ffffff" />
+    <rect x="13.5" y="17.5" width="21" height="6" rx="2" fill="#ffffff" />
+    
+    <!-- Central Medical Emblem Node -->
+    <circle cx="24" cy="20.5" r="2.2" fill="#0284c7" />
+    
+    <!-- Top Apex Knowledge Spark -->
+    <circle cx="24" cy="7.5" r="1.5" fill="#38bdf8" />
   </g>
 
-  <!-- Wordmark -->
-  <g transform="translate(66, 12)">
-    <!-- CMC Monogram -->
-    <text x="0" y="24" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="21" font-weight="800" letter-spacing="-0.03em" fill="#0f172a">
+  <!-- Clear Typography Lockup -->
+  <g transform="translate(66, 11)">
+    <!-- CMC -->
+    <text x="0" y="25" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="22" font-weight="900" letter-spacing="-0.03em" fill="#0f172a">
       CMC
     </text>
+    
     <!-- MedArchive -->
-    <text x="50" y="24" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="21" font-weight="700" letter-spacing="-0.02em" fill="#0e4b3c">
-      Med<tspan fill="#0f172a" font-weight="500">Archive</tspan>
+    <text x="56" y="25" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="22" font-weight="800" letter-spacing="-0.02em">
+      <tspan fill="#0284c7">Med</tspan><tspan fill="#1e293b" font-weight="700">Archive</tspan>
     </text>
+    
     <!-- Subtitle -->
-    <text x="1" y="38" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="600" letter-spacing="0.16em" fill="#64748b">
+    <text x="1" y="40" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="9" font-weight="700" letter-spacing="0.18em" fill="#64748b">
       CHITTAGONG MEDICAL COLLEGE
     </text>
   </g>
