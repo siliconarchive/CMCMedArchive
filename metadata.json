@@ -1,0 +1,8 @@
+{
+  "name": "CMC MedArchive",
+  "description": "Medical question archive, past examination papers, viva bank, and student notes for Chittagong Medical College (CMC).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CMC MedArchive</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{--bg:#fff;--ink:#14281f;--mut:#5b6e66;--g:#0f4d3a;--g2:#e7f1ec;--t:#168a8a;--t2:#e3f4f4;--line:#d9e4df;--warn:#fff4d6;--warnl:#e6c76a;--card:#fff;--r:12px;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0d1a15;--ink:#e6f0eb;--mut:#9bb0a7;--g:#6fd0a8;--g2:#16302a;--t:#5cc8c8;--t2:#12302f;--line:#26403a;--warn:#3a3217;--warnl:#7a6a2a;--card:#12241e}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Source Sans 3",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.15;margin:0 0 .5em;color:var(--g)}
+h1{font-size:clamp(1.9rem,5vw,3rem)}h2{font-size:1.5rem}h3{font-size:1.1rem}
+a{color:var(--t)}button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--t);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px}
+.brand{font:700 1.25rem "Bricolage Grotesque",sans-serif;color:var(--g);background:none;border:0;padding:0;display:flex;gap:8px;align-items:center}
+.logo{width:30px;height:30px;border-radius:8px;background:var(--g);color:#fff;display:grid;place-items:center;font-size:1rem}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:8px 12px;border-radius:8px;color:var(--ink)}
+nav button:hover,nav button.on{background:var(--g2);color:var(--g)}
+#menu{display:none;background:var(--g2);border:0;border-radius:8px;padding:8px 12px;color:var(--g)}
+@media(max-width:760px){#menu{display:block}nav{display:none;position:absolute;left:0;right:0;top:100%;background:var(--bg);border-bottom:1px solid var(--line);padding:8px 16px;flex-direction:column}nav.open{display:flex}}
+.notice{background:var(--warn);border-bottom:1px solid var(--warnl);font-size:.9rem;padding:8px 0}
+.hero{padding:40px 0 24px}.tag{color:var(--t);font-weight:600;margin:0 0 20px}
+.sb{display:flex;gap:8px;max-width:680px}
+input,select,textarea{font:inherit;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.btn{background:var(--g);color:#fff;border:0;border-radius:10px;padding:11px 18px;font-weight:600;white-space:nowrap}
+:root[data-theme="dark"] .btn,.btn.alt{background:var(--t2);color:var(--g)}
+.btn.alt{border:1px solid var(--line)}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;color:var(--ink)}
+button.card:hover,.item:hover{border-color:var(--t)}
+.qa{border-left:4px solid var(--t)}
+.ic{font-size:1.5rem}
+section{margin:32px 0}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:var(--g2);color:var(--g);border:0;border-radius:99px;padding:6px 14px;font-size:.92rem}
+.badge{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:99px;background:var(--t2);color:var(--t);margin-right:6px}
+.badge.demo{background:var(--warn);color:var(--ink);border:1px solid var(--warnl)}
+.badge.ok{background:var(--g2);color:var(--g)}
+.list{display:grid;gap:10px}
+.item{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;color:var(--ink)}
+.filters{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:12px 0}
+.mut{color:var(--mut);font-size:.92rem}
+.empty,.err{text-align:center;padding:32px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--mut)}
+.err{border-color:#c0392b;color:#c0392b}
+.sk{height:64px;border-radius:var(--r);background:linear-gradient(90deg,var(--g2),var(--bg),var(--g2));background-size:200% 100%;animation:sk 1s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}}
+label{display:block;font-weight:600;margin:12px 0 4px}
+.field-err{color:#c0392b;font-size:.9rem;min-height:1.2em}
+.ok-box{background:var(--g2);border:1px solid var(--g);border-radius:var(--r);padding:14px;margin:12px 0}
+.prev{max-width:100%;border-radius:10px;border:1px solid var(--line)}
+footer{border-top:1px solid var(--line);padding:24px 0;margin-top:40px;color:var(--mut);font-size:.9rem}
+.back{background:none;border:0;color:var(--t);padding:8px 0}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.6}
+h1,h2,h3,.brand{font-family:"Fraunces",Georgia,"Noto Serif",serif;letter-spacing:-.01em}
+h1{font-size:clamp(2.2rem,8vw,3.4rem);font-weight:700;line-height:1.08}
+h2{font-size:1.55rem;font-weight:700;margin:0 0 .7em;padding-left:12px;border-left:4px solid var(--t)}
+h3{font-size:1.1rem;font-weight:600}
+.item h3,.card h3{font-family:"Source Sans 3",system-ui,sans-serif;font-weight:600;font-size:1.05rem;line-height:1.35}
+.wrap{padding:0 18px}section{margin:36px 0}
+.hero{background:linear-gradient(135deg,var(--g2),var(--t2));border:1px solid var(--line);border-radius:18px;padding:28px 18px;margin-top:18px}
+.hero h1{margin-bottom:6px}.tag{font-size:1.05rem}
+.sb{max-width:none}.sb input{padding:14px;font-size:1rem}
+.grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.ic{width:44px;height:44px;border-radius:12px;background:var(--g2);display:grid;place-items:center;margin-bottom:8px;font-size:1.3rem}
+.card{padding:16px 14px}.list{gap:12px}.item{padding:16px}
+.badge{font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+.filters{grid-template-columns:repeat(2,1fr)}
+@media(min-width:700px){.filters{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}}
+footer{text-align:center;margin-top:48px}
+#splash{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;transition:opacity .35s}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .logo{width:64px;height:64px;font-size:2rem;border-radius:18px;animation:pulse 1.2s ease-in-out infinite}
+#splash b{font:700 1.6rem "Fraunces",Georgia,serif;color:var(--g)}
+#splash p{margin:0;color:var(--mut)}
+.bar2{width:160px;height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.bar2 i{display:block;height:100%;width:40%;background:var(--t);border-radius:4px;animation:slide 1s ease-in-out infinite}
+@keyframes slide{0%{margin-left:-40%}100%{margin-left:100%}}
+@keyframes pulse{50%{transform:scale(1.08)}}
+@media(prefers-reduced-motion:reduce){#splash .logo,.bar2 i{animation:none}}
+.who{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:.92rem;color:var(--g);font-weight:600}
+.seg{display:flex;gap:6px;background:var(--g2);padding:4px;border-radius:12px;margin:8px 0 12px}
+.seg button{flex:1;padding:10px;border:0;border-radius:9px;background:none;font-weight:600;color:var(--ink)}
+.seg button.on{background:var(--card);color:var(--g);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mrow{padding:10px 0;border-top:1px dashed var(--line)}
+.mbtns{display:flex;gap:8px;margin-top:6px}
+.mb,.mopt{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:8px 16px;font-weight:600}
+.mopt{display:flex;gap:10px;width:100%;text-align:left;margin-top:8px;padding:12px}
+.mb.good,.mopt.good{border-color:var(--g);background:var(--g2)}
+.mb.bad,.mopt.bad{border-color:#c0392b;background:rgba(192,57,43,.12)}
+.mexp{margin-top:6px;font-size:.95rem;color:var(--mut)}
+.mb:disabled,.mopt:disabled{color:var(--ink);cursor:default}
+.mb:disabled:not(.good):not(.bad),.mopt:disabled:not(.good):not(.bad){opacity:.6}
+.paper{border:1px solid var(--line);border-radius:10px;background:var(--card);padding:6px 14px 14px}
+.paperhead{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-bottom:2px solid var(--g);margin-bottom:6px}
+.paperhead b{font-family:"Fraunces",Georgia,serif;font-size:1.15rem;color:var(--g)}
+.paperhead span{color:var(--mut);font-size:.9rem}
+.item.pq{border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;padding:14px 0}
+.item.pq:last-child{border-bottom:0}
+.qhead{display:flex;gap:8px;font-weight:600}
+.qn{font-family:"Fraunces",Georgia,serif;color:var(--g)}
+.qtags{margin:4px 0 6px 24px}
+.mrow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:8px 0 8px 24px;border-top:1px dashed var(--line)}
+.mrow .mexp{grid-column:1/-1}
+.mbtns{margin:0}
+.mb{padding:6px 12px;min-width:38px}
+.pq .mopt{margin-left:24px;width:calc(100% - 24px);padding:10px 12px}
+.chip.on{outline:2px solid var(--t);font-weight:700}
+</style>
+</head>
+<body>
+<div id="splash" role="status" aria-label="Loading"><span class="logo">+</span><b>CMC MedArchive</b><p>Questions. Notes. Knowledge. Together.</p><div class="bar2"><i></i></div></div>
+<header><div class="wrap bar">
+<button class="brand" onclick="go('home')" aria-label="CMC MedArchive home"><span class="logo">+</span>CMC MedArchive</button>
+<button id="menu" aria-expanded="false" onclick="toggleMenu()">Menu</button>
+<nav id="nav"></nav>
+</div></header>
+<div class="notice"><div class="wrap">This website is still under development.</div></div>
+<main class="wrap" id="app" aria-live="polite"></main>
+<footer><div class="wrap"><div>Contact on Telegram: <a href="https://t.me/Sifat_Islam_7" target="_blank" rel="noopener noreferrer">@Sifat_Islam_7</a></div><div style="margin-top:6px">Copyright &copy; Silicon</div></div></footer>
+
+<script>
+const SUBJ_MBBS=["Anatomy","Physiology","Biochemistry","Pathology","Pharmacology","Microbiology","Community Medicine","Forensic Medicine"];
+const SUBJ_BDS=["Anatomy","Physiology","Biochemistry","Dental Anatomy","Oral Histology","Dental Materials"];
+let SUBJECTS=SUBJ_MBBS;
+const EXAMS=["Professional","Term","Card","Written","Viva"];
+const LS_KEY="cmc_medarchive_uploads_v1";
+const ALL_Q=[
+{id:"q1",text:"Describe the brachial plexus: formation, branches and clinical relevance.",subject:"Anatomy",topic:"Brachial plexus",type:"Professional",year:2021,marks:10,teacher:null,answer:"Formed by ventral rami of C5–T1 (roots, trunks, divisions, cords, branches). Key branches: axillary, musculocutaneous, median, ulnar, radial. Clinical: Erb's palsy (C5–C6) and Klumpke's palsy (C8–T1).",source:"Fictional demo record",verified:false},
+{id:"q2",text:"Write short notes on the brachial plexus injuries.",subject:"Anatomy",topic:"Brachial plexus",type:"Term",year:2023,marks:5,teacher:null,answer:"Upper trunk injury gives waiter's tip posture. Lower trunk injury gives claw hand. Mention mechanism, nerve roots and muscles affected.",source:"Fictional demo record",verified:false},
+{id:"q3",text:"Name the branches of the lateral cord of the brachial plexus.",subject:"Anatomy",topic:"Brachial plexus",type:"Viva",year:2022,marks:null,teacher:"Demo Examiner A (fictional)",answer:"Lateral pectoral nerve, musculocutaneous nerve, and the lateral root of the median nerve.",source:"Fictional demo record with a fictional verification source",verified:true},
+{id:"q4",text:"Explain the cardiac cycle with a pressure-volume diagram.",subject:"Physiology",topic:"Cardiac cycle",type:"Professional",year:2022,marks:10,teacher:null,answer:"Phases: atrial systole, isovolumetric contraction, ejection, isovolumetric relaxation, filling. Describe valve events and heart sounds S1 and S2.",source:"Fictional demo record",verified:false},
+{id:"q5",text:"What causes the second heart sound?",subject:"Physiology",topic:"Cardiac cycle",type:"Viva",year:2024,marks:null,teacher:"Demo Examiner B (fictional)",answer:"Closure of the aortic and pulmonary valves at the start of ventricular diastole.",source:"Fictional demo record with a fictional verification source",verified:true},
+{id:"q6",text:"Describe the steps of glycolysis and its regulation.",subject:"Biochemistry",topic:"Glycolysis",type:"Professional",year:2023,marks:10,teacher:null,answer:"Ten steps from glucose to pyruvate. Regulated at hexokinase, phosphofructokinase-1 (key step) and pyruvate kinase. Net 2 ATP under anaerobic conditions.",source:"Fictional demo record",verified:false},
+{id:"q7",text:"Which enzyme is the rate-limiting step of glycolysis?",subject:"Biochemistry",topic:"Glycolysis",type:"Card",year:2021,marks:1,teacher:null,answer:"Phosphofructokinase-1.",source:"Fictional demo record",verified:false},
+{id:"q8",text:"Discuss the mechanism of action of beta-blockers.",subject:"Pharmacology",topic:"Autonomic drugs",type:"Written",year:2024,marks:5,teacher:null,answer:"Competitive antagonists at beta-adrenergic receptors; reduce heart rate, contractility and renin release. Uses: hypertension, angina, arrhythmia.",source:"Fictional demo record",verified:false},
+{id:"q9",text:"Describe the stages of acute inflammation.",subject:"Pathology",topic:"Inflammation",type:"Term",year:2022,marks:5,teacher:null,answer:"Vascular changes, cellular events (margination, rolling, adhesion, transmigration), chemotaxis, phagocytosis and resolution.",source:"Fictional demo record",verified:false},
+{id:"q10",text:"Name the layers of the scalp.",subject:"Anatomy",topic:"Scalp",type:"Viva",year:2023,marks:null,teacher:null,answer:"SCALP: Skin, Connective tissue, Aponeurosis (galea), Loose areolar tissue, Pericranium.",source:"Fictional demo record",verified:false}
+];
+const ALL_R=[
+{id:"r1",title:"Brachial plexus summary notes (demo)",subject:"Anatomy",topic:"Brachial plexus",kind:"Notes",desc:"One-page revision summary of roots, trunks, cords and branches. Fictional demo entry, no file attached.",uploader:"Demo Student",date:"2026-09-01",perm:"Fictional demo content",demo:true},
+{id:"r2",title:"Cardiac cycle diagram (demo)",subject:"Physiology",topic:"Cardiac cycle",kind:"Image",desc:"Placeholder entry for a Wiggers diagram. No real image attached.",uploader:"Demo Student",date:"2026-09-05",perm:"Fictional demo content",demo:true},
+{id:"r3",title:"Glycolysis flowchart (demo)",subject:"Biochemistry",topic:"Glycolysis",kind:"Image",desc:"Placeholder entry for a pathway chart with regulated steps highlighted.",uploader:"Demo Student",date:"2026-09-09",perm:"Fictional demo content",demo:true},
+{id:"r4",title:"Scalp layers mnemonic (demo)",subject:"Anatomy",topic:"Scalp",kind:"Notes",desc:"Mnemonic and clinical notes on scalp layers and danger area.",uploader:"Demo Student",date:"2026-09-12",perm:"Fictional demo content",demo:true},
+{id:"r5",title:"Inflammation lecture video link (demo)",subject:"Pathology",topic:"Inflammation",kind:"Video link",desc:"Example of how an external video link entry looks. The link is not real.",uploader:"Demo Student",date:"2026-09-15",perm:"Fictional demo content",demo:true,url:""}
+];
+const BOARD={q1:"CMU",q2:"CU",q3:"CMU",q4:"CMU",q5:"CU",q6:"CMU",q7:"CU",q8:"CU",q9:"CMU",q10:"CU"};
+ALL_Q.forEach(q=>{q.board=BOARD[q.id]||"CMU";q.prog="MBBS"});ALL_R.forEach(r=>r.prog="MBBS");
+ALL_Q.push({id:"b1",text:"Describe the microscopic structure of enamel.",subject:"Oral Histology",topic:"Enamel",type:"Professional",year:2022,marks:10,teacher:null,answer:"Enamel is about 96% mineral (hydroxyapatite). Main features: enamel rods (prisms), interrod enamel, striae of Retzius, cross striations, Hunter-Schreger bands and enamel lamellae.",source:"Fictional demo record",verified:false,board:"CMU",prog:"BDS"},{id:"b2",text:"Name the first permanent tooth to erupt.",subject:"Dental Anatomy",topic:"Tooth eruption",type:"Viva",year:2023,marks:null,teacher:null,answer:"Usually the mandibular first molar, at about 6 years of age.",source:"Fictional demo record",verified:false,board:"CU",prog:"BDS"},{id:"b3",text:"List the properties of an ideal dental amalgam.",subject:"Dental Materials",topic:"Amalgam",type:"Written",year:2023,marks:5,teacher:null,answer:"Adequate strength, low creep, dimensional stability, corrosion resistance, good marginal seal and ease of manipulation.",source:"Fictional demo record",verified:false,board:"CMU",prog:"BDS"});
+ALL_R.push({id:"br1",title:"Enamel structure notes (demo)",subject:"Oral Histology",topic:"Enamel",kind:"Notes",desc:"Placeholder BDS notes entry on enamel rods and incremental lines. No file attached.",uploader:"Demo Student",date:"2026-09-18",perm:"Fictional demo content",demo:true,prog:"BDS"});
+function parseCSV(t){const rows=[];let r=[],f="",q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}else if(c==='"')q=true;else if(c===","){r.push(f);f=""}else if(c==="\n"){r.push(f);rows.push(r);r=[];f=""}else if(c!=="\r")f+=c}if(f||r.length){r.push(f);rows.push(r)}return rows}
+function splitTags(s){return String(s||"").split(";").map(x=>x.trim()).filter(Boolean)}
+const ORBIT_CSV="Program,Subject,Section,No,Topic,Question,Answer,Board,Exam,OtherTags,Page,Status\nMBBS,Anatomy,Short questions,d,Colle's fracture,\"Short question: Colle's fracture\",\"\",CMU,May-20; Nov-22,\"May-25; Ju-10; Ju-13; Ja-15; Nov-16; May-18\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,e,Anterior compartment of arm,\"Short question: muscles of the anterior compartment of the arm\",\"\",\"\",\"\",\"May-15\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,f,Clavicle,\"Short question: clavicle is a modified long bone\",\"\",\"\",\"\",\"May-16; May-19\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,g,Rotator cuff,\"Short question: rotator cuff\",\"\",CMU,May-20,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,h,Claw hand,\"Short question: what is claw hand\",\"\",CMU,Nov-21,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,11,Rotator cuff,\"What is rotator cuff and how is it formed; and its importance\",\"\",CMU,May-23,\"Nov-25\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,12,Shoulder joint,\"Why is the shoulder joint unstable\",\"\",CMU,May-23,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Short questions,13,Carrying angle,\"What is carrying angle\",\"\",\"\",\"\",\"Nov-25\",Orbit p.29,Unverified\nMBBS,Anatomy,Embryology,01,Turner syndrome,\"15-year-old girl with no puberty, webbed neck, widely spaced nipples, karyotype 45 XO. Type of abnormality; cause of karyotype; Barr body present or not\",\"Turner syndrome\",CMU,May-25,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Embryology,02,Anencephaly; neural tube defect,\"26-week pregnancy, high serum AFP, ultrasound shows no cranial vault. Type of defect; embryological background; prevention\",\"Neural tube defect (anencephaly)\",CMU,Nov-25,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Embryology,03,Polyhydramnios,\"Pregnant woman at 7 months with excess fluid in amniotic cavity. Name of condition; two causes; function of amniotic fluid\",\"Polyhydramnios\",CMU,May-24,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Embryology,04,Ectopic pregnancy,\"27-year-old with sharp lower abdominal pain, vaginal bleeding, 1.5 months amenorrhea, empty uterine cavity, right tube not seen. Condition; hormone responsible; reason for empty uterine cavity\",\"Ruptured ectopic pregnancy\",CMU,Nov-24,\"\",Orbit p.29,Unverified\nMBBS,Anatomy,Embryology,05,Omphalocele,\"20-week pregnancy, midline mass with small intestine covered by thin membrane. Condition; embryological basis; associated anomalies\",\"Omphalocele\",\"\",\"\",\"\",Orbit p.29-30,Unverified\nMBBS,Anatomy,Embryology,06,Down syndrome,\"Baby of 38-year-old mother with flat face, webbed neck, upslanting eyes, simian crease. Why risk rises with maternal age; translocation; which extra chromosome copy persists\",\"Down syndrome\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,07,Sacrococcygeal teratoma,\"Ultrasound shows large mass near sacrum of 26-week fetus. Origin of mass; tissue types it may contain\",\"Sacrococcygeal teratoma\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,08,Turner syndrome,\"Infertile woman with small breast tissue, karyotype XO. Diagnosis\",\"Turner syndrome\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,09,Down syndrome,\"Baby of 36-year-old mother with flat face, webbed neck, simian crease, extra chromosome 21. Term for condition; why aged mothers are susceptible; two prenatal diagnostic procedures\",\"Down syndrome\",CMU,23M,\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,10,Ectopic pregnancy,\"25-year-old with severe lower abdominal pain, rapid pulse, BP 80/50, 6 weeks missed period. Name of condition; why and where it occurs; hormone increased; lining epithelium of involved part\",\"Ectopic pregnancy (ruptured)\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,11,Anencephaly,\"Baby of 40-year-old mother born at home with exposed brain tissue, died after 2 hours. Name of defect; developmental explanation; prevention\",\"Anencephaly\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,12,Ectopic pregnancy,\"Implantation of blastocyst occasionally takes place outside the uterus. Term; four sites; fate of the condition\",\"Ectopic pregnancy\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,13,Omphalocele,\"20-year-old pregnant woman at 20 weeks, midline mass with small intestine covered by thin membrane. Condition; embryological basis; associated anomalies\",\"Omphalocele\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Embryology,14,Down syndrome,\"Baby of 38-year-old mother with flat face, webbed neck, simian crease, Down syndrome on chromosomal analysis. Why risk rises with maternal age; translocation; extra chromosome copy\",\"Down syndrome\",\"\",\"\",\"\",Orbit p.30,Unverified\nMBBS,Anatomy,Thorax & Upper limb,01,Acute myocardial infarction,\"45-year-old with left chest pain, vomiting, sweating, pain radiating to medial left arm, ischaemic ECG, raised troponin. Condition; why pain radiates; two vessels for bypass grafting\",\"Acute MI\",CMU,May-25,\"\",Orbit p.31,Unverified\nMBBS,Anatomy,Thorax & Upper limb,02,Erb's palsy,\"Baby after forceps delivery with left arm medially rotated and adducted, forearm pronated and extended. Condition; brachial plexus site; muscle for abduction and its nerve supply\",\"Erb's palsy\",CMU,Nov-25,\"\",Orbit p.31,Unverified\nMBBS,Anatomy,Thorax & Upper limb,03,Radial nerve injury,\"31-year-old with fracture of humerus shaft, loss of sensation in anatomical snuff box and back of arm and forearm, wrist drop. Injured structures; origin and root value; anatomical basis\",\"Radial nerve and profunda brachii artery; posterior cord of brachial plexus (book lists root value as C5, C5, C7, C8, T1: looks like a typo)\",CMU,May-24,\"\",Orbit p.31,Unverified\nMBBS,Anatomy,Thorax & Upper limb,04,Surgical neck of humerus; axillary nerve,\"25-year-old after road accident with loss of shoulder abduction, X-ray shows humerus fracture. Site of fracture; important structure involved; why abduction is lost\",\"Surgical neck of humerus; axillary nerve and posterior circumflex humeral artery; deltoid paralysis\",CMU,Nov-24,\"\",Orbit p.31,Unverified\nMBBS,Anatomy,Thorax & Upper limb,05,Axillary nerve,\"35-year-old with fracture of surgical neck of humerus. Nerve injured and its cord of origin; two muscles supplied; effect on shoulder joint\",\"Axillary nerve; posterior cord\",\"\",\"\",\"\",Orbit p.31,Unverified\nMBBS,Anatomy,Thorax & Upper limb,06,Pleural effusion,\"35-year-old with fever, breathlessness, trachea and heart shifted to the right, left pleural effusion, fluid aspirated through 6th intercostal space. Why trachea and heart shifted; structures pierced by cannula\",\"Left-sided pleural effusion\",\"\",\"\",\"\",Orbit p.31-32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,07,Angina pectoris,\"50-year-old with precordial chest pain radiating to left head, neck and medial forearm up to little finger. Cause; why pain radiates; nerve supply of involved organ\",\"Angina pectoris\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,08,Myocardial infarction; coronary artery,\"55-year-old with chest tightness on climbing stairs, now severe. Why pain; areas supplied by left coronary artery; why coronary artery is a functional end artery\",\"Myocardial ischemia\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,09,Acute myocardial infarction,\"50-year-old with profuse sweating and chest pain radiating to inner left arm and forearm. Condition; structure involved; why pain radiates\",\"Myocardial infarction\",CMU,23M,\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,10,Axillary nerve,\"45-year-old chronic crutch user with loss of shoulder contour, cannot abduct beyond 90 degrees, loss of sensation over upper outer arm. Nerve; origin, root value, distribution; cause of contour loss\",\"Axillary nerve\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,11,Radial nerve; wrist drop,\"25-year-old after motorcycle accident with abnormal wrist position and weak grip, fracture of humerus shaft. Structure damaged; name of wrist position; explanation\",\"Radial nerve\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,12,Median nerve; ape thumb deformity,\"28-year-old pregnant woman with pain and numbness in lateral 2/3 of palm and 3.5 digits, thenar wasting. Condition; nerve compressed; muscle involved\",\"Ape thumb deformity\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,13,Colle's fracture,\"60-year-old who fell on outstretched hand with dinner fork deformity, distal radius fracture with posterior displacement. Condition; difference from Smith fracture; nerve likely injured\",\"Colle's fracture\",\"\",\"\",\"\",Orbit p.32,Unverified\nMBBS,Anatomy,Thorax & Upper limb,14,Erb's palsy,\"40-year-old who fell from bike on shoulder with stretched neck, impaired elbow flexion, arm abducted and medially rotated, forearm extended and pronated. Clinical term; limb position; site of injury; paralysed muscle for adduction; spinal nerves for sensory loss\",\"Erb's palsy\",\"\",\"\",\"\",Orbit p.32-33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,15,Colle's fracture,\"Elderly man who fell on outstretched hand with dorsal wrist swelling, posterior displacement of distal radius. What is Colle's fracture; difference from Smith fracture; nerve injured; position of styloid processes\",\"Colle's fracture\",\"\",\"\",\"\",Orbit p.33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,16,Erb's palsy,\"40-year-old who fell from bike with right arm adducted and medially rotated, forearm extended and pronated, loss of sensation on lateral upper limb. Clinical term; limb position; site of injury; muscle for adduction; spinal nerves\",\"Erb's palsy\",\"\",\"\",\"\",Orbit p.33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,17,Bone marrow aspiration; red marrow,\"40-year-old woman with weakness, tiredness, Hb 7 g/dl, bone marrow aspiration from a bone of the chest. Locations of red marrow in adults; bone chosen; structures that could be injured\",\"Red marrow: sternum, ribs, vertebrae\",\"\",\"\",\"\",Orbit p.33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,18,Axillary nerve,\"50-year-old crutch user with loss of normal shoulder shape, cannot abduct beyond 90 degrees, loss of sensation over lower half of deltoid. Nerve; origin and root value; why cutaneous sensation lost; why abduction impossible\",\"Axillary nerve\",\"\",\"\",\"\",Orbit p.33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,19,Median nerve; ape thumb deformity,\"28-year-old pregnant woman with pain and numbness of lateral 2/3 of palm and 3.5 digits, thenar wasting. Condition; nerve compressed; muscle involved\",\"Ape thumb deformity\",\"\",\"\",\"\",Orbit p.33,Unverified\nMBBS,Anatomy,Thorax & Upper limb,20,Myocardial infarction; circumflex artery,\"53-year-old with chest pain along inner left arm, breathlessness, nausea, sweating, thrombosis in circumflex coronary artery. Diagnosis; sulcus and vein accompanying the artery; part of conducting system made ischemic; basis of inner arm pain\",\"Myocardial infarction\",\"\",\"\",\"\",Orbit p.33-34,Unverified\nMBBS,Anatomy,Thorax & Upper limb,21,Carpal tunnel syndrome,\"50-year-old woman with right thumb, index, middle and part of ring finger pain worse at night, weak thumb movement. Condition; nerve affected; cord and root value; formation of brachial plexus\",\"Carpal tunnel syndrome\",\"\",\"\",\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Thorax & Upper limb,22,Pleural effusion,\"Patient with difficulty breathing and dry cough, fluid in right lung drawn through a needle in an intercostal space. Condition; site where fluid accumulates; why that site is chosen; structures pierced by needle\",\"Pleural effusion\",\"\",\"\",\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,01,Cholecystitis; Calot's triangle,\"40-year-old woman with right hypochondrium pain referred to right shoulder tip, Murphy's sign positive, cholecystitis due to gallstone. Landmark for Murphy's sign; why pain goes to shoulder tip; boundaries and contents of Calot's triangle\",\"Tip of right costal cartilage at midclavicular line\",CMU,May-25,\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,02,Foot drop; common peroneal nerve,\"50-year-old unable to dorsiflex and evert right foot after plaster cast removal for fracture of upper end of right fibula. Joints involved; nerve involved; evertors of foot\",\"Foot drop\",CMU,Nov-25,\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,03,Internal hemorrhoids,\"42-year-old with constipation, fresh blood in stool, protruding mass, piles at 3, 7 and 11 o'clock. Internal versus external hemorrhoids; why painless; portocaval anastomosis in anal canal\",\"Internal hemorrhoids\",CMU,May-24,\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,04,Ectopic pregnancy,\"36-year-old with severe abdominal pain, 2 months missed periods, gestational sac in fallopian tube. Clinical condition; other possible sites; site of fluid collection and why\",\"Ectopic pregnancy; fluid collects in pouch of Douglas (retro-uterine pouch)\",CMU,Nov-24,\"\",Orbit p.34,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,05,Appendicitis,\"22-year-old male with right iliac fossa pain, fever, earlier umbilical pain, McBurney's point tenderness, positive psoas test. Term for condition; basis of pain shift; probable position of the structure\",\"Appendicitis\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,06,Carcinoma head of pancreas,\"60-year-old woman with progressive jaundice, pale stool, itching, palpable gallbladder, carcinoma of head of pancreas. Anatomical basis of jaundice; arterial supply of head of pancreas\",\"Obstruction of bile duct\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,07,Femoral neck fracture,\"75-year-old woman who fell, right lower limb shortened and laterally rotated, subcapital intracapsular fracture of femoral neck. Other intracapsular types; basis of lateral rotation; possible complication\",\"\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,08,Appendicitis,\"20-year-old with right lower abdominal pain, fever, vomiting, right iliac fossa tenderness. Possible cause; artery supply with histological features of the organ\",\"Appendicitis\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,09,Cryptorchidism,\"6-month-old boy with empty right scrotum and small inguinal swelling. Define cryptorchidism; disadvantages; factors responsible for descent of testis\",\"\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,10,Ectopic pregnancy,\"27-year-old with severe lower abdominal pain, pale and toxic, 6 weeks amenorrhea. Normal site of implantation; formation of functional layer of endometrium and its importance; sources of development of uterus and vagina\",\"Normal site: posterior wall of uterus close to fundus\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,11,Fibula fracture; foot drop,\"37-year-old with difficulty walking, left foot drop, fracture of left fibula. Fracture portion and why; muscles involved\",\"Fracture 2-5 cm proximal to distal end of lateral malleolus\",\"\",\"\",\"\",Orbit p.35,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,12,Varicose vein,\"45-year-old policeman with leg pain and swelling worse after standing, blackening of medial leg, twisted structure under skin. Condition; structure involved; why it developed\",\"Varicose vein\",CMU,23M,\"\",Orbit p.35-36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,13,Superficial inguinal lymph nodes,\"30-year-old with multiple groin swellings medial part parallel to inguinal ligament. What is the swelling; regions of body whose infection causes it\",\"Superficial inguinal lymph node\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,14,Prostate gland,\"55-year-old man with difficulty in micturition that increases on straining, enlarged pelvic organ. Organ involved; anatomical explanation of difficulty\",\"Prostate gland\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,15,Ectopic pregnancy,\"25-year-old with severe right lower abdominal pain, two missed periods, very low BP, fluid in peritoneal cavity. Clinical condition; fates; why fluid collects\",\"Book states: Ascites (please verify)\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,16,Appendicitis,\"22-year-old medical student with right iliac fossa pain, fever, umbilical pain earlier, McBurney's point tenderness, positive psoas test. Term; basis of pain shift; probable position of affected structure\",\"Appendicitis\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,17,Ectopic pregnancy,\"22-year-old with acute severe lower abdominal pain, vaginal bleeding, 2 months amenorrhea, positive pregnancy test, pulse 140, BP 90/60. Medical term; embryological basis; commonest site\",\"Ectopic pregnancy\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,18,Femoral neck fracture,\"75-year-old woman who fell, right lower limb shortened and laterally rotated, subcapital intracapsular fracture of femoral neck. Other intracapsular types; basis of lateral rotation; possible complication\",\"\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,19,Ureteric colic,\"40-year-old with colicky left flank pain referred to groin, scrotum and left thigh, small radio-opaque shadow in lower left abdomen. Clinical condition; why colicky; cause of referred pain\",\"Ureteric colic\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,Abdomen & Lower limb,20,Varicose vein,\"50-year-old garment worker with chronic dull pain in both legs, dilated tortuous veins on medial side, discoloured scaly skin. Condition; structure affected; mechanism\",\"Varicose vein\",\"\",\"\",\"\",Orbit p.36,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",01,Thyroglossal cyst,\"4-year-old boy with painless midline cystic neck swelling below body of hyoid, moves up on tongue protrusion or swallowing. Condition; embryological basis; why it moves up\",\"Thyroglossal cyst\",CMU,May-25,\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",02,Broca's aphasia,\"50-year-old man after stroke unable to produce speech. Cortical area damaged; clinical condition; artery supply of the area\",\"Broca's (expressive) aphasia\",CMU,Nov-25,\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",03,Black eye; scalp layers,\"16-year-old with severe blow to head, blackish discoloration around eyes 8 hours later. Scalp layer where blood collects; anatomical basis; other layers of scalp\",\"Black eye (book also prints a stray 'Ans: b) Progesterone' here, which does not fit)\",CMU,May-24,\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",04,Hydrocephalus,\"Newborn with unusually large head, bulging fontanelle, eyes fixed downward. Clinical condition; two causes; types\",\"Hydrocephalus\",CMU,Nov-24,\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",05,Basilar skull fracture,\"24-year-old after motorcycle accident with swelling over skull dome and eyelids, black discoloration around eyes. Cause of swelling; name of condition\",\"Basilar skull fracture\",\"\",\"\",\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",06,Thyroid gland,\"55-year-old woman with midline neck enlargement moving with swallowing, tremor, high BP. Organ involved; artery supply; cells present and developmental source\",\"Thyroid gland\",\"\",\"\",\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",07,Acute otitis media,\"6-month-old baby with high fever, right ear pain and discharge, bulging tympanic membrane. Probable diagnosis; why common in early childhood; prevention\",\"Acute otitis media\",SMU,23M,\"\",Orbit p.37,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",08,Bell's palsy,\"55-year-old man with sudden right facial deformity, loss of forehead wrinkle and nasolabial furrow, mouth deviated to left, partial loss of taste. Medical term; cranial nerve; why mouth deviates to left\",\"Right-sided Bell's palsy\",CMU,23M,\"\",Orbit p.37-38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",09,Bell's palsy,\"28-year-old man in winter with mouth deviated to left. Diagnosis; site of nerve affected; distribution of nerve\",\"Bell's palsy\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",10,Acute parotitis,\"16-year-old boy with painful swelling in front of right ear, pain while eating, temperature 103 F, red congested vestibule mucosa. Condition; why painful; duct opening at the vestibule\",\"Acute parotitis\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",11,Facial nerve palsy (upper motor neuron),\"60-year-old hypertensive man with drooping right mouth angle, dribbling, loss of nasolabial fold, normal forehead wrinkle and palpebral fissure. Nerve injured; type of lesion; reason for normal palpebral fissure\",\"Facial nerve\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",12,Bell's palsy,\"50-year-old man with sudden right facial deformity, loss of forehead wrinkle, open palpebral fissure, deviated mouth angle, partial taste loss. Medical term; cranial nerve; functional type; terminal motor branches; why taste is partly lost\",\"Bell's palsy\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",13,Thyroid surgery; recurrent laryngeal nerve,\"50-year-old with hoarseness after surgery of a neck swelling. Which swelling was operated; structure injured; how to prevent injury\",\"Thyroid swelling\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",14,Thyroglossal cyst,\"4-year-old boy with painless midline cystic neck swelling near hyoid, moves with swallowing and tongue protrusion. Term for the mass; developmental basis; why it moves upward\",\"Thyroglossal cyst\",\"\",\"\",\"\",Orbit p.38,Unverified\nMBBS,Anatomy,\"Head, Neck, Brain & Eyeball\",15,Bell's palsy,\"55-year-old man with sudden right facial deformity, loss of forehead wrinkle and nasolabial furrow, mouth deviated left, partial taste loss. Medical term; cranial nerve; why mouth deviates left; most likely site of injury\",\"Bell's palsy\",\"\",\"\",\"\",Orbit p.38,Unverified\n";
+(function(){for(let i=ALL_Q.length-1;i>=0;i--)if(ALL_Q[i].prog==="MBBS")ALL_Q.splice(i,1);
+ALL_Q.filter(q=>q.prog==="BDS").forEach(q=>{q.exam=String(q.year)});
+parseCSV(ORBIT_CSV).slice(1).filter(r=>r.length>=12).forEach((r,i)=>{const ex=splitTags(r[8]),ot=splitTags(r[9]);let y=0;[...ex,...ot].forEach(t=>{const m=t.match(/(\d\d)M?$/);if(m)y=Math.max(y,2000+Number(m[1]))});
+ALL_Q.push({id:"o"+i,text:r[5],subject:r[1],topic:r[4],section:r[2],no:r[3],type:"Written",year:y||null,marks:null,teacher:null,answer:r[6]||"Not printed in the book.",source:"Orbit Question Bank 18th ed., "+r[10]+" (scanned, unverified)",page:r[10],verified:false,board:r[7],exam:r[8],other:r[9],prog:"MBBS",real:true})})})();
+let PROG=null,DEMO_Q=[],DEMO_R=[];
+function setProg(p){PROG=p;SUBJECTS=p==="BDS"?SUBJ_BDS:SUBJ_MBBS;DEMO_Q=ALL_Q.filter(q=>q.prog===p);DEMO_R=ALL_R.filter(r=>r.prog===p);try{localStorage.setItem("cmc_prog",p)}catch(e){}}
+function resetProg(){PROG=null;try{localStorage.removeItem("cmc_prog")}catch(e){}state={page:"home",id:null,q:"",f:{}};document.getElementById("nav").classList.remove("open");renderNav();render()}
+function pick(p){setProg(p);go("home")}
+function choose(){return `<div class="hero"><h1>CMC MedArchive</h1><p class="tag">Questions. Notes. Knowledge. Together.</p><h2>Choose your program</h2><p class="mut">Each program has its own questions, notes and counts. You can switch any time from the menu.</p><div class="grid"><button class="card" onclick="pick('MBBS')"><div class="ic">🩺</div><h3>MBBS</h3><span class="mut">Medical students</span></button><button class="card" onclick="pick('BDS')"><div class="ic">🦷</div><h3>BDS</h3><span class="mut">Dental students. Fewer records so far.</span></button></div><p class="mut">Initially intended for Chittagong Medical College (CMC) students. MBBS Anatomy records come from a scanned question bank (unverified); BDS records are fictional demos.</p></div>`}
+const POP=["Brachial plexus","Cardiac cycle","Glycolysis","Scalp","Inflammation","Autonomic drugs"];
+const sessionFiles={}; // object URLs live only for this browser session
+let state={page:"home",id:null,q:"",f:{}}, uploadsError=false;
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function loadUploads(){try{uploadsError=false;return JSON.parse(localStorage.getItem(LS_KEY)||"[]")}catch(e){uploadsError=true;return[]}}
+function saveUploads(a){try{localStorage.setItem(LS_KEY,JSON.stringify(a));return true}catch(e){return false}}
+const allR=()=>SIGNUP_URL?SERVER_R.filter(r=>r.prog===PROG):NOTES_CSV_URL?[...SHEET_R.filter(r=>r.prog===PROG),...loadUploads().filter(r=>(r.prog||"MBBS")===PROG)]:[...loadUploads().filter(r=>(r.prog||"MBBS")===PROG),...DEMO_R];
+const norm=s=>String(s||"").toLowerCase();
+const hit=(q,arr)=>{const t=norm(q).split(/\s+/).filter(Boolean);return t.every(w=>norm(arr.join(" ")).includes(w))};
+
+const NAV=[["home","Home"],["archive","Written (CQ)"],["mcq","MCQ"],["library","Library"],["teacher","Viva"],["upload","Upload"],["about","About"]];
+function renderNav(){if(!PROG){document.getElementById("nav").innerHTML="";return}document.getElementById("nav").innerHTML=NAV.map(([k,l])=>`<button class="${state.page===k?"on":""}" onclick="go('${k}')">${l}</button>`).join("")+`<button onclick="resetProg()">${PROG} • Change</button>`+(TOKEN?`<button onclick="logout()">Log out</button>`:"")}
+function toggleMenu(){const n=document.getElementById("nav"),o=n.classList.toggle("open");document.getElementById("menu").setAttribute("aria-expanded",o)}
+function go(page,id,extra,noPush){if(!noPush)saveHist();state={...state,page,id:id||null,...(extra||{})};if(page==="archive"||page==="library"||page==="teacher"){if(!extra)state.q="";}
+document.getElementById("nav").classList.remove("open");renderNav();if(!noPush)pushHist();window.scrollTo(0,0);
+if(page==="archive"||page==="library"){document.getElementById("app").innerHTML=`<h2>Loading…</h2><div class="list"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>`;setTimeout(render,250)}else render()}
+function render(){const p=state.page,a=document.getElementById("app");if(!PROG){a.innerHTML=choose();return}a.innerHTML=({home,archive,question,library,resource,upload,teacher,signup,mcq,about}[p]||home)();bind()}
+
+function tagText(q){return [...splitTags(q.exam).map(e=>(q.board?q.board+" ":"")+e),...splitTags(q.other).map(x=>x+" (board not stated)")]}
+function qCard(q){const tg=tagText(q);return `<button class="item qa" onclick="go('question','${q.id}')"><span class="badge demo">${q.real?(q.verified?"Verified":"Unverified"):"Demo"}</span><span class="badge">${esc(q.subject)}</span>${q.section?`<span class="badge">${esc(q.section)}</span>`:""}${tg.length?`<span class="badge ok">${esc(tg.join(", "))}</span>`:'<span class="badge">No exam tag</span>'}<h3 style="margin:8px 0 2px">${esc(q.text)}</h3><span class="mut">${esc(q.topic)}${q.real?" \u00b7 "+esc(q.page):""}</span></button>`}
+function who(r){return r.demo?"Demo entry":"Shared by "+esc(r.uploader)+(r.college?" \u00b7 "+esc(r.college):"")}
+function rCard(r){return `<button class="item" onclick="go('resource','${r.id}')">${r.demo?'<span class="badge demo">Demo</span>':r.srv?'<span class="badge ok">Student note</span>':'<span class="badge ok">Your upload</span>'}<span class="badge">${esc(r.kind)}</span><span class="badge">${esc(r.subject)}</span><h3 style="margin:8px 0 2px">${esc(r.title)}</h3><span class="mut">${esc(r.topic)} \u00b7 ${esc(r.date)}</span><div class="who">${who(r)}</div></button>`}
+function grouped(res){if(!res.length)return '<div class="empty">No resources found. Be the first to add one.</div>';
+const g={};res.forEach(r=>{const k=String(r.topic||"Other").trim().toLowerCase();(g[k]=g[k]||{name:String(r.topic||"Other").trim(),items:[]}).items.push(r)});
+return Object.values(g).sort((a,b)=>b.items.length-a.items.length||a.name.localeCompare(b.name)).map(x=>`<section style="margin:24px 0"><h2>${esc(x.name)} <span class="badge ok">${x.items.length} note${x.items.length===1?"":"s"}</span></h2><div class="list">${x.items.map(rCard).join("")}</div></section>`).join("")}
+function topicOptions(){const t=new Set();DEMO_Q.forEach(q=>t.add(q.topic.split(";")[0].trim()));SERVER_R.forEach(r=>r.topic&&t.add(String(r.topic).trim()));return [...t].sort().map(x=>`<option value="${esc(x)}">`).join("")}
+
+function home(){
+const recent=allR().slice(0,4);
+return `<div class="hero"><h1>CMC MedArchive</h1><p class="tag">Questions. Notes. Knowledge. Together. <span class="badge ok">${PROG}</span></p>
+<form class="sb" onsubmit="event.preventDefault();go('archive',null,{q:this.q.value,f:{}})"><input name="q" aria-label="Search" placeholder="Search questions, topics, teachers, notes…"><button class="btn">Search</button></form>
+<p class="mut">Initially made for students of Chittagong Medical College (CMC).</p>
+<p><button class="btn" onclick="go('upload')">Upload Resource</button></p></div>
+<section><h2>Quick access</h2><div class="grid">
+<button class="card" onclick="go('archive')"><div class="ic">📚</div><h3>Written Questions</h3><span class="mut">Past questions with answers</span></button>
+<button class="card" onclick="go('teacher')"><div class="ic">🗣️</div><h3>Viva Bank</h3><span class="mut">Coming soon</span></button>
+<button class="card" onclick="go('library',null,{q:'',f:{kind:'Notes'}})"><div class="ic">📝</div><h3>Student Notes</h3><span class="mut">Shared by students</span></button>
+<button class="card" onclick="go('library',null,{q:'',f:{kind:'Image'}})"><div class="ic">🖼️</div><h3>Images</h3><span class="mut">Diagrams and charts</span></button>
+<button class="card" onclick="go('mcq')"><div class="ic">✅</div><h3>MCQ</h3><span class="mut">True/False and SBA</span></button>
+<button class="card" onclick="go('library')"><div class="ic">🕒</div><h3>Recent Uploads</h3><span class="mut">Newest resources</span></button></div></section>
+<section><h2>Written question segments</h2><div class="chips">${sections().map(x=>`<button class="chip" data-s="${esc(x.name)}" onclick="go('archive',null,{q:'',f:{section:this.dataset.s}})">${esc(x.name)} (${x.n})</button>`).join("")}</div></section>
+<section><h2>Subjects</h2><div class="chips">${SUBJECTS.map(s=>`<button class="chip" onclick="go('archive',null,{q:'',f:{subject:'${s}'}})">${s}</button>`).join("")}</div></section>
+<section><h2>Popular topics</h2><div class="chips">${popular().map(t=>`<button class="chip" data-t="${esc(t)}" onclick="go('archive',null,{q:this.dataset.t,f:{}})">${esc(t)}</button>`).join("")}</div></section>
+<section><h2>Recently added resources</h2><div class="list">${recent.map(rCard).join("")}</div></section>`}
+
+function opts(arr,sel,all){return `<option value="">${all}</option>`+arr.map(v=>`<option ${String(v)===String(sel)?"selected":""}>${v}</option>`).join("")}
+function archive(){
+const f=state.f||{};
+const topics=[...new Set(DEMO_Q.map(q=>q.topic))].sort(),years=[...new Set(DEMO_Q.map(q=>q.year))].filter(Boolean).sort().reverse(),teachers=[...new Set(DEMO_Q.filter(q=>q.verified&&q.teacher).map(q=>q.teacher))];
+const res=DEMO_Q.filter(q=>(!f.subject||q.subject===f.subject)&&(!f.section||q.section===f.section)&&(!f.topic||q.topic===f.topic)&&(!f.year||String(q.year)===String(f.year))&&(!f.type||q.type===f.type)&&(!f.teacher||(q.verified&&q.teacher===f.teacher))&&hit(state.q,[q.text,q.topic,q.subject,q.answer,q.verified?q.teacher:""]));
+return `<h2>Written Questions (CQ)</h2><p class="mut">${PROG==="MBBS"?"Scanned from the Orbit Question Bank (unverified). Exam tags appear only where the book prints them.":"Fictional demo records."}</p>
+${secChips()}
+<input id="sq" aria-label="Search questions" placeholder="Search by question text or topic…" value="${esc(state.q)}">
+<div class="filters">
+<select data-f="subject" aria-label="Subject">${opts(SUBJECTS,f.subject,"All subjects")}</select>
+<select data-f="year" aria-label="Year">${opts(years,f.year,"All years")}</select>
+<select data-f="type" aria-label="Exam type">${opts(EXAMS,f.type,"All exam types")}</select>
+<select data-f="teacher" aria-label="Verified teacher">${opts(teachers,f.teacher,"Any verified teacher")}</select></div>
+${freq2(res)}<p class="mut">${res.length} result${res.length===1?"":"s"} <button class="back" onclick="go('archive',null,{q:'',f:{}})">Clear filters</button></p>
+<div class="list">${res.length?res.map(qCard).join(""):'<div class="empty">No questions match. Try fewer words or clear the filters.</div>'}</div>`}
+
+function freq(res){const t=state.q.trim();if(!t||!res.length)return"";const c={CMU:0,CU:0};res.forEach(q=>c[q.board]++);const yc={},tc={};res.forEach(q=>{yc[q.year]=(yc[q.year]||0)+1;tc[q.type]=(tc[q.type]||0)+1});const ys=Object.keys(yc).sort().reverse().map(y=>y+": "+yc[y]).join(", "),tys=Object.keys(tc).map(k=>k+": "+tc[k]).join(", ");return `<div class="ok-box"><b>“${esc(t)}”</b> matches ${res.length} question${res.length===1?"":"s"}: <b>CMU ${c.CMU}</b> and <b>CU ${c.CU}</b>.<br>By year: ${ys}<br>By exam type: ${tys}<br><span class="mut">Fictional demo counts.</span></div>`}
+
+const SIGNUP_URL=""; // paste your Apps Script web app link here
+let TOKEN=null,ROLE=null,COLLEGE="",VIVA=[],SERVER_R=[];
+function collegeName(){return COLLEGE==="CMC"?"Chittagong Medical College":(COLLEGE||"your college")}
+try{TOKEN=sessionStorage.getItem("cmc_tok");ROLE=sessionStorage.getItem("cmc_role");COLLEGE=sessionStorage.getItem("cmc_col")||""}catch(e){}
+function api(b){return fetch(SIGNUP_URL,{method:"POST",body:JSON.stringify(b)}).then(r=>r.json())}
+function loginPage(msg){return `<h2>Library login</h2><p class="mut">The library is for verified CMC students. Enter your email and the access code we sent you. No code yet? <a href="#signup" onclick="go('signup');return false">Request access</a></p><form id="lf" novalidate><label for="lr">Email</label><input id="lr" type="email" autocomplete="email"><label for="lc">Access code</label><input id="lc" autocapitalize="characters" autocomplete="off"><p class="field-err" id="lfe" role="alert">${msg?esc(msg):""}</p><button class="btn">Log in</button></form>`}
+async function doLogin(e){e.preventDefault();const fe=document.getElementById("lfe"),email=document.getElementById("lr").value.trim().toLowerCase(),code=document.getElementById("lc").value.trim().toUpperCase();
+if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!code){fe.textContent="Enter your email and access code.";return}
+const b=e.target.querySelector("button");b.disabled=true;fe.textContent="Checking\u2026";
+try{const j=await api({action:"login",email:email,code:code});if(!j.ok){fe.textContent=j.msg||"Wrong email or code.";b.disabled=false;return}
+TOKEN=j.token;ROLE=j.role||"other";COLLEGE=j.college||"";try{sessionStorage.setItem("cmc_tok",TOKEN);sessionStorage.setItem("cmc_role",ROLE);sessionStorage.setItem("cmc_col",COLLEGE)}catch(x){}
+await loadLibrary();renderNav();render()}catch(x){fe.textContent="Could not reach the server. Try again.";b.disabled=false}}
+async function loadLibrary(){try{const j=await api({action:"library",token:TOKEN});if(!j.ok){logout();return false}
+ROLE=j.role||ROLE;COLLEGE=j.college||COLLEGE;try{sessionStorage.setItem("cmc_role",ROLE||"");sessionStorage.setItem("cmc_col",COLLEGE||"")}catch(x){}
+SERVER_R=(j.items||[]).map((x,i)=>({id:"v"+i,title:x.title,subject:x.subject,topic:x.topic,kind:x.kind||"Notes",desc:x.desc,uploader:x.uploader,college:x.college==="CMC"?"Chittagong Medical College":(x.college||""),date:x.date,perm:"Shared by a verified student",url:/^https:\/\//.test(x.url||"")?x.url:"",prog:x.prog==="BDS"?"BDS":"MBBS",srv:true}));return true}catch(x){return false}}
+function logout(){TOKEN=null;ROLE=null;COLLEGE="";VIVA=[];SERVER_R=[];try{sessionStorage.removeItem("cmc_tok");sessionStorage.removeItem("cmc_role");sessionStorage.removeItem("cmc_col")}catch(x){}renderNav();if(PROG)render()}
+function bootLib(){if(SIGNUP_URL&&TOKEN)loadLibrary().then(()=>{renderNav();render()})}
+function submitPage(){return `<h2>Share a note</h2><p class="mut">Put your file in your own Google Drive, set sharing to "Anyone with the link can view", then paste the link here. An admin checks it before it appears.</p><form id="nf" novalidate><label for="nt">Title</label><input id="nt" maxlength="120"><label for="nc">Type</label><select id="nc">${opts(["Notes","Lecture","Teacher's note","Questions"],"","Choose type")}</select>
+<label for="ns">Subject</label><select id="ns">${opts(SUBJECTS,"","Choose subject")}</select><label for="np">Topic</label><input id="np" maxlength="80" list="tl"><datalist id="tl">${topicOptions()}</datalist><label for="nd">Description</label><textarea id="nd" rows="3" maxlength="400"></textarea><label for="nl">Google Drive link</label><input id="nl" type="url" placeholder="https://drive.google.com/\u2026"><label style="font-weight:400;display:flex;gap:8px;margin-top:14px"><input id="nk" type="checkbox" style="width:auto;margin-top:5px"><span>I own this material or have permission to share it.</span></label><p class="field-err" id="nfe" role="alert"></p><button class="btn">Send for review</button></form><div id="ndone"></div>`}
+async function doSubmit(e){e.preventDefault();const g=id=>document.getElementById(id).value.trim(),fe=document.getElementById("nfe");let err="";
+if(!g("nt"))err="Enter a title.";else if(!g("nc"))err="Choose a type.";else if(!g("ns"))err="Choose a subject.";else if(!g("np"))err="Enter a topic.";else if(!g("nd"))err="Add a short description.";else if(!/^https:\/\/(drive|docs)\.google\.com\//.test(g("nl")))err="Paste a Google Drive or Docs link starting with https://";else if(!document.getElementById("nk").checked)err="Tick the permission box.";
+fe.textContent=err;if(err)return;const b=e.target.querySelector("button");b.disabled=true;fe.textContent="Sending\u2026";
+try{const j=await api({action:"submit",token:TOKEN,title:g("nt"),kind:g("nc"),subject:g("ns"),topic:g("np"),desc:g("nd"),link:g("nl"),prog:PROG});
+if(!j.ok){if(j.expired){logout();return}fe.textContent=j.msg||"Could not send.";b.disabled=false;return}
+fe.textContent="";document.getElementById("nf").hidden=true;document.getElementById("ndone").innerHTML=`<div class="ok-box"><b>Sent for review.</b><p>It will appear in the library after an admin approves it.</p><button class="btn" onclick="go('library')">Back to library</button></div>`}
+catch(x){fe.textContent="Could not reach the server. Try again.";b.disabled=false}}
+function signupForm(c){return `<p class="mut">Admins use your ID card photo only to check that you are a student of the college you choose. Your choice is a request: the admin sets your final college after seeing the card.</p>
+<form id="sf" novalidate>
+<label for="sk">College</label><select id="sk" onchange="document.getElementById('sox').hidden=this.value!=='Other'"><option value="CMC">Chittagong Medical College (CMC)</option><option value="Other">Another college under CMU</option></select>
+<div id="sox" hidden><label for="so">College name</label><input id="so" maxlength="80"></div>
+<label for="sn">Full name</label><input id="sn" autocomplete="name">
+<label for="sb">Batch / session</label><input id="sb" maxlength="20" placeholder="e.g. 2024-25">
+${c?"":`<label for="sr">Roll number</label><input id="sr" inputmode="numeric">
+<label for="ss">Section</label><select id="ss">${opts(["A","B","C","D"],"","Choose section")}</select>`}
+<label for="se">Email (you will log in with it)</label><input id="se" type="email" autocomplete="email">
+<label for="sid">College ID card (photo or PDF)</label><input id="sid" type="file" accept="image/*,.pdf">
+<label style="font-weight:400;display:flex;gap:8px;margin-top:14px"><input id="sc" type="checkbox" style="width:auto;margin-top:5px"><span>I agree to share my ID card photo for verification. Only admins can see it, and it is deleted after verification.</span></label>
+<p class="mut">An admin checks your card before you get access. You will receive an access code by email.</p>
+<p class="field-err" id="sfe" role="alert"></p>
+<button class="btn">Send request</button></form><div id="sdone"></div>`}
+function signup(){return `<h2>Sign up</h2>
+${SIGNUP_URL?"":'<div class="notice" style="border:1px solid var(--warnl);border-radius:10px;padding:10px 14px;margin-bottom:12px">Preview only: the site is not connected yet, so nothing you enter is sent anywhere.</div>'}
+${signupForm(false)}`}
+function teacherGate(){return `<h2>Teacher-wise viva questions</h2><div class="card"><p>This part is checked for each college. After verification you see only the viva questions of your own college.</p></div>
+<h3 style="margin-top:20px">Already verified? Log in</h3>
+<form id="lf" novalidate><label for="lr">Email</label><input id="lr" type="email" autocomplete="email"><label for="lc">Access code</label><input id="lc" autocapitalize="characters" autocomplete="off"><p class="field-err" id="lfe" role="alert"></p><button class="btn">Log in</button></form>
+<details class="card" style="margin-top:20px" open><summary><b>New here? Request access</b></summary>${signupForm(true)}</details>`}
+async function submitSignup(e){e.preventDefault();const g=id=>(document.getElementById(id)||{value:""}).value.trim(),has=id=>!!document.getElementById(id),fe=document.getElementById("sfe");let err="";
+const file=document.getElementById("sid").files[0];
+if(!g("sn"))err="Enter your full name.";else if(!g("sb"))err="Enter your batch or session.";else if(has("sr")&&!/^\d{1,8}$/.test(g("sr")))err="Roll number should be digits only.";else if(has("ss")&&!g("ss"))err="Choose your section.";else if(g("sk")==="Other"&&g("so").length<3)err="Enter your college name.";else if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(g("se")))err="Enter a valid email address.";else if(!file)err="Attach a photo of your college ID card.";else if(!/^(image\/(jpeg|png|webp)|application\/pdf)$/.test(file.type))err="ID card must be a JPG, PNG, WebP or PDF.";else if(file.size>8*1024*1024)err="File is too large. Maximum is 8 MB.";else if(!document.getElementById("sc").checked)err="Please tick the consent box.";
+fe.textContent=err;if(err)return;
+const btn=e.target.querySelector("button");btn.disabled=true;fe.textContent="Preparing\u2026";
+try{let blob=file;if(file.type.startsWith("image/"))blob=await compressImage(file);
+if(blob.size>3*1024*1024)throw new Error("big");
+const data=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(",")[1]);r.onerror=no;r.readAsDataURL(blob)});
+if(SIGNUP_URL){await fetch(SIGNUP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({name:g("sn"),batch:g("sb"),roll:g("sr"),section:g("ss"),collegeType:g("sk"),collegeName:g("so"),email:g("se"),mime:blob.type,file:data})})}
+fe.textContent="";document.getElementById("sf").hidden=true;
+document.getElementById("sdone").innerHTML=`<div class="ok-box"><b>${SIGNUP_URL?"Request sent.":"Form looks good (preview only)."}</b><p>${SIGNUP_URL?"An admin will check your details. This page cannot confirm delivery, so if you hear nothing in a few days, ask an admin.":"Nothing was sent because the site is not connected yet."}</p><button class="btn" onclick="go('home')">Back to home</button></div>`}
+catch(x){fe.textContent="Could not prepare the file. Try a smaller photo or PDF.";btn.disabled=false}}
+
+function freq2(all){const t=state.q.trim();if(!t||!all.length)return"";
+const tp=all.filter(q=>hit(t,[q.topic])),res=tp.length?tp:all;
+const ex=new Set(),ot=new Set();let tg=0;
+res.forEach(q=>{const a=splitTags(q.exam),b=splitTags(q.other);a.forEach(e=>ex.add((q.board||"Board not stated")+" "+e));b.forEach(e=>ot.add(e));if(a.length||b.length)tg++});
+const L=[...ex].sort();
+return `<div class="ok-box"><b>${esc(t)}</b>: ${res.length} question${res.length===1?"":"s"} with this topic, ${tg} with exam tags${all.length>res.length?` (${all.length-res.length} more questions only mention the word in their text)`:""}.<br>Tagged exams (${L.length}): ${L.length?esc(L.join(", ")):"none"}${ot.size?`<br>Other tags, board not stated (${ot.size}): ${esc([...ot].join(", "))}`:""}<br><span class="mut">Counts tagged exams, not how often the book repeats a question. Untagged questions are not counted.</span></div>`}
+function popular(){const c={};DEMO_Q.forEach(q=>{const k=q.topic.split(";")[0].trim();c[k]=(c[k]||0)+1});return Object.keys(c).sort((a,b)=>c[b]-c[a]).slice(0,10)}
+function question(){
+const q=DEMO_Q.find(x=>x.id===state.id);if(!q)return `<div class="err">Question not found.</div><button class="back" onclick="go('archive')">Back to archive</button>`;
+const tg=tagText(q),rel=DEMO_Q.filter(x=>x.id!==q.id&&x.topic.split(";")[0].trim()===q.topic.split(";")[0].trim());
+return `<button class="back" onclick="go('archive')">\u2190 Back to archive</button>
+<span class="badge demo">${q.real?"Scanned from Orbit \u00b7 unverified":"Fictional demo record"}</span><span class="badge">${esc(q.subject)}</span>
+<h1 style="font-size:1.4rem;margin-top:10px">${esc(q.text)}</h1>
+<div class="card"><p><b>Topic:</b> ${esc(q.topic)}<br>${q.section?`<b>Section:</b> ${esc(q.section)}<br>`:""}<b>Exam tags:</b> ${tg.length?esc(tg.join(", ")):"None printed"}<br><b>Source:</b> ${esc(q.source)}<br><b>Verification:</b> ${q.verified?"Verified":"Unverified"}</p>
+<h3>Answer (as printed)</h3><p>${esc(q.answer)}</p></div>
+<section><h2>Related questions on this topic</h2><div class="list">${rel.length?rel.map(qCard).join(""):'<div class="empty">No related questions in the data.</div>'}</div></section>`}
+
+function library(){
+if(SIGNUP_URL&&!TOKEN)return loginPage();
+const f=state.f||{};const kinds=["Notes","Lecture","Teacher's note","Questions","Image","PDF","Document","Video link"];
+const res=allR().filter(r=>(!f.subject||r.subject===f.subject)&&(!f.kind||r.kind===f.kind)&&hit(state.q,[r.title,r.topic,r.subject,r.desc,r.uploader]));
+return `<h2>Student Resource Library</h2>
+${uploadsError?'<div class="err">Saved uploads could not be read from this browser. Demo items are still shown.</div>':""}
+<input id="sq" aria-label="Search resources" placeholder="Search resources…" value="${esc(state.q)}">
+<div class="filters"><select data-f="subject" aria-label="Subject">${opts(SUBJECTS,f.subject,"All subjects")}</select><select data-f="kind" aria-label="Type">${opts(kinds,f.kind,"All types")}</select></div>
+<p><button class="btn" onclick="go('upload')">Upload Resource</button></p>
+${grouped(res)}`}
+
+function resource(){
+const r=allR().find(x=>x.id===state.id);if(!r)return `<div class="err">Resource not found.</div><button class="back" onclick="go('library')">Back</button>`;
+const url=sessionFiles[r.id];let prev="";const more=allR().filter(x=>x.id!==r.id&&String(x.topic).trim().toLowerCase()===String(r.topic).trim().toLowerCase());
+if(url&&r.mime&&r.mime.startsWith("image/"))prev=`<img class="prev" src="${url}" alt="${esc(r.title)}">`;
+else if(url&&r.mime==="application/pdf")prev=`<iframe class="prev" src="${url}" style="width:100%;height:480px" title="PDF preview"></iframe>`;
+else if(r.url)prev=`<p><a class="btn" style="display:inline-block;text-decoration:none" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Open ${r.kind==="Video link"?"video":"note"}</a></p>`;
+else if(!r.demo)prev=`<div class="empty">Preview unavailable. The file itself was not saved; only its details were. Re-select the file on the Upload page to preview it again.</div>`;
+else prev=`<div class="empty">Demo entry with no file attached.</div>`;
+return `<button class="back" onclick="go('library')">← Back to library</button>
+${r.demo?'<span class="badge demo">Fictional demo record</span>':r.srv?'<span class="badge ok">Student note</span>':'<span class="badge ok">Saved in this browser only</span>'}<span class="badge">${esc(r.kind)}</span>
+<h1 style="font-size:1.7rem;margin-top:10px">${esc(r.title)}</h1>
+<div class="card"><p><b>Subject:</b> ${esc(r.subject)}<br><b>Topic:</b> ${esc(r.topic)}<br><b>Shared by:</b> ${esc(r.uploader)}${r.college?" \u00b7 "+esc(r.college):""}<br><b>Date:</b> ${esc(r.date)}<br><b>Source/permission:</b> ${esc(r.perm)}${r.fname?`<br><b>File:</b> ${esc(r.fname)} (${esc(r.size)})${r.note?" · "+esc(r.note):""}`:""}</p><p>${esc(r.desc)}</p></div>
+<section><h2>Preview</h2>${prev}</section>
+${more.length?`<section><h2>More notes on this topic (${more.length})</h2><div class="list">${more.map(rCard).join("")}</div></section>`:""}
+${r.demo||r.srv?"":`<p><button class="btn alt" onclick="del('${r.id}')">Remove from this browser</button></p>`}`}
+function del(id){if(!confirm("Remove this entry from this browser?"))return;saveUploads(loadUploads().filter(x=>x.id!==id));delete sessionFiles[id];go("library")}
+
+const MAX=20*1024*1024,OK={"application/pdf":"PDF","image/png":"Image","image/jpeg":"Image","image/webp":"Image","application/vnd.openxmlformats-officedocument.wordprocessingml.document":"Document","text/plain":"Notes"};
+function upload(){
+if(SIGNUP_URL)return TOKEN?submitPage():loginPage("Log in to share a note.");
+return `<h2>Share a note</h2><div class="card"><p class="mut">Put your file in your own Google Drive, set sharing to "Anyone with the link can view", then paste the link here.${noteForm()?" An admin checks it before it appears for everyone.":" The site is not connected to the shared sheet yet, so a note is saved on this device only."}</p></div>
+<form id="uf" novalidate>
+<label for="un">Your name</label><input id="un" maxlength="60" autocomplete="name">
+<label for="uc">Your medical college</label><input id="uc" maxlength="80" placeholder="e.g. Chittagong Medical College">
+<label for="t">Title</label><input id="t" maxlength="120">
+<label for="s">Subject</label><select id="s">${opts(SUBJECTS,"","Choose subject")}</select>
+<label for="tp">Topic</label><input id="tp" maxlength="80" list="tl"><datalist id="tl">${topicOptions()}</datalist>
+<label for="d">Description</label><textarea id="d" rows="3" maxlength="500"></textarea>
+<label for="ul">Google Drive link</label><input id="ul" type="url" placeholder="https://drive.google.com/\u2026">
+<label style="font-weight:400;display:flex;gap:8px;margin-top:14px"><input id="ck" type="checkbox" style="width:auto;margin-top:5px"><span>I own this material or have permission to share it.</span></label>
+<p class="field-err" id="fe" role="alert"></p><button class="btn">Send</button></form><div id="done"></div>`}
+
+function teacherServer(){return `<h2>Teacher-wise viva questions</h2><div class="card"><p>Showing questions for <b>${esc(collegeName())}</b> only. Other colleges cannot see them, and you cannot see theirs. An entry appears only when someone recorded where it came from.</p></div>
+<form id="tf" class="sb" style="margin:14px 0" novalidate><input id="tq" aria-label="Search" placeholder="Teacher, subject or keyword\u2026"><button class="btn">Search</button></form>
+<div class="filters"><select id="tt" aria-label="Type"><option value="">All types</option><option>Text</option><option>PDF</option><option>Image</option></select></div>
+<div id="tres"><div class="empty">Type a teacher name, subject or keyword to search.</div></div>
+<details class="card" style="margin-top:20px"><summary><b>Add a viva question</b></summary><form id="vf" novalidate>
+<label for="vt">Teacher name</label><input id="vt" maxlength="80">
+<label for="vs">Subject</label><select id="vs">${opts(SUBJECTS,"","Choose subject")}</select>
+<label for="vd">When was it asked</label><input id="vd" type="date">
+<label for="vq">Question (text)</label><textarea id="vq" rows="3" maxlength="600"></textarea>
+<label for="vl">Or a Google Drive link to a PDF or image</label><input id="vl" type="url" placeholder="https://drive.google.com/\u2026">
+<label for="vk">File type (if you added a link)</label><select id="vk"><option value="">None</option><option>PDF</option><option>Image</option></select>
+<label for="vn">How do you know this? (for example: asked to me in my viva)</label><input id="vn" maxlength="160">
+<p class="field-err" id="vfe" role="alert"></p><button class="btn">Send for review</button></form><div id="vdone"></div></details>`}
+function vCard(t){const id=(String(t.url||"").match(/[-\w]{25,}/)||[])[0],ok=/^https:\/\//.test(t.url||"");
+return `<div class="item"><span class="badge ok">Asked ${esc(t.date||"date not recorded")}</span><span class="badge">${esc(t.kind)}</span>${t.text?`<p style="margin:8px 0">${esc(t.text)}</p>`:""}${t.kind==="Image"&&id&&ok?`<img class="prev" loading="lazy" src="https://drive.google.com/thumbnail?id=${id}&sz=w800" alt="Viva question image">`:""}${ok?`<p><a class="btn alt" style="display:inline-block;text-decoration:none" href="${esc(t.url)}" target="_blank" rel="noopener noreferrer">Open ${t.kind==="PDF"?"PDF":"file"}</a></p>`:""}${t.answer?`<p class="mut">Answer: ${esc(t.answer)}</p>`:""}<div class="who">Source: ${esc(t.source||"not recorded")}</div></div>`}
+function renderViva(){const box=document.getElementById("tres"),ft=document.getElementById("tt").value,list=VIVA.filter(t=>!ft||t.kind===ft);
+if(!list.length){box.innerHTML='<div class="empty">Nothing found. Nothing is guessed.</div>';return}
+const g={};list.forEach(t=>{const k=String(t.teacher||"Unknown").trim();g[k]=g[k]||{};(g[k][t.subject]=g[k][t.subject]||[]).push(t)});
+box.innerHTML=Object.keys(g).sort().map(tn=>`<section style="margin:24px 0"><h2>${esc(tn)}</h2>${Object.keys(g[tn]).sort().map(sj=>`<h3>${esc(sj)}</h3><div class="list">${g[tn][sj].sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(vCard).join("")}</div>`).join("")}</section>`).join("")}
+async function doTeacher(e){e.preventDefault();const q=document.getElementById("tq").value.trim(),box=document.getElementById("tres");if(q.length<2){box.innerHTML='<div class="empty">Type at least 2 letters.</div>';return}
+box.innerHTML='<div class="sk"></div>';
+try{const j=await api({action:"viva",token:TOKEN,q:q});if(!j.ok){if(j.expired){logout();return}box.innerHTML=`<div class="err">${esc(j.msg||"Not allowed.")}</div>`;return}
+VIVA=j.items||[];renderViva()}catch(x){box.innerHTML='<div class="err">Could not reach the server. Try again.</div>'}}
+async function doViva(e){e.preventDefault();const g=id=>document.getElementById(id).value.trim(),fe=document.getElementById("vfe");let err="";
+if(g("vt").length<2)err="Enter the teacher name.";else if(!g("vs"))err="Choose a subject.";else if(!g("vq")&&!g("vl"))err="Add the question text or a Drive link.";else if(g("vl")&&!/^https:\/\/(drive|docs)\.google\.com\//.test(g("vl")))err="Paste a Google Drive link starting with https://";else if(g("vl")&&!g("vk"))err="Choose whether the file is a PDF or an image.";else if(!g("vn"))err="Tell us how you know this.";
+fe.textContent=err;if(err)return;const b=e.target.querySelector("button");b.disabled=true;fe.textContent="Sending\u2026";
+try{const j=await api({action:"vivasubmit",token:TOKEN,teacher:g("vt"),subject:g("vs"),date:g("vd"),text:g("vq"),link:g("vl"),kind:g("vk"),note:g("vn")});
+if(!j.ok){if(j.expired){logout();return}fe.textContent=j.msg||"Could not send.";b.disabled=false;return}
+fe.textContent="";document.getElementById("vf").hidden=true;document.getElementById("vdone").innerHTML='<div class="ok-box"><b>Sent for review.</b><p>It appears for your college after an admin checks it.</p></div>'}
+catch(x){fe.textContent="Could not reach the server. Try again.";b.disabled=false}}
+function teacher(){
+if(!SIGNUP_URL)return vivaSoon();
+if(SIGNUP_URL){if(!TOKEN)return teacherGate();return teacherServer()}
+const t=state.q.trim();const res=t?DEMO_Q.filter(q=>q.verified&&q.teacher&&norm(q.teacher).includes(norm(t))):[];
+return `<h2>Teacher-wise search</h2>
+<div class="card"><p>Questions are linked to a teacher only when a reliable source exists. No teacher names are stored yet, so searches find nothing until verified sources are added.</p></div>
+<div class="sb" style="margin:14px 0"><input id="sq" aria-label="Teacher name" placeholder="Search teacher/examiner name…" value="${esc(state.q)}"></div>
+${!t?'<div class="empty">Type a name to search.</div>':res.length?`<div class="list">${res.map(qCard).join("")}</div>`:'<div class="empty">No verified questions found for that name. Nothing is guessed or inferred.</div>'}`}
+
+function about(){return `<h2>About</h2>
+<div class="card"><h3>About the site</h3><p>A student-run archive idea for Chittagong Medical College: find past questions, viva questions and shared study resources in one place.</p>
+<h3>How the demo works</h3>
+<p><b>Search:</b> every word you type must appear somewhere in a question's text, topic, subject or answer (partial words work). Filters narrow results further.</p>
+<p><b>Upload:</b> share a Google Drive link with your name and medical college. Notes on the same topic appear together under that topic.</p>
+<h3>Limitations</h3><ul><li>The site is still under development, so some features may change.</li><li>No accounts, so uploader names are typed by hand and cannot be trusted.</li><li>MBBS Anatomy questions are scanned from a published question bank and are unverified; BDS records are fictional.</li></ul>
+<h3>To make it a real public site</h3><ul><li>A backend with a database and file storage.</li><li>Student login (for example CMC email or roll verification).</li><li>Moderation, reporting and copyright takedown.</li><li>A verification process for teacher attribution.</li><li>Real, permitted question data from CMC.</li></ul></div>
+<div class="card" style="margin-top:12px"><h3>About the developer</h3><p><b>Sifat Islam</b><br><span class="mut">Chittagong Medical College</span></p><p>Sifat turned a simple wish into a working website: that no student should lose hours hunting for old questions and notes. Curious, patient and determined, he kept improving this project step by step, always with one goal in mind, to make studying easier for his fellow students. CMC MedArchive exists because of his vision and hard work.</p></div>`}
+
+function bind(){
+const sq=document.getElementById("sq");
+if(sq)sq.addEventListener("input",e=>{state.q=e.target.value;const pos=e.target.selectionStart;
+const a=document.getElementById("app");const keep=state.page;a.innerHTML=({archive,library,teacher}[keep])();bind();const n=document.getElementById("sq");n.focus();n.setSelectionRange(pos,pos)});
+document.querySelectorAll("select[data-f]").forEach(s=>s.addEventListener("change",e=>{state.f={...state.f,[s.dataset.f]:e.target.value};render()}));
+const sf=document.getElementById("sf");if(sf)sf.addEventListener("submit",submitSignup);
+const lf=document.getElementById("lf");if(lf)lf.addEventListener("submit",doLogin);
+const nf=document.getElementById("nf");if(nf)nf.addEventListener("submit",doSubmit);
+const tf=document.getElementById("tf");if(tf)tf.addEventListener("submit",doTeacher);
+const vf=document.getElementById("vf");if(vf)vf.addEventListener("submit",doViva);
+const tt=document.getElementById("tt");if(tt)tt.addEventListener("change",renderViva);
+const mq=document.getElementById("mq");if(mq)mq.addEventListener("input",e=>{MCQ.q=e.target.value;mcqRefresh()});
+const ms=document.getElementById("ms");if(ms)ms.addEventListener("change",e=>{MCQ.s=e.target.value;mcqRefresh()});
+const uf=document.getElementById("uf");
+if(uf){const k=document.getElementById("k");k.addEventListener("change",()=>{const v=k.value==="Video link";document.getElementById("urlbox").hidden=!v;document.getElementById("filebox").hidden=v});uf.addEventListener("submit",submitUpload)}}
+
+function fmt(b){return b>1048576?(b/1048576).toFixed(1)+" MB":Math.round(b/1024)+" KB"}
+const CDN="https://cdnjs.cloudflare.com/ajax/libs/";
+function loadScript(src){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>no(new Error("load"));document.head.appendChild(s)})}
+async function compressImage(file){const bmp=await createImageBitmap(file);const sc=Math.min(1,1600/Math.max(bmp.width,bmp.height));const c=document.createElement("canvas");c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(bmp,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,"image/jpeg",0.7))}
+async function compressPdf(file){
+if(!window.pdfjsLib)await loadScript(CDN+"pdf.js/3.11.174/pdf.min.js");
+if(!window.PDFLib)await loadScript(CDN+"pdf-lib/1.17.1/pdf-lib.min.js");
+pdfjsLib.GlobalWorkerOptions.workerSrc=CDN+"pdf.js/3.11.174/pdf.worker.min.js";
+const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
+if(pdf.numPages>80)throw new Error("too long");
+const out=await PDFLib.PDFDocument.create();
+for(let i=1;i<=pdf.numPages;i++){document.getElementById("fe").textContent=`Compressing page ${i} of ${pdf.numPages}…`;
+const p=await pdf.getPage(i),v=p.getViewport({scale:1.5}),base=p.getViewport({scale:1});
+const c=document.createElement("canvas");c.width=v.width;c.height=v.height;const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);
+await p.render({canvasContext:x,viewport:v}).promise;
+const jb=await new Promise(r=>c.toBlob(r,"image/jpeg",0.6));const img=await out.embedJpg(await jb.arrayBuffer());
+out.addPage([base.width,base.height]).drawImage(img,{x:0,y:0,width:base.width,height:base.height})}
+return new Blob([await out.save()],{type:"application/pdf"})}
+async function compressFile(f){if(f.type==="application/pdf")return compressPdf(f);if(f.type.startsWith("image/"))return compressImage(f);return null}
+
+async function submitUpload(e){e.preventDefault();const $=id=>document.getElementById(id),v=id=>$(id).value.trim(),fe=$("fe");let err="";
+if(!v("un"))err="Enter your name.";else if(!v("uc"))err="Enter your medical college.";else if(!v("t"))err="Enter a title.";else if(!v("s"))err="Choose a subject.";else if(!v("tp"))err="Enter a topic.";else if(!v("d"))err="Add a short description.";else if(!/^https:\/\/(drive|docs)\.google\.com\//.test(v("ul")))err="Paste a Google Drive link that starts with https://";else if(!$("ck").checked)err="Tick the permission box.";
+fe.textContent=err;if(err)return;
+const f=noteForm(),b=e.target.querySelector("button");
+if(f){b.disabled=true;fe.textContent="Sending\u2026";const vals={NAME:v("un"),COLLEGE:v("uc"),SUBJECT:v("s"),TOPIC:v("tp"),TITLE:v("t"),DESC:v("d"),LINK:v("ul"),PROGRAM:PROG},fd=new URLSearchParams();Object.keys(vals).forEach(k=>{if(f.map[k])fd.append(f.map[k],vals[k])});
+try{await fetch(f.action,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:fd.toString()})}catch(x){fe.textContent="Could not send. Check your internet and try again.";b.disabled=false;return}
+fe.textContent="";$("uf").hidden=true;$("done").innerHTML='<div class="ok-box"><b>Sent for review.</b><p>It will appear for everyone after an admin approves it.</p><button class="btn" onclick="go(\'library\')">Back to library</button> <button class="btn alt" onclick="go(\'upload\')">Add another</button></div>';return}
+const rec={id:"u"+Date.now(),title:v("t"),subject:v("s"),topic:v("tp"),kind:"Drive link",desc:v("d"),uploader:v("un"),college:v("uc"),prog:PROG,date:new Date().toISOString().slice(0,10),perm:"Shared by a student",url:v("ul")};
+const list=loadUploads();list.unshift(rec);
+if(!saveUploads(list)){fe.textContent="Browser storage is full or blocked, so the note could not be saved.";return}
+$("uf").hidden=true;$("done").innerHTML=`<div class="ok-box"><b>Saved on this device only.</b><p>The site is not connected to the shared sheet yet, so other people cannot see this note.</p><button class="btn" onclick="go('resource','${rec.id}')">View note</button> <button class="btn alt" onclick="go('upload')">Add another</button></div>`}
+
+try{const sp=localStorage.getItem("cmc_prog");if(sp==="MBBS"||sp==="BDS")setProg(sp)}catch(e){}
+const SHEET_CSV_URL=""; // paste the published Google Sheet CSV link here
+function loadSheet(){if(!SHEET_CSV_URL)return;
+fetch(SHEET_CSV_URL).then(r=>{if(!r.ok)throw new Error("bad");return r.text()}).then(t=>{
+const rows=parseCSV(t).slice(1).filter(r=>r.length>=12&&r[5]&&r[11]!=="Rejected");
+if(!rows.length)return;
+for(let i=ALL_Q.length-1;i>=0;i--)if(ALL_Q[i].real)ALL_Q.splice(i,1);
+rows.forEach((r,i)=>{const ex=splitTags(r[8]),ot=splitTags(r[9]);let y=0;[...ex,...ot].forEach(x=>{const m=x.match(/(\d\d)M?$/);if(m)y=Math.max(y,2000+Number(m[1]))});
+ALL_Q.push({id:"s"+i,text:r[5],subject:r[1],topic:r[4]||r[1],section:r[2],no:r[3],type:"Written",year:y||null,marks:null,teacher:null,answer:r[6]||"Not printed in the source.",source:r[10]||"Google Sheet",page:r[10],verified:r[11]==="Verified",board:r[7],exam:r[8],other:r[9],prog:r[0]==="BDS"?"BDS":"MBBS",real:true})});
+if(PROG)setProg(PROG);if(state.page!=="question")render()}).catch(()=>{})}
+const MCQ_CSV_URL=""; // paste the published Google Sheet CSV link for MCQs here
+const MCQ_SAMPLE=[
+{id:"s1",prog:"MBBS",type:"TF",subject:"Anatomy",topic:"Brachial plexus",stem:"Regarding the brachial plexus:",items:[{t:"It is formed by the ventral rami of C5 to T1.",a:true},{t:"The axillary nerve arises from the posterior cord.",a:true},{t:"The musculocutaneous nerve arises from the medial cord.",a:false,e:"It arises from the lateral cord."},{t:"Erb's palsy involves the C5 and C6 roots.",a:true},{t:"The long thoracic nerve arises from the lateral cord.",a:false,e:"It arises from the roots (C5 to C7)."}],sample:true},
+{id:"s2",prog:"MBBS",type:"TF",subject:"Physiology",topic:"Cardiac cycle",stem:"During the cardiac cycle:",items:[{t:"The first heart sound is due to closure of the atrioventricular valves.",a:true},{t:"The second heart sound is due to closure of the aortic and pulmonary valves.",a:true},{t:"Most ventricular filling occurs during atrial systole.",a:false,e:"Most filling is passive, early in diastole."},{t:"The aortic valve opens when left ventricular pressure exceeds aortic pressure.",a:true},{t:"During isovolumetric contraction both the AV and semilunar valves are open.",a:false,e:"All valves are closed."}],sample:true},
+{id:"s3",prog:"MBBS",type:"TF",subject:"Biochemistry",topic:"Glycolysis",stem:"In glycolysis:",items:[{t:"Phosphofructokinase-1 is the main rate-limiting enzyme.",a:true},{t:"The net gain is 2 ATP per glucose under anaerobic conditions.",a:true},{t:"It takes place in the mitochondria.",a:false,e:"It takes place in the cytosol."},{t:"Pyruvate is converted to lactate under anaerobic conditions.",a:true},{t:"Hexokinase is inhibited by glucose-6-phosphate.",a:true}],sample:true},
+{id:"s4",prog:"MBBS",type:"SBA",subject:"Anatomy",topic:"Axillary nerve",stem:"A 25-year-old man cannot abduct his arm after a fracture of the surgical neck of the humerus. Which nerve is most likely injured?",opts:["Radial nerve","Axillary nerve","Musculocutaneous nerve","Median nerve","Ulnar nerve"],ans:1,exp:"The axillary nerve winds around the surgical neck and supplies the deltoid and teres minor.",sample:true},
+{id:"s5",prog:"MBBS",type:"SBA",subject:"Physiology",topic:"Heart sounds",stem:"Which of the following best explains the first heart sound?",opts:["Closure of the aortic valve","Closure of the pulmonary valve","Closure of the mitral and tricuspid valves","Rapid ventricular filling","Atrial contraction"],ans:2,exp:"S1 marks the start of ventricular systole when the AV valves close.",sample:true},
+{id:"s6",prog:"MBBS",type:"SBA",subject:"Biochemistry",topic:"Glycolysis",stem:"Which enzyme catalyses the main rate-limiting step of glycolysis?",opts:["Hexokinase","Phosphofructokinase-1","Pyruvate kinase","Aldolase","Enolase"],ans:1,exp:"Phosphofructokinase-1 is the key regulatory step.",sample:true}];
+let MCQ_ALL=MCQ_SAMPLE.slice(),MCQ={tab:"TF",q:"",s:"",ans:{}};
+function mcqRows(){return MCQ_ALL.filter(m=>m.prog===PROG&&m.type===MCQ.tab&&(!MCQ.s||m.subject===MCQ.s)&&hit(MCQ.q,[m.stem,m.topic,m.subject,...(m.items?m.items.map(x=>x.t):m.opts)]))}
+function mcqTag(m){const t=[(m.board?m.board+" ":"")+(m.exam||"")].filter(x=>x.trim());return `<span class="badge ${m.sample?"demo":"ok"}">${m.sample?"Sample":(m.verified?"Verified":"Unverified")}</span><span class="badge">${esc(m.subject)}</span><span class="badge">${esc(m.topic)}</span>${t.length?`<span class="badge ok">${esc(t[0])}</span>`:""}`}
+function tfCard(m,n){const a=MCQ.ans[m.id]||{},k=m.items.filter((x,i)=>i in a).length,c=m.items.filter((x,i)=>a[i]===x.a).length;
+return `<div class="item pq"><div class="qhead"><b class="qn">${n}.</b><span>${esc(m.stem)}</span></div><div class="qtags">${mcqTag(m)}</div>${m.items.map((it,i)=>{const sh=i in a,ok=sh&&a[i]===it.a;return `<div class="mrow"><span class="lt">${"abcde"[i]})</span><span>${esc(it.t)}</span><span class="mbtns"><button class="mb ${sh&&a[i]===true?(ok?"good":"bad"):""}" onclick="mcqTF('${m.id}',${i},true)"${sh?" disabled":""}>T</button><button class="mb ${sh&&a[i]===false?(ok?"good":"bad"):""}" onclick="mcqTF('${m.id}',${i},false)"${sh?" disabled":""}>F</button></span>${sh?`<div class="mexp">${ok?"Correct":"Wrong"}. Answer: ${it.a?"True":"False"}.${it.e?" "+esc(it.e):""}</div>`:""}</div>`}).join("")}${k===m.items.length?`<div class="who">Score: ${c} of ${k}${m.exp?" \u00b7 "+esc(m.exp):""}</div>`:""}</div>`}
+function sbaCard(m,n){const c=MCQ.ans[m.id],sh=c!==undefined;
+return `<div class="item pq"><div class="qhead"><b class="qn">${n}.</b><span>${esc(m.stem)}</span></div><div class="qtags">${mcqTag(m)}</div>${m.opts.map((o,i)=>`<button class="mopt ${sh?(i===m.ans?"good":(i===c?"bad":"")):""}" onclick="mcqSBA('${m.id}',${i})"${sh?" disabled":""}><b>${"ABCDE"[i]}.</b><span>${esc(o)}</span></button>`).join("")}${sh?`<div class="mexp">${c===m.ans?"Correct.":"Not quite."} Answer: ${"ABCDE"[m.ans]}.${m.exp?" "+esc(m.exp):""}</div>`:""}</div>`}
+function mcqList(){const r=mcqRows();return r.length?`<div class="paper"><div class="paperhead"><b>${MCQ.tab==="TF"?"True / False":"Single Best Answer (SBA)"}</b><span>${MCQ.tab==="TF"?"Mark each statement T (true) or F (false).":"Choose the one best answer."} Your answer locks once chosen.</span></div>${r.map((m,i)=>m.type==="TF"?tfCard(m,i+1):sbaCard(m,i+1)).join("")}</div>`:'<div class="empty">No MCQs found here yet.</div>'}
+function mcqScore(){let n=0,c=0;MCQ_ALL.filter(m=>m.prog===PROG).forEach(m=>{const a=MCQ.ans[m.id];if(a===undefined)return;if(m.type==="TF"){m.items.forEach((x,i)=>{if(i in a){n++;if(a[i]===x.a)c++}})}else{n++;if(a===m.ans)c++}});return n?`Answered ${n} \u00b7 Correct ${c}`:"Tap an answer to check it."}
+function mcqRefresh(){const r=document.getElementById("mres"),s=document.getElementById("mscore");if(r)r.innerHTML=mcqList();if(s)s.textContent=mcqScore()}
+function mcqTab(t){MCQ.tab=t;render()}
+function mcqTF(id,i,v){MCQ.ans[id]=MCQ.ans[id]||{};if(i in MCQ.ans[id])return;MCQ.ans[id][i]=v;mcqRefresh()}
+function mcqSBA(id,i){if(MCQ.ans[id]!==undefined)return;MCQ.ans[id]=i;mcqRefresh()}
+function mcq(){return `<h2>MCQ practice</h2><div class="seg" role="tablist"><button class="${MCQ.tab==="TF"?"on":""}" onclick="mcqTab('TF')">True / False</button><button class="${MCQ.tab==="SBA"?"on":""}" onclick="mcqTab('SBA')">SBA</button></div>
+<p class="mut">${MCQ.tab==="TF"?"Each question has five statements. Mark each one True or False.":"Single Best Answer: choose the one best option."}${MCQ_ALL.some(m=>m.sample&&m.prog===PROG)?" The questions shown now are fictional samples, not real exam questions.":""}</p>
+<input id="mq" aria-label="Search MCQs" placeholder="Search topic or keyword\u2026" value="${esc(MCQ.q)}">
+<div class="filters"><select id="ms" aria-label="Subject">${opts(SUBJECTS,MCQ.s,"All subjects")}</select></div>
+<p class="mut" id="mscore">${mcqScore()}</p><div id="mres">${mcqList()}</div>`}
+function loadMcq(){if(!MCQ_CSV_URL)return;fetch(MCQ_CSV_URL).then(r=>{if(!r.ok)throw new Error("bad");return r.text()}).then(t=>{const rows=parseCSV(t).slice(1).filter(r=>r.length>=16&&r[4]&&r[15]!=="Rejected"),out=[];
+rows.forEach((r,i)=>{const type=r[1]==="TF"?"TF":"SBA",o=[r[5],r[6],r[7],r[8],r[9]],b={id:"c"+i,prog:r[0]==="BDS"?"BDS":"MBBS",type:type,subject:r[2],topic:r[3],stem:r[4],exp:r[11],board:r[12],exam:r[13],verified:r[15]==="Verified"};
+if(type==="TF"){const a=String(r[10]).toUpperCase().replace(/[^TF]/g,"");if(a.length!==5)return;out.push({...b,items:o.map((x,k)=>({t:x,a:a[k]==="T"}))})}else{const k="ABCDE".indexOf(String(r[10]).trim().toUpperCase());if(k<0)return;out.push({...b,opts:o,ans:k})}});
+if(out.length){MCQ_ALL=out;MCQ.ans={};if(state.page==="mcq")render()}}).catch(()=>{})}
+const NOTES_FORM_PREFILL=""; // paste the Google Form pre-filled link here
+const NOTES_CSV_URL=""; // paste the published CSV link of the form's response sheet here
+let SHEET_R=[];
+function noteForm(){if(!NOTES_FORM_PREFILL)return null;try{const u=new URL(NOTES_FORM_PREFILL),map={};u.searchParams.forEach((v,k)=>{if(k.indexOf("entry.")===0)map[String(v).toUpperCase()]=k});return{action:u.origin+u.pathname.replace(/\/viewform$/,"/formResponse"),map:map}}catch(e){return null}}
+function loadNotes(){if(!NOTES_CSV_URL)return;fetch(NOTES_CSV_URL).then(r=>{if(!r.ok)throw new Error("bad");return r.text()}).then(t=>{const rows=parseCSV(t);if(rows.length<2)return;const h=rows[0].map(x=>String(x).toLowerCase()),ix=k=>h.findIndex(x=>x.indexOf(k)>=0),c={ts:ix("timestamp"),name:ix("name"),col:ix("college"),sub:ix("subject"),top:ix("topic"),ti:ix("title"),de:ix("desc"),li:ix("link"),st:ix("status"),pr:ix("program")},g=(r,k)=>k>=0?String(r[k]||"").trim():"";
+SHEET_R=rows.slice(1).filter(r=>g(r,c.st).toLowerCase()==="approved"&&/^https:\/\//.test(g(r,c.li))).map((r,i)=>({id:"n"+i,title:g(r,c.ti),subject:g(r,c.sub),topic:g(r,c.top)||"Other",kind:"Notes",desc:g(r,c.de),uploader:g(r,c.name),college:g(r,c.col),date:g(r,c.ts).split(" ")[0],perm:"Shared by a student",url:g(r,c.li),prog:g(r,c.pr).toUpperCase()==="BDS"?"BDS":"MBBS",srv:true}));
+if(state.page==="library"||state.page==="home")render()}).catch(()=>{})}
+function vivaSoon(){return `<h2>Viva</h2><div class="card"><span class="badge demo">Under development</span><p>Teacher-wise viva questions are coming soon. You will be able to search a teacher's name and see the questions, split by subject and the date they were asked.</p></div>`}
+function sections(){const m={};DEMO_Q.forEach(q=>{if(q.section)m[q.section]=(m[q.section]||0)+1});return Object.keys(m).map(k=>({name:k,n:m[k]}))}
+function setSec(v){state.f={...state.f,section:v};render()}
+function secChips(){const l=sections();if(!l.length)return"";const cur=(state.f||{}).section||"";return `<div class="chips" style="margin:8px 0 4px"><button class="chip ${cur?"":"on"}" data-s="" onclick="setSec(this.dataset.s)">All segments</button>${l.map(x=>`<button class="chip ${cur===x.name?"on":""}" data-s="${esc(x.name)}" onclick="setSec(this.dataset.s)">${esc(x.name)} (${x.n})</button>`).join("")}</div>`}
+function hashOf(s){return "#"+s.page+(s.id?"-"+s.id:"")}
+function snap(){return JSON.parse(JSON.stringify(state))}
+function saveHist(){try{history.replaceState({s:snap(),y:window.scrollY},"")}catch(e){}}
+function pushHist(){try{history.pushState({s:snap(),y:0},"",hashOf(state))}catch(e){}}
+function fromHash(){const m=/^#([a-z]+)(?:-([a-z0-9]+))?$/.exec(location.hash||"");const ok=["home","archive","question","library","resource","upload","teacher","signup","mcq","about"];return m&&ok.includes(m[1])?{page:m[1],id:m[2]||null,q:"",f:{}}:null}
+addEventListener("popstate",e=>{let st=e.state&&e.state.s;if(!st)st=fromHash()||{page:"home",id:null,q:"",f:{}};state=st;document.getElementById("nav").classList.remove("open");renderNav();render();const y=(e.state&&e.state.y)||0;requestAnimationFrame(()=>window.scrollTo(0,y))});
+const h0=fromHash();if(h0&&PROG)state={...state,...h0};
+try{history.replaceState({s:snap(),y:0},"",hashOf(state))}catch(e){}
+renderNav();render();loadSheet();loadMcq();loadNotes();bootLib();
+setTimeout(()=>{const sp=document.getElementById("splash");if(sp){sp.classList.add("hide");setTimeout(()=>sp.remove(),400)}},900);
+</script>
+</body>
+</html>
