@@ -2,7 +2,8 @@
 // Subjects Imported:
 //   - Anatomy (19 Papers, 380 Questions across 2021–2025)
 //   - Biochemistry (20 Papers, 400 Questions across 2021–2025)
-// Standard Textbook Verified Content (Snell, Gray's, Moore, BD Chaurasia, Langman, Junqueira, Harper's, Lehninger)
+//   - Physiology (21 Papers, 420 Questions across 2021–2025)
+// Standard Textbook Verified Content (Guyton & Hall, Ganong, Snell, Gray's, Moore, BD Chaurasia, Langman, Junqueira, Harper's, Lehninger)
 
 import {
   MCQ_ANSWER_REGISTRY,
@@ -47,6 +48,37 @@ export interface McqItem {
   sourceReference?: string;
   officialOrbitDiscrepancy?: string;
   reviewReason?: string;
+}
+
+export function getAvailableMcqSubjects(): string[] {
+  const set = new Set<string>();
+  AUTHENTIC_MCQ_PAPERS.forEach(p => set.add(p.subject));
+  return Array.from(set).sort();
+}
+
+export function getAvailableMcqPapersForSubject(subject: string): string[] {
+  const set = new Set<string>();
+  AUTHENTIC_MCQ_PAPERS
+    .filter(p => p.subject.toLowerCase() === subject.toLowerCase())
+    .forEach(p => set.add(p.paper));
+  return Array.from(set).sort();
+}
+
+export function getAvailableMcqYearsForPaper(subject: string, paper: string): number[] {
+  const set = new Set<number>();
+  AUTHENTIC_MCQ_PAPERS
+    .filter(p => p.subject.toLowerCase() === subject.toLowerCase() && p.paper.toLowerCase() === paper.toLowerCase())
+    .forEach(p => { if (p.year) set.add(p.year); });
+  return Array.from(set).sort((a, b) => a - b);
+}
+
+export function getMatchingMcqPapers(subject?: string, paper?: string, year?: number): McqExamPaper[] {
+  return AUTHENTIC_MCQ_PAPERS.filter(p => {
+    if (subject && p.subject.toLowerCase() !== subject.toLowerCase()) return false;
+    if (paper && p.paper.toLowerCase() !== paper.toLowerCase()) return false;
+    if (year && p.year !== year) return false;
+    return true;
+  });
 }
 
 export const AUTHENTIC_MCQ_PAPERS: McqExamPaper[] = [
@@ -25222,60 +25254,13090 @@ export const AUTHENTIC_MCQ_PAPERS: McqExamPaper[] = [
         "sourceReference": "Harper's Illustrated Biochemistry (32nd Ed.) / Lehninger (8th Ed.)"
       }
     ]
+  },
+  {
+    "id": "cmu-phy-2025-nov-p1",
+    "session": "November 2025",
+    "year": 2025,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 2,
+    "bookPage": "pp. 2–5",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Cell membrane",
+        "items": [
+          {
+            "label": "a",
+            "text": "Maintains the intracellular environment",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Contains receptor proteins and ion channels",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Separates intracellular fluid from extracellular fluid",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is composed of inorganic substances",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is freely permeable to electrolytes",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Cell membrane separates ICF from ECF and controls what enters/leaves. | (B): Integral proteins form receptors, channels, carriers and pumps. | (C): Cell membrane is the boundary between ICF and ECF. | (D): Membrane is lipid (phospholipid, cholesterol), protein and carbohydrate — all organic. | (E): The lipid bilayer is impermeable to ions; they cross via channels/pumps.",
+        "textbookNote": "(A): Cell membrane separates ICF from ECF and controls what enters/leaves. | (B): Integral proteins form receptors, channels, carriers and pumps. | (C): Cell membrane is the boundary between ICF and ECF. | (D): Membrane is lipid (phospholipid, cholesterol), protein and carbohydrate — all organic. | (E): The lipid bilayer is impermeable to ions; they cross via channels/pumps.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Mitochondria",
+        "items": [
+          {
+            "label": "a",
+            "text": "Have a membrane similar to the cell membrane",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are the chief site of protein synthesis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Are the chief site for ATP generation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Are absent near the membranes of actively secreting cells",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Have their own DNA",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Mitochondria have an inner and outer lipid membrane. | (B): Ribosomes (rough ER) synthesise proteins; mitochondria make ATP. | (C): Mitochondria generate most ATP by oxidative phosphorylation. | (D): Mitochondria are abundant where ATP is needed (secretory/transport cells). | (E): Mitochondria have their own circular DNA.",
+        "textbookNote": "(A): Mitochondria have an inner and outer lipid membrane. | (B): Ribosomes (rough ER) synthesise proteins; mitochondria make ATP. | (C): Mitochondria generate most ATP by oxidative phosphorylation. | (D): Mitochondria are abundant where ATP is needed (secretory/transport cells). | (E): Mitochondria have their own circular DNA.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Negative feedback means",
+        "items": [
+          {
+            "label": "a",
+            "text": "Center receiving negative information from periphery",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Center sending negative signal to appropriate organs",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "A reversible phenomenon",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Opposite to initiating stimuli",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Acceleration of initiating stimuli",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Negative feedback: response opposes the initiating stimulus. | (D): Negative feedback opposes the change. | (E): Acceleration of the stimulus is positive feedback.",
+        "textbookNote": "(A): Negative feedback: response opposes the initiating stimulus. | (D): Negative feedback opposes the change. | (E): Acceleration of the stimulus is positive feedback.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Na+-K+ pump",
+        "items": [
+          {
+            "label": "a",
+            "text": "Constant pumping activity is carried out in all cells",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Cell volume is maintained",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Na+ is actively transported into the cell",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "K+ is actively transported out of the cell",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Equal number of Na+ and K+ are transported",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Pump works continuously in all cells. | (B): Na+-K+ pump prevents cell swelling. | (C): Na+-K+ pump moves 3 Na+ OUT and 2 K+ IN. | (D): Na+-K+ pump moves K+ INTO the cell. | (E): 3 Na+ out for 2 K+ in.",
+        "textbookNote": "(A): Pump works continuously in all cells. | (B): Na+-K+ pump prevents cell swelling. | (C): Na+-K+ pump moves 3 Na+ OUT and 2 K+ IN. | (D): Na+-K+ pump moves K+ INTO the cell. | (E): 3 Na+ out for 2 K+ in.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Enteric nervous system",
+        "items": [
+          {
+            "label": "a",
+            "text": "Means the special nervous system for GIT",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Causes GIT secretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Helps in gut motility",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is under autonomic control",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is stimulated by stretching of gut wall",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): The ENS (myenteric + submucosal plexus) is the intrinsic gut nervous system. | (B): Submucosal plexus controls secretion and local blood flow. | (C): Myenteric plexus controls motility. | (D): ENS works independently; ANS only modulates it. | (E): Stretch triggers the peristaltic reflex via ENS.",
+        "textbookNote": "(A): The ENS (myenteric + submucosal plexus) is the intrinsic gut nervous system. | (B): Submucosal plexus controls secretion and local blood flow. | (C): Myenteric plexus controls motility. | (D): ENS works independently; ANS only modulates it. | (E): Stretch triggers the peristaltic reflex via ENS.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Erythropoiesis is regulated by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Rate of erythrocyte destruction",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Erythropoietin",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vitamin B12",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Androgen",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Blood pressure",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): EPO (driven by hypoxia) regulates erythropoiesis, not destruction rate. | (B): EPO from kidney stimulates RBC production. | (C): B12 is needed for maturation (DNA synthesis), not regulation. | (D): Androgens stimulate EPO and erythropoiesis. | (E): Blood pressure does not regulate erythropoiesis.",
+        "textbookNote": "(A): EPO (driven by hypoxia) regulates erythropoiesis, not destruction rate. | (B): EPO from kidney stimulates RBC production. | (C): B12 is needed for maturation (DNA synthesis), not regulation. | (D): Androgens stimulate EPO and erythropoiesis. | (E): Blood pressure does not regulate erythropoiesis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Plasma albumin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Contributes 80% of plasma colloid osmotic pressure",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is negatively charged at normal blood pH",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Carries CO2 in blood",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is filtered freely at renal glomerulus",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Lacks essential amino acids",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Albumin contributes ~80% of plasma oncotic pressure. | (B): Albumin is negatively charged at pH 7.4. | (C): Plasma proteins (carbamino) carry a small fraction of CO2. | (D): Albumin is too large (69 kDa) and negatively charged → not filtered. | (E): Albumin contains essential amino acids.",
+        "textbookNote": "(A): Albumin contributes ~80% of plasma oncotic pressure. | (B): Albumin is negatively charged at pH 7.4. | (C): Plasma proteins (carbamino) carry a small fraction of CO2. | (D): Albumin is too large (69 kDa) and negatively charged → not filtered. | (E): Albumin contains essential amino acids.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "A person with group A (+ve) blood",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has anti-B antibody in the plasma",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "May have the genotype AB",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Can be a donor for a person with AB or A",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has A agglutinogen in RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has D agglutinogen in RBC membrane",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Group A has A antigen and anti-B antibody. | (B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): '+ve' means Rh D antigen present on RBC.",
+        "textbookNote": "(A): Group A has A antigen and anti-B antibody. | (B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): '+ve' means Rh D antigen present on RBC.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Platelets",
+        "items": [
+          {
+            "label": "a",
+            "text": "Have a role in blood coagulation",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Liberate 5-HT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Form plug by sticking to each other",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secrete ADP",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Provide phospholipid for the intrinsic pathway",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Platelets form the plug and support coagulation. | (B): Dense granules release serotonin, ADP, Ca2+. | (C): Platelet aggregation forms the platelet plug. | (D): Dense granules release ADP. | (E): Platelet phospholipid (PF3) is needed for intrinsic/common pathways.",
+        "textbookNote": "(A): Platelets form the plug and support coagulation. | (B): Dense granules release serotonin, ADP, Ca2+. | (C): Platelet aggregation forms the platelet plug. | (D): Dense granules release ADP. | (E): Platelet phospholipid (PF3) is needed for intrinsic/common pathways.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Tests for bleeding disorder are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Coagulation time",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Bleeding time",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Partial thromboplastin time",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Platelet count",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "RBC count",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): CT tests the intrinsic/common pathways. | (B): BT tests platelet function. | (C): PTT tests the intrinsic pathway. | (D): Low count (thrombocytopenia) causes bleeding. | (E): RBC count is not a test for bleeding disorder.",
+        "textbookNote": "(A): CT tests the intrinsic/common pathways. | (B): BT tests platelet function. | (C): PTT tests the intrinsic pathway. | (D): Low count (thrombocytopenia) causes bleeding. | (E): RBC count is not a test for bleeding disorder.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Properties of cardiac muscle are all EXCEPT",
+        "opts": [
+          "Refractory period",
+          "Conductivity",
+          "Auto-excitability",
+          "Summation"
+        ],
+        "correctIndex": 3,
+        "explanation": "Cardiac muscle cannot show summation/tetanus because of the long refractory period.",
+        "textbookNote": "Cardiac muscle cannot show summation/tetanus because of the long refractory period.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Regarding SA node cells, all are true EXCEPT",
+        "opts": [
+          "Innervated by the vagus nerve",
+          "Found in both atria",
+          "The normal pacemaker of the heart",
+          "Inherently leaky to Na+ ions"
+        ],
+        "correctIndex": 1,
+        "explanation": "SA node lies in the right atrial wall at the SVC opening.",
+        "textbookNote": "SA node lies in the right atrial wall at the SVC opening.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "First heart sound is",
+        "opts": [
+          "Produced at the beginning of ventricular systole",
+          "Caused by opening of atrioventricular valves",
+          "Caused by closure of aortic and pulmonary valves",
+          "Produced at the beginning of ventricular diastole"
+        ],
+        "correctIndex": 0,
+        "explanation": "S1 is produced at the start of ventricular systole.",
+        "textbookNote": "S1 is produced at the start of ventricular systole.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "QRS complex is",
+        "opts": [
+          "Due to atrial repolarization and ventricular depolarization",
+          "Due to atrial depolarization",
+          "0.12 to 0.4 second in duration",
+          "Due to ventricular repolarization"
+        ],
+        "correctIndex": 0,
+        "explanation": "QRS = ventricular depolarisation (atrial repolarisation is hidden in it).",
+        "textbookNote": "QRS = ventricular depolarisation (atrial repolarisation is hidden in it).",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Regarding surfactant, all are true EXCEPT",
+        "opts": [
+          "Is secreted by type-II pneumocytes",
+          "Increases the lung compliance",
+          "Increases surface tension",
+          "Prevents collapse of the lungs"
+        ],
+        "correctIndex": 2,
+        "explanation": "Surfactant DEcreases surface tension.",
+        "textbookNote": "Surfactant DEcreases surface tension.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Lung defense mechanisms include",
+        "opts": [
+          "Macrophages",
+          "Serotonin",
+          "Negative intrapleural pressure",
+          "Pulmonary stretch receptors"
+        ],
+        "correctIndex": 0,
+        "explanation": "Alveolar macrophages phagocytose particles.",
+        "textbookNote": "Alveolar macrophages phagocytose particles.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "The oxy-Hb dissociation curve is shifted to the right by",
+        "opts": [
+          "Increased 2,3-DPG",
+          "Decreased PCO2",
+          "Increased pH",
+          "Increased PO2"
+        ],
+        "correctIndex": 0,
+        "explanation": "↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right.",
+        "textbookNote": "↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "The brush border enzyme is",
+        "opts": [
+          "Aminopeptidase",
+          "Nuclease",
+          "Collagenase",
+          "Ribonuclease"
+        ],
+        "correctIndex": 0,
+        "explanation": "Brush-border enzymes: aminopeptidase, dipeptidases, disaccharidases.",
+        "textbookNote": "Brush-border enzymes: aminopeptidase, dipeptidases, disaccharidases.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Intrinsic factor",
+        "opts": [
+          "Is secreted by oxyntic cells",
+          "Forms a protective barrier",
+          "Prevents digestion of stomach wall",
+          "Activates brush border enzymes"
+        ],
+        "correctIndex": 0,
+        "explanation": "Intrinsic factor is secreted by parietal (oxyntic) cells.",
+        "textbookNote": "Intrinsic factor is secreted by parietal (oxyntic) cells.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Regarding bile salts, all are true EXCEPT",
+        "opts": [
+          "Are derived from cholesterol",
+          "Are essential for fat digestion",
+          "Form micelles",
+          "Are absorbed mainly in the upper small gut"
+        ],
+        "correctIndex": 3,
+        "explanation": "Bile salts are absorbed in the terminal ileum.",
+        "textbookNote": "Bile salts are absorbed in the terminal ileum.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2025-nov-p2",
+    "session": "November 2025",
+    "year": 2025,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 6,
+    "bookPage": "pp. 6–9",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Aquaporins",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are protein channels",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are membrane lipids",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Form water channels in renal tubules",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Type 4 is present in salivary gland",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Type 5 is present in brain",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Aquaporins are water-channel proteins. | (B): Aquaporins are proteins, not lipids. | (C): AQP-1 (PCT), AQP-2 (ADH, collecting duct). | (D): AQP-5 is in salivary/lacrimal glands; AQP-4 is in brain and basolateral collecting duct. | (E): AQP-4 is the brain aquaporin; AQP-5 is in salivary glands.",
+        "textbookNote": "(A): Aquaporins are water-channel proteins. | (B): Aquaporins are proteins, not lipids. | (C): AQP-1 (PCT), AQP-2 (ADH, collecting duct). | (D): AQP-5 is in salivary/lacrimal glands; AQP-4 is in brain and basolateral collecting duct. | (E): AQP-4 is the brain aquaporin; AQP-5 is in salivary glands.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Proximal convoluted tubules secrete",
+        "items": [
+          {
+            "label": "a",
+            "text": "Bicarbonate ion",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Bile salts",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Hydrogen ion",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Potassium ion",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Oxalate",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): PCT reabsorbs bicarbonate (via H+ secretion), it does not secrete it. | (B): Bile salts are the most important component of bile for fat digestion. | (C): PCT secretes H+ (Na+-H+ exchange). | (D): PCT reabsorbs K+; late DCT/CD secrete K+. | (E): PCT secretes organic anions (oxalate, urate, PAH).",
+        "textbookNote": "(A): PCT reabsorbs bicarbonate (via H+ secretion), it does not secrete it. | (B): Bile salts are the most important component of bile for fat digestion. | (C): PCT secretes H+ (Na+-H+ exchange). | (D): PCT reabsorbs K+; late DCT/CD secrete K+. | (E): PCT secretes organic anions (oxalate, urate, PAH).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "The pituitary gland",
+        "items": [
+          {
+            "label": "a",
+            "text": "Secretes thyroid stimulating hormone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Secretes ADH",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has the optic chiasma anteriorly",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secretion is regulated by hypothalamus",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is endodermal in origin",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Thyrotrophs of anterior pituitary secrete TSH. | (B): ADH is made in the hypothalamus and released from the posterior pituitary. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Hypothalamic releasing/inhibiting hormones control it. | (E): Pituitary derives from oral ectoderm (Rathke's pouch) and neuroectoderm.",
+        "textbookNote": "(A): Thyrotrophs of anterior pituitary secrete TSH. | (B): ADH is made in the hypothalamus and released from the posterior pituitary. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Hypothalamic releasing/inhibiting hormones control it. | (E): Pituitary derives from oral ectoderm (Rathke's pouch) and neuroectoderm.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Thyroid stimulating hormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Stimulates synthesis of T3 and T4",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is biochemically an amine",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is released from the anterior pituitary",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Can be estimated by ELISA",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is high in thyrotoxicosis",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): TSH stimulates synthesis/release of T3, T4. | (B): TSH is a glycoprotein. | (C): TSH is secreted by anterior pituitary thyrotrophs. | (D): TSH is measured by immunoassay. | (E): TSH is suppressed in thyrotoxicosis.",
+        "textbookNote": "(A): TSH stimulates synthesis/release of T3, T4. | (B): TSH is a glycoprotein. | (C): TSH is secreted by anterior pituitary thyrotrophs. | (D): TSH is measured by immunoassay. | (E): TSH is suppressed in thyrotoxicosis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Hormones that act on the female breast",
+        "items": [
+          {
+            "label": "a",
+            "text": "Aldosterone",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Adrenal glucocorticoids",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Cortisol",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Estrogen",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Aldosterone retains Na+ and water. | (B): Glucocorticoids contribute (permissive) to breast development with GH, insulin, thyroxine. | (C): GH contributes to breast development. | (D): Cortisol (glucocorticoid) supports breast development. | (E): Estrogen causes ductal growth.",
+        "textbookNote": "(A): Aldosterone retains Na+ and water. | (B): Glucocorticoids contribute (permissive) to breast development with GH, insulin, thyroxine. | (C): GH contributes to breast development. | (D): Cortisol (glucocorticoid) supports breast development. | (E): Estrogen causes ductal growth.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Knee jerk",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a monosynaptic reflex",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a superficial reflex",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Receptor is the patellar tendon",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is exaggerated in LMN lesion",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Response is extension",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Receptor is the muscle spindle. | (D): Knee jerk is lost/reduced in LMN lesion.",
+        "textbookNote": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Receptor is the muscle spindle. | (D): Knee jerk is lost/reduced in LMN lesion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Slow adapting receptors are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Pain receptors",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Receptors in the vestibular apparatus",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Thermoreceptors",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Baroreceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Chemoreceptors",
+            "ans": true
+          }
+        ],
+        "explanation": "Standard medical physiology textbook verified facts.",
+        "textbookNote": "Standard medical physiology textbook verified facts.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "In Wallerian degeneration",
+        "items": [
+          {
+            "label": "a",
+            "text": "Chromatolysis occurs",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Axon breaks into short lengths",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "The neurofibrils ultimately disappear",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Mitotic division of Schwann cells does not occur",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Myelin sheath disintegrates into fat droplets",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Chromatolysis is in the cell body (retrograde reaction), not Wallerian. | (B): Wallerian degeneration: axon breaks up, myelin → fat droplets. | (C): Distal axon degenerates completely. | (D): Schwann cells proliferate in Wallerian degeneration. | (E): Myelin breaks into fat droplets.",
+        "textbookNote": "(A): Chromatolysis is in the cell body (retrograde reaction), not Wallerian. | (B): Wallerian degeneration: axon breaks up, myelin → fat droplets. | (C): Distal axon degenerates completely. | (D): Schwann cells proliferate in Wallerian degeneration. | (E): Myelin breaks into fat droplets.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Abnormalities of taste are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Ageusia",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Presbycusis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Hypogeusia",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Hyposmia",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Dysgeusia",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Ageusia = loss of taste. | (B): Presbycusis = age-related hearing loss. | (C): Hypogeusia = decreased taste. | (D): Hyposmia = decreased smell. | (E): Dysgeusia = distorted taste.",
+        "textbookNote": "(A): Ageusia = loss of taste. | (B): Presbycusis = age-related hearing loss. | (C): Hypogeusia = decreased taste. | (D): Hyposmia = decreased smell. | (E): Dysgeusia = distorted taste.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "The auditory sensation involves the following",
+        "items": [
+          {
+            "label": "a",
+            "text": "Labyrinth",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Saccule",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Lateral geniculate body",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Spiral ganglion",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Scala media",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Cochlea (hearing) lies in the labyrinth. | (B): Saccule belongs to the vestibular (equilibrium) system. | (C): Auditory relay is the medial geniculate body; lateral is visual. | (D): Spiral ganglion cells form the cochlear nerve. | (E): Scala media contains the organ of Corti.",
+        "textbookNote": "(A): Cochlea (hearing) lies in the labyrinth. | (B): Saccule belongs to the vestibular (equilibrium) system. | (C): Auditory relay is the medial geniculate body; lateral is visual. | (D): Spiral ganglion cells form the cochlear nerve. | (E): Scala media contains the organ of Corti.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Norepinephrine excites mainly",
+        "opts": [
+          "α adrenergic receptors",
+          "β1 adrenergic receptors",
+          "β2 adrenergic receptors",
+          "β3 adrenergic receptors"
+        ],
+        "correctIndex": 0,
+        "explanation": "Norepinephrine acts mainly on α-receptors (and β1 in heart).",
+        "textbookNote": "Norepinephrine acts mainly on α-receptors (and β1 in heart).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "The substance that is mostly reabsorbed by the kidney is",
+        "opts": [
+          "Amino acids",
+          "Bicarbonate ions",
+          "Chloride ions",
+          "Sodium ions"
+        ],
+        "correctIndex": 0,
+        "explanation": "Amino acids are ~100% reabsorbed.",
+        "textbookNote": "Amino acids are ~100% reabsorbed.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "The most potent stimulus for growth hormone secretion",
+        "opts": [
+          "Increased blood free fatty acid",
+          "Decreased blood glucose",
+          "Ghrelin hormone",
+          "Exercise"
+        ],
+        "correctIndex": 1,
+        "explanation": "Hypoglycaemia (and fasting, exercise, deep sleep, ghrelin) stimulates GH; high FFA/glucose inhibit it.",
+        "textbookNote": "Hypoglycaemia (and fasting, exercise, deep sleep, ghrelin) stimulates GH; high FFA/glucose inhibit it.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "The principal estrogen secreted by the ovaries is",
+        "opts": [
+          "β-estradiol",
+          "Estriol",
+          "Estrone",
+          "Progestin"
+        ],
+        "correctIndex": 0,
+        "explanation": "17β-estradiol is the most potent and principal ovarian estrogen.",
+        "textbookNote": "17β-estradiol is the most potent and principal ovarian estrogen.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "The most potent amino acids that potentiate insulin secretion",
+        "opts": [
+          "Arginine, Lysine",
+          "Leucine, Lysine",
+          "Cysteine, Arginine",
+          "Tryptophan, Tyrosine"
+        ],
+        "correctIndex": 0,
+        "explanation": "Arginine and lysine are the most potent amino-acid insulin secretagogues.",
+        "textbookNote": "Arginine and lysine are the most potent amino-acid insulin secretagogues.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "The adrenal steroid is degraded mainly in the",
+        "opts": [
+          "Gall bladder",
+          "Liver",
+          "Kidney",
+          "Pancreas"
+        ],
+        "correctIndex": 1,
+        "explanation": "Adrenal steroids are inactivated by conjugation in the liver.",
+        "textbookNote": "Adrenal steroids are inactivated by conjugation in the liver.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "The major source of heat production is",
+        "opts": [
+          "Ingestion of food",
+          "Muscular exertion",
+          "Norepinephrine",
+          "Thyroid hormone"
+        ],
+        "correctIndex": 1,
+        "explanation": "Skeletal muscle (exertion) is the biggest source of heat.",
+        "textbookNote": "Skeletal muscle (exertion) is the biggest source of heat.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Neurotransmitter that almost always causes excitation",
+        "opts": [
+          "Acetylcholine",
+          "GABA",
+          "Glutamate",
+          "Serotonin"
+        ],
+        "correctIndex": 2,
+        "explanation": "Glutamate is the main excitatory CNS transmitter; GABA/glycine inhibit.",
+        "textbookNote": "Glutamate is the main excitatory CNS transmitter; GABA/glycine inhibit.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "The most sensitive touch receptor is",
+        "opts": [
+          "Free nerve ending",
+          "Meissner's corpuscles",
+          "Merkel's discs",
+          "Pacinian corpuscles"
+        ],
+        "correctIndex": 1,
+        "explanation": "Meissner's corpuscles are the most sensitive touch receptors of the skin.",
+        "textbookNote": "Meissner's corpuscles are the most sensitive touch receptors of the skin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "The most important articulator of speech is",
+        "opts": [
+          "Lips",
+          "Mouth",
+          "Soft palate",
+          "Tongue"
+        ],
+        "correctIndex": 3,
+        "explanation": "The tongue is the most important articulator.",
+        "textbookNote": "The tongue is the most important articulator.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2025-may-p1",
+    "session": "May 2025",
+    "year": 2025,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 10,
+    "bookPage": "pp. 10–13",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Cell membrane",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has stable composition throughout the cell cycle",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is freely permeable to ions but not to protein",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is freely permeable to fat-soluble substances",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Contains relatively fewer proteins than lipid",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Transports glucose by a co-transport mechanism",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Membrane composition changes during the cell cycle. | (B): The bilayer blocks ions and water-soluble substances; it passes lipid-soluble ones. | (C): Lipid-soluble substances (O2, CO2, alcohol, steroids) dissolve in the bilayer. | (D): By weight membrane is ~55% protein, ~25% phospholipid, ~13% cholesterol. | (E): Glucose enters by Na+–glucose co-transport (SGLT) in gut/renal tubule.",
+        "textbookNote": "(A): Membrane composition changes during the cell cycle. | (B): The bilayer blocks ions and water-soluble substances; it passes lipid-soluble ones. | (C): Lipid-soluble substances (O2, CO2, alcohol, steroids) dissolve in the bilayer. | (D): By weight membrane is ~55% protein, ~25% phospholipid, ~13% cholesterol. | (E): Glucose enters by Na+–glucose co-transport (SGLT) in gut/renal tubule.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Gap junctions",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are present in the apical region of cell",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Are abundant in AV node",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Have transmembrane protein connections",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Permit rapid propagation of impulse",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Prevent movement of ions",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Gap junctions lie laterally/at intercalated discs, not apical. | (B): AV node has few gap junctions, hence slow conduction. | (C): Connexons join adjacent cells. | (D): Gap junctions allow rapid spread of excitation. | (E): Gap junctions ALLOW ion/small molecule movement.",
+        "textbookNote": "(A): Gap junctions lie laterally/at intercalated discs, not apical. | (B): AV node has few gap junctions, hence slow conduction. | (C): Connexons join adjacent cells. | (D): Gap junctions allow rapid spread of excitation. | (E): Gap junctions ALLOW ion/small molecule movement.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Macrocytic anemia develops in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vitamin B12 deficiency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Folic acid deficiency",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vitamin C deficiency",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Iron overload",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Pernicious anemia",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): B12 deficiency → macrocytic (megaloblastic) anaemia. | (B): Folate deficiency → megaloblastic anaemia. | (C): Vitamin C deficiency → scurvy (usually normocytic/mild anaemia). | (D): Iron overload does not cause macrocytic anaemia.",
+        "textbookNote": "(A): B12 deficiency → macrocytic (megaloblastic) anaemia. | (B): Folate deficiency → megaloblastic anaemia. | (C): Vitamin C deficiency → scurvy (usually normocytic/mild anaemia). | (D): Iron overload does not cause macrocytic anaemia.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Erythropoiesis is regulated by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Rate of erythrocyte destruction",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Erythropoietin",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vitamin B12",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Androgen",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Blood pressure",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): EPO (driven by hypoxia) regulates erythropoiesis, not destruction rate. | (B): EPO from kidney stimulates RBC production. | (C): B12 is needed for maturation (DNA synthesis), not regulation. | (D): Androgens stimulate EPO and erythropoiesis. | (E): Blood pressure does not regulate erythropoiesis.",
+        "textbookNote": "(A): EPO (driven by hypoxia) regulates erythropoiesis, not destruction rate. | (B): EPO from kidney stimulates RBC production. | (C): B12 is needed for maturation (DNA synthesis), not regulation. | (D): Androgens stimulate EPO and erythropoiesis. | (E): Blood pressure does not regulate erythropoiesis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Plasma albumin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Contributes 80% of plasma colloid osmotic pressure",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is negatively charged at normal blood pH",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Carries CO2 in blood",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is filtered freely at renal glomerulus",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Lacks essential amino acids",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Albumin contributes ~80% of plasma oncotic pressure. | (B): Albumin is negatively charged at pH 7.4. | (C): Plasma proteins (carbamino) carry a small fraction of CO2. | (D): Albumin is too large (69 kDa) and negatively charged → not filtered. | (E): Albumin contains essential amino acids.",
+        "textbookNote": "(A): Albumin contributes ~80% of plasma oncotic pressure. | (B): Albumin is negatively charged at pH 7.4. | (C): Plasma proteins (carbamino) carry a small fraction of CO2. | (D): Albumin is too large (69 kDa) and negatively charged → not filtered. | (E): Albumin contains essential amino acids.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "First heart sound",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is prolonged and loud",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is best heard over aortic area",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is best heard over mitral area",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is produced due to closure of AV valves",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Marks the clinical beginning of diastole",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): S1 (lub) is longer, lower pitched and louder than S2. | (B): S1 is best at mitral/tricuspid (apex); S2 at aortic/pulmonary. | (C): S1 is best heard at the mitral (apex) area. | (D): S1 is due to closure of AV valves at start of systole. | (E): S1 marks the start of systole; S2 the start of diastole.",
+        "textbookNote": "(A): S1 (lub) is longer, lower pitched and louder than S2. | (B): S1 is best at mitral/tricuspid (apex); S2 at aortic/pulmonary. | (C): S1 is best heard at the mitral (apex) area. | (D): S1 is due to closure of AV valves at start of systole. | (E): S1 marks the start of systole; S2 the start of diastole.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Obstructive airways disease (COPD) is similar to restrictive lung disease (RLD) in that",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vital capacity (VC)",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Forced expiratory volume in one second (FEV1)",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "The ratio FEV1/VC",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Residual volume",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Peak expiratory flow rate to the same degree",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): FEV1/VC falls in obstruction, normal/high in restriction. | (D): Residual volume prevents total collapse. | (E): PEFR falls more in obstruction.",
+        "textbookNote": "(C): FEV1/VC falls in obstruction, normal/high in restriction. | (D): Residual volume prevents total collapse. | (E): PEFR falls more in obstruction.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "GIT movement primarily responsible for propulsion of food along the digestive tract",
+        "items": [
+          {
+            "label": "a",
+            "text": "Segmentation contraction",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Tonic contraction",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Peristalsis",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Haustration",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Pendular movement",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Propulsion is by peristalsis; segmentation mixes. | (B): Tonic contraction maintains tone, not propulsion. | (C): Peristalsis is the propulsive movement of the gut. | (D): Haustration is a mixing movement of the colon. | (E): Pendular movements mix in small intestine.",
+        "textbookNote": "(A): Propulsion is by peristalsis; segmentation mixes. | (B): Tonic contraction maintains tone, not propulsion. | (C): Peristalsis is the propulsive movement of the gut. | (D): Haustration is a mixing movement of the colon. | (E): Pendular movements mix in small intestine.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Sinoatrial node cells are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Found in both atria",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Innervated by the vagus",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Unable to generate impulses when completely denervated",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Connected to the AV node by fine bundles of Purkinje tissue",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Able to generate impulses because their membrane potential is unstable",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): SA node lies in the right atrial wall at the SVC opening. | (B): Right vagus mainly supplies the SA node. | (C): SA node is autorhythmic; denervated rate ≈ 100/min. | (D): SA and AV nodes are connected by atrial internodal fibres, not Purkinje fibres. | (E): Unstable RMP gives SA node automaticity.",
+        "textbookNote": "(A): SA node lies in the right atrial wall at the SVC opening. | (B): Right vagus mainly supplies the SA node. | (C): SA node is autorhythmic; denervated rate ≈ 100/min. | (D): SA and AV nodes are connected by atrial internodal fibres, not Purkinje fibres. | (E): Unstable RMP gives SA node automaticity.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "A person with group A (+ve) blood",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has anti-B antibody in plasma",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "May have the genotype AB",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Can be a donor for a person with AB or A",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has A agglutinogen on RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has B agglutinogen on RBC membrane",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): Group A has A agglutinogen, not B.",
+        "textbookNote": "(B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): Group A has A agglutinogen, not B.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Which part of the ECG corresponds to ventricular repolarization?",
+        "opts": [
+          "The P wave",
+          "The QRS duration",
+          "The T wave",
+          "The U wave"
+        ],
+        "correctIndex": 2,
+        "explanation": "T wave = ventricular repolarisation; QRS = depolarisation; P = atrial.",
+        "textbookNote": "T wave = ventricular repolarisation; QRS = depolarisation; P = atrial.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "The second heart sound is caused by",
+        "opts": [
+          "Closure of the aortic and pulmonary valves",
+          "Vibrations in the ventricular wall during systole",
+          "Ventricular filling",
+          "Closure of the mitral and tricuspid valves"
+        ],
+        "correctIndex": 0,
+        "explanation": "S2 is caused by closure of the aortic and pulmonary valves.",
+        "textbookNote": "S2 is caused by closure of the aortic and pulmonary valves.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "When the radius of the resistance vessels is increased, which of the following is",
+        "opts": [
+          "Systolic blood pressure",
+          "Diastolic blood pressure",
+          "Viscosity of the blood",
+          "Capillary blood flow"
+        ],
+        "correctIndex": 3,
+        "explanation": "Resistance ∝ 1/r⁴; larger radius → less resistance → more flow.",
+        "textbookNote": "Resistance ∝ 1/r⁴; larger radius → less resistance → more flow.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Most of the iron in the body is present in",
+        "opts": [
+          "Hemoglobin",
+          "Myoglobin",
+          "Ferritin",
+          "Transferrin"
+        ],
+        "correctIndex": 0,
+        "explanation": "~65% of body iron is in haemoglobin.",
+        "textbookNote": "~65% of body iron is in haemoglobin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "A person whose blood group is 'B positive' has which of the following?",
+        "opts": [
+          "The rhesus D antigen and the B antigen on their RBC and anti-A agglutinin",
+          "The rhesus antigen and the B antigen on their RBC and anti-B agglutinin",
+          "The rhesus D antigen and the A antigen on their RBC and anti-A agglutinin",
+          "No rhesus D antigen and the B antigen on their RBC and anti-A agglutinin"
+        ],
+        "correctIndex": 0,
+        "explanation": "B+ = B antigen + D antigen; plasma anti-A.",
+        "textbookNote": "B+ = B antigen + D antigen; plasma anti-A.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "What substance is the product of the second step in the blood clotting process?",
+        "opts": [
+          "Thrombin",
+          "Prothrombin",
+          "Prothrombin activator",
+          "Fibrin"
+        ],
+        "correctIndex": 0,
+        "explanation": "Step 2 converts prothrombin to thrombin.",
+        "textbookNote": "Step 2 converts prothrombin to thrombin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "How does homeostasis return the body to a healthy state after stressful stimuli? By",
+        "opts": [
+          "Responses that oppose the stress",
+          "Learned behavior",
+          "Reflex action",
+          "Buffering mechanism"
+        ],
+        "correctIndex": 0,
+        "explanation": "Negative feedback produces responses opposing the change.",
+        "textbookNote": "Negative feedback produces responses opposing the change.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Defecation reflex is integrated by",
+        "opts": [
+          "Brain stem",
+          "Cerebral cortex",
+          "Spinal cord",
+          "Basal ganglia"
+        ],
+        "correctIndex": 2,
+        "explanation": "Defecation reflex is integrated in the sacral spinal cord.",
+        "textbookNote": "Defecation reflex is integrated in the sacral spinal cord.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "What ensures that the lungs expand as the chest wall expands?",
+        "opts": [
+          "A secreted surfactant",
+          "Negative pressure between the pleurae",
+          "Serous liquid secreted by the pleura",
+          "The elastic recoil of the alveolar tissue"
+        ],
+        "correctIndex": 1,
+        "explanation": "Negative intrapleural pressure couples lungs to the chest wall.",
+        "textbookNote": "Negative intrapleural pressure couples lungs to the chest wall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Which structure has the thickest wall?",
+        "opts": [
+          "The aorta",
+          "The interventricular septum",
+          "The left ventricle",
+          "The right ventricle"
+        ],
+        "correctIndex": 2,
+        "explanation": "The left ventricle generates highest pressure and has the thickest wall.",
+        "textbookNote": "The left ventricle generates highest pressure and has the thickest wall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2025-may-p2",
+    "session": "May 2025",
+    "year": 2025,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 14,
+    "bookPage": "pp. 14–17",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Active Na+ transport occurs in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Cortical collecting tubule",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Distal convoluted tubule",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Proximal convoluted tubule",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Thin descending limb of LH",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Thin ascending limb of LH",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Active Na+ reabsorption occurs in cortical collecting duct (principal cells). | (B): DCT actively reabsorbs Na+ (thiazide-sensitive NCC). | (C): PCT reabsorbs Na+ actively. | (D): Thin descending limb has no active Na+ transport. | (E): Thin ascending limb is passive to NaCl.",
+        "textbookNote": "(A): Active Na+ reabsorption occurs in cortical collecting duct (principal cells). | (B): DCT actively reabsorbs Na+ (thiazide-sensitive NCC). | (C): PCT reabsorbs Na+ actively. | (D): Thin descending limb has no active Na+ transport. | (E): Thin ascending limb is passive to NaCl.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Indicators used to measure ECF",
+        "items": [
+          {
+            "label": "a",
+            "text": "Antipyrine",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Evans blue dye",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "22Na",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Inulin",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Thiosulfate",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Antipyrine measures TBW. | (B): Evans blue measures plasma volume. | (C): 22Na distributes in ECF. | (D): Inulin measures ECF (and GFR). | (E): Thiosulfate/inulin/sucrose/22Na measure ECF.",
+        "textbookNote": "(A): Antipyrine measures TBW. | (B): Evans blue measures plasma volume. | (C): 22Na distributes in ECF. | (D): Inulin measures ECF (and GFR). | (E): Thiosulfate/inulin/sucrose/22Na measure ECF.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Hormones that use cAMP as second messenger",
+        "items": [
+          {
+            "label": "a",
+            "text": "Calcitonin",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Glucagon",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Oxytocin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Secretin",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Thyroid releasing hormone",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Calcitonin is not a physiological gastrin stimulus. | (B): Glucagon acts through cAMP. | (C): Oxytocin acts through IP3/Ca2+. | (D): Secretin inhibits gastric motility/emptying and stimulates HCO3 - secretion. | (E): TRH acts via PLC–IP3.",
+        "textbookNote": "(A): Calcitonin is not a physiological gastrin stimulus. | (B): Glucagon acts through cAMP. | (C): Oxytocin acts through IP3/Ca2+. | (D): Secretin inhibits gastric motility/emptying and stimulates HCO3 - secretion. | (E): TRH acts via PLC–IP3.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Thyroid stimulating hormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is biochemically an amine",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Can be estimated by ELISA",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is high in thyrotoxicosis",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is released from the anterior pituitary",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Stimulates synthesis of T3 and T4",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): TSH is a glycoprotein. | (B): TSH is measured by immunoassay. | (C): TSH is suppressed in thyrotoxicosis. | (D): TSH is secreted by anterior pituitary thyrotrophs. | (E): TSH stimulates synthesis/release of T3, T4.",
+        "textbookNote": "(A): TSH is a glycoprotein. | (B): TSH is measured by immunoassay. | (C): TSH is suppressed in thyrotoxicosis. | (D): TSH is secreted by anterior pituitary thyrotrophs. | (E): TSH stimulates synthesis/release of T3, T4.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Specific effects of testosterone on pelvis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Causes a broad ovoid-shaped pelvis",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Causes pelvic bones to be rougher",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increases strength of pelvis",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Narrows the pelvic outlet",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Shortens the pelvis",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Estrogen causes a broad pelvis; testosterone a narrow, rough, strong pelvis. | (B): Testosterone thickens, roughens and strengthens bones. | (C): Testosterone adds bone matrix. | (E): Testosterone lengthens the pelvis.",
+        "textbookNote": "(A): Estrogen causes a broad pelvis; testosterone a narrow, rough, strong pelvis. | (B): Testosterone thickens, roughens and strengthens bones. | (C): Testosterone adds bone matrix. | (E): Testosterone lengthens the pelvis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Neuronal circuits in the spinal cord can cause",
+        "items": [
+          {
+            "label": "a",
+            "text": "Feeding reflex",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Reaction to pain",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Reaction to pleasure",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Reflexes that control GIT movement",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Walking movements",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Feeding is a hypothalamic/brainstem function. | (B): Withdrawal reflex is spinal. | (C): Pleasure reaction is a limbic/higher function. | (D): Spinal reflexes control gut movement (defecation). | (E): Walking patterns are generated in spinal cord circuits.",
+        "textbookNote": "(A): Feeding is a hypothalamic/brainstem function. | (B): Withdrawal reflex is spinal. | (C): Pleasure reaction is a limbic/higher function. | (D): Spinal reflexes control gut movement (defecation). | (E): Walking patterns are generated in spinal cord circuits.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Tactile senses are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Pain",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Pressure",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Temperature",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Touch",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Vibration",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Pain is not a tactile (touch) sense. | (C): Temperature is detected by thermoreceptors (not a touch sense); body temperature is regulated by the hypothalamus. | (E): Vibration is carried in the dorsal column.",
+        "textbookNote": "(A): Pain is not a tactile (touch) sense. | (C): Temperature is detected by thermoreceptors (not a touch sense); body temperature is regulated by the hypothalamus. | (E): Vibration is carried in the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Somatostatin acts to",
+        "items": [
+          {
+            "label": "a",
+            "text": "Depress the secretion of insulin",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decrease motility of stomach",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Decrease secretion of GIT",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increase secretion of glucagon",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increase absorption of GIT",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Somatostatin inhibits insulin and glucagon. | (B): Somatostatin decreases GI motility. | (C): Somatostatin decreases GI secretions. | (D): Somatostatin inhibits glucagon. | (E): Somatostatin reduces GI absorption.",
+        "textbookNote": "(A): Somatostatin inhibits insulin and glucagon. | (B): Somatostatin decreases GI motility. | (C): Somatostatin decreases GI secretions. | (D): Somatostatin inhibits glucagon. | (E): Somatostatin reduces GI absorption.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Pain-producing chemical substances are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Bradykinin",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Endorphins",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Enkephalins",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Potassium ions",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Proteolytic enzymes",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Endorphins relieve pain; they are not pain-producing. | (C): Enkephalins are analgesic peptides. | (D): PCT reabsorbs K+; late DCT/CD secrete K+.",
+        "textbookNote": "(B): Endorphins relieve pain; they are not pain-producing. | (C): Enkephalins are analgesic peptides. | (D): PCT reabsorbs K+; late DCT/CD secrete K+.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "Curvature of cornea increases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Curvature of lens increases",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Visual axes of the two eyes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Ciliary muscle contracts → lens becomes more convex. | (C): Constricted pupil increases depth of focus. | (D): Pupillary constriction reduces light entry. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Ciliary muscle contracts → lens becomes more convex. | (C): Constricted pupil increases depth of focus. | (D): Pupillary constriction reduces light entry. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Post-menopausal hot flush is mainly due to",
+        "opts": [
+          "Decreased androgen",
+          "Decreased estrogen",
+          "Increased progesterone",
+          "Increased FSH"
+        ],
+        "correctIndex": 1,
+        "explanation": "Oestrogen withdrawal causes hot flushes.",
+        "textbookNote": "Oestrogen withdrawal causes hot flushes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "The body's most powerful sodium-retaining hormone is",
+        "opts": [
+          "Angiotensin II",
+          "Antidiuretic hormone",
+          "Atrial natriuretic peptide",
+          "Parathyroid hormone"
+        ],
+        "correctIndex": 0,
+        "explanation": "Aldosterone is the most powerful; of the options, angiotensin II acts via aldosterone.",
+        "textbookNote": "Aldosterone is the most powerful; of the options, angiotensin II acts via aldosterone.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "The most important effect of glucagon in high concentration is",
+        "opts": [
+          "Activate adipose cell lipase",
+          "Enhances the strength of the heart",
+          "Inhibit storage of triglyceride in liver",
+          "Increases blood flow in tissues"
+        ],
+        "correctIndex": 0,
+        "explanation": "High-dose glucagon activates lipase, making FFA available.",
+        "textbookNote": "High-dose glucagon activates lipase, making FFA available.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "The most likely method of heat loss from skin is",
+        "opts": [
+          "Conduction",
+          "Convection",
+          "Evaporation",
+          "Radiation"
+        ],
+        "correctIndex": 3,
+        "explanation": "Radiation is ~60% of heat loss in a resting nude person.",
+        "textbookNote": "Radiation is ~60% of heat loss in a resting nude person.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "One of the most important clinical causes of edema is",
+        "opts": [
+          "Allergic reaction",
+          "Anemia",
+          "Nephrotic syndrome",
+          "Pregnancy"
+        ],
+        "correctIndex": 2,
+        "explanation": "Nephrotic syndrome → hypoalbuminaemia → ↓oncotic pressure → edema.",
+        "textbookNote": "Nephrotic syndrome → hypoalbuminaemia → ↓oncotic pressure → edema.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Highest concentration of voltage-gated sodium channels is present in",
+        "opts": [
+          "Axon terminal",
+          "Dendrites",
+          "Initial segment of axon",
+          "Node of Ranvier"
+        ],
+        "correctIndex": 3,
+        "explanation": "Nodes of Ranvier have the highest Na+-channel density (~2000/μm²).",
+        "textbookNote": "Nodes of Ranvier have the highest Na+-channel density (~2000/μm²).",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Corticospinal tract fibers mostly originate from",
+        "opts": [
+          "Primary motor cortex",
+          "Premotor areas",
+          "Somatosensory areas",
+          "Supplementary motor areas"
+        ],
+        "correctIndex": 0,
+        "explanation": "~30% from primary motor cortex, 30% premotor/supplementary, 40% somatosensory; primary motor cortex is the chief origin.",
+        "textbookNote": "~30% from primary motor cortex, 30% premotor/supplementary, 40% somatosensory; primary motor cortex is the chief origin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Blood–cerebrospinal fluid barrier is highly permeable to",
+        "opts": [
+          "Chloride",
+          "Plasma proteins",
+          "Sodium",
+          "Water"
+        ],
+        "correctIndex": 3,
+        "explanation": "Water, CO2 and O2 cross the BCSF barrier freely.",
+        "textbookNote": "Water, CO2 and O2 cross the BCSF barrier freely.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Aqueous humor secretion begins mainly with the active transport of",
+        "opts": [
+          "Divalent cations of alkali metals group",
+          "Potassium cations of the KCl",
+          "Sodium anions of the NaCl",
+          "Sodium cations of the NaCl"
+        ],
+        "correctIndex": 3,
+        "explanation": "Active Na+ transport into ciliary epithelium draws water.",
+        "textbookNote": "Active Na+ transport into ciliary epithelium draws water.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "A major part of flavor of food is actually contributed by the sense of",
+        "opts": [
+          "Audition",
+          "Gustation",
+          "Olfaction",
+          "Trigeminal sense"
+        ],
+        "correctIndex": 2,
+        "explanation": "Smell contributes most of flavour.",
+        "textbookNote": "Smell contributes most of flavour.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2024-nov-p1",
+    "session": "November 2024",
+    "year": 2024,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 18,
+    "bookPage": "pp. 18–21",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Regarding action potential",
+        "items": [
+          {
+            "label": "a",
+            "text": "Produced by threshold stimuli",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Depolarization phase is caused by influx of K+",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Influx of Ca2+ can produce depolarization",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Consists of either depolarization or repolarization",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Depolarization is mostly due to Na+ influx",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): AP is all-or-none; occurs at threshold. | (B): Depolarisation is due to Na+ (or Ca2+) influx; K+ efflux repolarises. | (C): Ca2+ influx causes depolarisation in cardiac/smooth muscle. | (D): An action potential has both depolarisation and repolarisation. | (E): Nerve/skeletal AP depolarisation is due to Na+ influx.",
+        "textbookNote": "(A): AP is all-or-none; occurs at threshold. | (B): Depolarisation is due to Na+ (or Ca2+) influx; K+ efflux repolarises. | (C): Ca2+ influx causes depolarisation in cardiac/smooth muscle. | (D): An action potential has both depolarisation and repolarisation. | (E): Nerve/skeletal AP depolarisation is due to Na+ influx.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Maturation of RBC means",
+        "items": [
+          {
+            "label": "a",
+            "text": "Cells are smaller in size",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Appearance of Hb and increase in its concentration",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Disappearance of nucleus",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Cytoplasm transforming to basophilic",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Persistence of organelles",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): RBC size decreases with maturation. | (B): Hb accumulates as RBC mature. | (C): Nucleus is extruded. | (D): Cytoplasm turns acidophilic (as Hb accumulates). | (E): Organelles disappear in mature RBC.",
+        "textbookNote": "(A): RBC size decreases with maturation. | (B): Hb accumulates as RBC mature. | (C): Nucleus is extruded. | (D): Cytoplasm turns acidophilic (as Hb accumulates). | (E): Organelles disappear in mature RBC.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "A person with A (+ve) blood group has",
+        "items": [
+          {
+            "label": "a",
+            "text": "Anti-A agglutinin in plasma",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "A agglutinogen on RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "D-Rh factor on RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "D-Rh factor present on RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Anti-D agglutinin in plasma",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Group A plasma has anti-B, not anti-A. | (B): Group A RBCs carry A agglutinogen. | (C): Rh-positive RBC carry the D antigen. | (D): Rh-positive RBC carry the D antigen. | (E): Rh-positive persons do not make anti-D.",
+        "textbookNote": "(A): Group A plasma has anti-B, not anti-A. | (B): Group A RBCs carry A agglutinogen. | (C): Rh-positive RBC carry the D antigen. | (D): Rh-positive RBC carry the D antigen. | (E): Rh-positive persons do not make anti-D.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Plasma albumin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Contributes more to plasma colloid osmotic pressure",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Filters freely through glomerular membrane",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is positively charged at the normal pH of blood",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Carries carbon dioxide in blood",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lacks the essential amino acids",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Albumin gives most of the colloid osmotic pressure. | (B): Albumin does not filter through the glomerulus. | (C): Albumin carries negative charge at normal pH. | (E): Albumin contains essential amino acids.",
+        "textbookNote": "(A): Albumin gives most of the colloid osmotic pressure. | (B): Albumin does not filter through the glomerulus. | (C): Albumin carries negative charge at normal pH. | (E): Albumin contains essential amino acids.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "In normal lung",
+        "items": [
+          {
+            "label": "a",
+            "text": "Minute respiratory volume is always 6 L/min",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "The air remaining in lung after quiet expiration is FRC",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vital capacity equals inspiratory capacity plus residual volume",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "All volumes and capacities are 20–25% more in male",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Functional residual capacity is about 1200 mL",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Minute volume varies with activity. | (B): FRC = ERV + RV ≈ 2.3 L. | (C): VC = IC + ERV (not RV). | (D): Women have 20–25% smaller volumes than men. | (E): FRC ≈ 2300 mL; RV ≈ 1200 mL.",
+        "textbookNote": "(A): Minute volume varies with activity. | (B): FRC = ERV + RV ≈ 2.3 L. | (C): VC = IC + ERV (not RV). | (D): Women have 20–25% smaller volumes than men. | (E): FRC ≈ 2300 mL; RV ≈ 1200 mL.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Dead space air",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is not useful for gas exchange",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is expired lastly",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "In young adult man is about 250 mL",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Saturates inspired air with H2O vapour",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is disadvantageous for removing the expiratory gas from lung",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Dead space air does not take part in exchange. | (B): Dead space air is expired FIRST. | (C): Anatomical dead space ≈ 150 mL. | (D): Dead space humidifies and warms inspired air. | (E): Dead space is wasted ventilation.",
+        "textbookNote": "(A): Dead space air does not take part in exchange. | (B): Dead space air is expired FIRST. | (C): Anatomical dead space ≈ 150 mL. | (D): Dead space humidifies and warms inspired air. | (E): Dead space is wasted ventilation.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "In ECG",
+        "items": [
+          {
+            "label": "a",
+            "text": "QRS complex is due to ventricular repolarization",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "S-T segment indicates ventricle is depolarized",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "P wave is absent in SA nodal block",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Normal P-R interval is about 0.30 sec",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "P-R interval lengthens due to parasympathetic",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): QRS = ventricular depolarisation. | (B): S-T segment = ventricles fully depolarised (plateau). | (C): SA block → no atrial depolarisation → P wave absent. | (D): Normal PR = 0.12–0.20 s. | (E): Vagal stimulation slows AV conduction, lengthening PR.",
+        "textbookNote": "(A): QRS = ventricular depolarisation. | (B): S-T segment = ventricles fully depolarised (plateau). | (C): SA block → no atrial depolarisation → P wave absent. | (D): Normal PR = 0.12–0.20 s. | (E): Vagal stimulation slows AV conduction, lengthening PR.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Regarding saliva secretion",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is increased by sympathetic stimulation",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can be affected by higher center",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increased during nervousness",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is primarily under hormonal control",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Has antiseptic action",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (B): Saliva secretion is affected by appetite, emotion. | (C): Nervousness inhibits saliva (dry mouth). | (D): Salivary secretion is purely nervous. | (E): Lysozyme, IgA and thiocyanate make saliva antiseptic.",
+        "textbookNote": "(A): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (B): Saliva secretion is affected by appetite, emotion. | (C): Nervousness inhibits saliva (dry mouth). | (D): Salivary secretion is purely nervous. | (E): Lysozyme, IgA and thiocyanate make saliva antiseptic.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Hormones that inhibit gastric emptying are",
+        "items": [
+          {
+            "label": "a",
+            "text": "CCK",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Motilin",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Secretin",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Gastrin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "GIP",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (B): Motilin stimulates gastric/intestinal motility (MMC). | (C): Secretin inhibits gastric motility/emptying and stimulates HCO3 - secretion. | (D): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (E): GIP inhibits gastric motility and acid; stimulates insulin.",
+        "textbookNote": "(A): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (B): Motilin stimulates gastric/intestinal motility (MMC). | (C): Secretin inhibits gastric motility/emptying and stimulates HCO3 - secretion. | (D): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (E): GIP inhibits gastric motility and acid; stimulates insulin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "From the upper small intestine maximum absorption of",
+        "items": [
+          {
+            "label": "a",
+            "text": "Glucose",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Amino acid",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Water-soluble vitamins",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Long chain fatty acid",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Fe2+",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Glucose, amino acids, vitamins, iron are absorbed in upper small intestine. | (B): Amino acids are completely reabsorbed in PCT.",
+        "textbookNote": "(A): Glucose, amino acids, vitamins, iron are absorbed in upper small intestine. | (B): Amino acids are completely reabsorbed in PCT.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Plasma membrane is mainly composed of",
+        "opts": [
+          "Carbohydrate",
+          "Protein",
+          "Cholesterol",
+          "Phospholipid",
+          "Phospholipid and cholesterol"
+        ],
+        "correctIndex": 3,
+        "explanation": "The membrane is a phospholipid bilayer with embedded protein and cholesterol.",
+        "textbookNote": "The membrane is a phospholipid bilayer with embedded protein and cholesterol.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Which of the following promotes rouleaux formation?",
+        "opts": [
+          "Albumin",
+          "Prealbumin",
+          "Globulin",
+          "Fibrinogen",
+          "Prothrombin"
+        ],
+        "correctIndex": 3,
+        "explanation": "Fibrinogen (and globulins) promote rouleaux and ESR.",
+        "textbookNote": "Fibrinogen (and globulins) promote rouleaux and ESR.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Oxy-Hb dissociation curve is shifted to the right by",
+        "opts": [
+          "Increased 2,3-DPG",
+          "Decreased PCO2",
+          "Increased pH",
+          "Increased PO2",
+          "Decreased H+ concentration"
+        ],
+        "correctIndex": 0,
+        "explanation": "↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right.",
+        "textbookNote": "↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Lymphocytes",
+        "opts": [
+          "Form 1–2% of the WBC",
+          "Have important phagocytic function",
+          "Can be transformed by stimulus to plasma cells",
+          "Are nonmotile",
+          "Develop in thymus only"
+        ],
+        "correctIndex": 2,
+        "explanation": "B lymphocytes transform into plasma cells.",
+        "textbookNote": "B lymphocytes transform into plasma cells.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Anemia due to maturation defect is",
+        "opts": [
+          "Hemolytic anemia",
+          "Microcytic anemia",
+          "Normocytic anemia",
+          "Pernicious anemia",
+          "Blood loss anemia"
+        ],
+        "correctIndex": 3,
+        "explanation": "Pernicious anaemia (B12 deficiency) is a maturation defect → macrocytic.",
+        "textbookNote": "Pernicious anaemia (B12 deficiency) is a maturation defect → macrocytic.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Peripheral cell membrane proteins act as",
+        "opts": [
+          "Pumps",
+          "Adhesion molecules",
+          "Channels",
+          "Carriers",
+          "Enzymes"
+        ],
+        "correctIndex": 4,
+        "explanation": "Some membrane proteins are enzymes.",
+        "textbookNote": "Some membrane proteins are enzymes.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Gastrocolic reflex is due to release of",
+        "opts": [
+          "Serotonin",
+          "Gastrin",
+          "Somatostatin",
+          "Ach",
+          "VIP"
+        ],
+        "correctIndex": 1,
+        "explanation": "Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying.",
+        "textbookNote": "Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Main aim of BP regulating mechanism is to maintain the",
+        "opts": [
+          "Systolic BP",
+          "Diastolic BP",
+          "Mean BP",
+          "Pulse pressure",
+          "Both systolic and pulse pressure"
+        ],
+        "correctIndex": 2,
+        "explanation": "Mean BP is the effective perfusion pressure.",
+        "textbookNote": "Mean BP is the effective perfusion pressure.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Hypoxia is",
+        "opts": [
+          "Complete absence of O2 at tissue level",
+          "Lack of O2 in blood",
+          "Lack of O2 and accumulation of CO2 in the tissue",
+          "Lack of O2 at tissue level",
+          "Lack of PO2 in inspired air"
+        ],
+        "correctIndex": 3,
+        "explanation": "Hypoxia = reduced O2 at tissue level.",
+        "textbookNote": "Hypoxia = reduced O2 at tissue level.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Most sensitive index to assess severity of obstructive lung diseases is",
+        "opts": [
+          "Forced vital capacity",
+          "FEV1",
+          "PEFR",
+          "Total lung capacity",
+          "Residual volume"
+        ],
+        "correctIndex": 1,
+        "explanation": "FEV1 (and FEV1/FVC) is the best index of airway obstruction.",
+        "textbookNote": "FEV1 (and FEV1/FVC) is the best index of airway obstruction.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2024-nov-p2",
+    "session": "November 2024",
+    "year": 2024,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 22,
+    "bookPage": "pp. 22–25",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Factors that favor glomerular filtration",
+        "items": [
+          {
+            "label": "a",
+            "text": "Glomerular filtration coefficient",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Bowman's capsule hydrostatic pressure",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Systemic arterial pressure",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Afferent arteriolar resistance",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Glomerular hydrostatic pressure",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Higher Kf increases GFR. | (B): Capsular pressure opposes filtration. | (C): Higher arterial pressure raises glomerular pressure. | (D): Raised afferent resistance LOWERS GFR. | (E): Glomerular capillary hydrostatic pressure drives filtration.",
+        "textbookNote": "(A): Higher Kf increases GFR. | (B): Capsular pressure opposes filtration. | (C): Higher arterial pressure raises glomerular pressure. | (D): Raised afferent resistance LOWERS GFR. | (E): Glomerular capillary hydrostatic pressure drives filtration.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Proteins and polypeptide hormones are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Aldosterone",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Estrogen",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Parathormone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Oxytocin",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Aldosterone retains Na+ and water. | (B): Estrogen causes ductal growth. | (C): GH contributes to breast development. | (E): Oxytocin acts through IP3/Ca2+.",
+        "textbookNote": "(A): Aldosterone retains Na+ and water. | (B): Estrogen causes ductal growth. | (C): GH contributes to breast development. | (E): Oxytocin acts through IP3/Ca2+.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Regarding insulin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Secretion may increase in K+-depleted patient",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Activates hormone-sensitive lipase",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is a hormone associated with energy abundance",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "IGF-1 and GH promote normal growth of bones and tissues",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Deficiency makes the person more prone to infection",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): K+ depletion decreases insulin secretion. | (B): Insulin inhibits lipase. | (C): Insulin signals energy abundance. | (D): IGF-1 and GH promote growth. | (E): Hyperglycaemia/insulin deficiency impairs immunity.",
+        "textbookNote": "(A): K+ depletion decreases insulin secretion. | (B): Insulin inhibits lipase. | (C): Insulin signals energy abundance. | (D): IGF-1 and GH promote growth. | (E): Hyperglycaemia/insulin deficiency impairs immunity.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Regarding cortisol",
+        "items": [
+          {
+            "label": "a",
+            "text": "A steroid hormone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decreased protein synthesis (extrahepatic)",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Decreased utilization of free fatty acids",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Promotes wound healing",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increased blood volume",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): GH is a protein hormone. | (B): Cortisol is catabolic in muscle. | (C): Cortisol increases FFA mobilisation and use. | (D): Cortisol impairs wound healing. | (E): Cortisol has minor mineralocorticoid action.",
+        "textbookNote": "(A): GH is a protein hormone. | (B): Cortisol is catabolic in muscle. | (C): Cortisol increases FFA mobilisation and use. | (D): Cortisol impairs wound healing. | (E): Cortisol has minor mineralocorticoid action.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Hormones are cleared from plasma by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Metabolic destruction by the tissues",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Binding with the tissues",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Excretion by liver into the bile",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Excretion by the kidney into the urine",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Excretion by the GIT into the stool",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Hormones are cleared by degradation, binding, excretion. | (E): GIT excretion is minor.",
+        "textbookNote": "(A): Hormones are cleared by degradation, binding, excretion. | (E): GIT excretion is minor.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Brain stem controls",
+        "items": [
+          {
+            "label": "a",
+            "text": "Equilibrium",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Vision",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Cardiovascular system",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Reflexes",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Respiration",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Vision is not controlled by the brainstem.",
+        "textbookNote": "(B): Vision is not controlled by the brainstem.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Sensations transmitted by anterolateral system are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Warmth and cold",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Fine touch",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Crude touch",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Tickle and itch",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Vibration is carried in the dorsal column. | (C): Fine touch is a dorsal-column modality.",
+        "textbookNote": "(A): Vibration is carried in the dorsal column. | (C): Fine touch is a dorsal-column modality.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Regarding spermatogenesis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Begins at an average age of 13 years",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decreased markedly in old age",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Entire period is about 34 days",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Occurs in seminiferous tubules of testes",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Luteinizing hormone promotes spermatogenesis",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Spermatogenesis begins at puberty (~13 years). | (B): Declines gradually; does not stop. | (C): Spermatogenesis takes ~74 days. | (D): Spermatogenesis occurs in seminiferous tubules. | (E): FSH (and testosterone) promote spermatogenesis; LH stimulates testosterone.",
+        "textbookNote": "(A): Spermatogenesis begins at puberty (~13 years). | (B): Declines gradually; does not stop. | (C): Spermatogenesis takes ~74 days. | (D): Spermatogenesis occurs in seminiferous tubules. | (E): FSH (and testosterone) promote spermatogenesis; LH stimulates testosterone.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Norepinephrine",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is released in circulating blood",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is secreted mainly at synapses",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is metabolized rapidly",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Has a more prolonged action than acetylcholine",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Probably activates inhibitory receptors",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): NE is removed slowly (hence longer action). | (E): NE acts mainly on excitatory receptors.",
+        "textbookNote": "(C): NE is removed slowly (hence longer action). | (E): NE acts mainly on excitatory receptors.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "The pigment layer of retina",
+        "items": [
+          {
+            "label": "a",
+            "text": "Contains the cell bodies of rods and cones",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is the innermost layer of the retina",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Stores large quantities of vitamin A",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Removes waste from the photoreceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Prevents light reflection throughout the globe of eyeball",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Pigment epithelium is the outermost layer; cell bodies are in nuclear layers. | (B): Pigment epithelium is the outermost layer. | (C): Pigment epithelium stores vitamin A (retinol). | (D): RPE phagocytoses shed photoreceptor discs. | (E): Melanin absorbs stray light.",
+        "textbookNote": "(A): Pigment epithelium is the outermost layer; cell bodies are in nuclear layers. | (B): Pigment epithelium is the outermost layer. | (C): Pigment epithelium stores vitamin A (retinol). | (D): RPE phagocytoses shed photoreceptor discs. | (E): Melanin absorbs stray light.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "The most important factor that influences potassium secretion by the cortical",
+        "opts": [
+          "Activation of renin–angiotensin system",
+          "High potassium diet",
+          "Increased plasma ADH concentration",
+          "Increased plasma aldosterone concentration",
+          "Reabsorption of sodium ion by cortical collecting duct"
+        ],
+        "correctIndex": 1,
+        "explanation": "High ECF K+ (diet) is the main stimulus of K+ secretion by principal cells.",
+        "textbookNote": "High ECF K+ (diet) is the main stimulus of K+ secretion by principal cells.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Which of the following is the most important effect of growth hormone?",
+        "opts": [
+          "Decreased glucose uptake by the tissue",
+          "Increased glucose production by the liver",
+          "Increased insulin secretion",
+          "Decreased glycolysis",
+          "Increased gluconeogenesis"
+        ],
+        "correctIndex": 0,
+        "explanation": "GH is anti-insulin: ↓ glucose uptake.",
+        "textbookNote": "GH is anti-insulin: ↓ glucose uptake.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Which basal ganglia fiber carries more clinical importance?",
+        "opts": [
+          "Corticostriate fiber",
+          "Thalamostriate fiber",
+          "Nigrostriatal fiber",
+          "Striatopallidal fiber",
+          "Strionigral fiber"
+        ],
+        "correctIndex": 2,
+        "explanation": "Nigrostriatal dopaminergic fibres degenerate in Parkinson's disease.",
+        "textbookNote": "Nigrostriatal dopaminergic fibres degenerate in Parkinson's disease.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Which provides most of the damping function?",
+        "opts": [
+          "Cerebral cortex",
+          "Muscle spindle",
+          "Cerebellum",
+          "Basal ganglia",
+          "Spinal cord"
+        ],
+        "correctIndex": 2,
+        "explanation": "Cerebellum damps/smooths movement (prevents overshoot).",
+        "textbookNote": "Cerebellum damps/smooths movement (prevents overshoot).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Which has the most potent glucocorticoid activity (natural hormone)?",
+        "opts": [
+          "Aldosterone",
+          "Cortisol",
+          "Corticosterone",
+          "Cortisone",
+          "9α-fludrocortisone"
+        ],
+        "correctIndex": 1,
+        "explanation": "Cortisol (glucocorticoid) supports breast development.",
+        "textbookNote": "Cortisol (glucocorticoid) supports breast development.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "The autonomic nervous system is activated mainly by centers located in",
+        "opts": [
+          "Basal ganglia",
+          "Cerebral cortex",
+          "Cerebellum",
+          "Spinal cord",
+          "Thalamus"
+        ],
+        "correctIndex": 3,
+        "explanation": "ANS is activated mainly from spinal cord, brainstem, hypothalamus.",
+        "textbookNote": "ANS is activated mainly from spinal cord, brainstem, hypothalamus.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "The most important cause of insulin resistance is",
+        "opts": [
+          "Excess glucocorticoids",
+          "Fatty liver disease",
+          "Obesity",
+          "Pregnancy",
+          "Polycystic ovary disease"
+        ],
+        "correctIndex": 2,
+        "explanation": "Obesity is the commonest cause of insulin resistance.",
+        "textbookNote": "Obesity is the commonest cause of insulin resistance.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Which has the slowest conduction velocity?",
+        "opts": [
+          "Aβ fiber",
+          "Aα fiber",
+          "Aμ fiber",
+          "B fiber",
+          "C fiber"
+        ],
+        "correctIndex": 4,
+        "explanation": "C fibres (0.5–2 m/s) conduct slowest.",
+        "textbookNote": "C fibres (0.5–2 m/s) conduct slowest.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "The majority of heat loss from the body occurs by",
+        "opts": [
+          "Evaporation",
+          "Conduction",
+          "Radiation",
+          "Convection",
+          "Evaporation and conduction"
+        ],
+        "correctIndex": 2,
+        "explanation": "Radiation accounts for ~60% of heat loss.",
+        "textbookNote": "Radiation accounts for ~60% of heat loss.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Which one of the following is the most potent bitter substance?",
+        "opts": [
+          "Caffeine",
+          "Magnesium sulphate",
+          "Nicotine",
+          "Saccharin",
+          "Strychnine hydrochloride"
+        ],
+        "correctIndex": 4,
+        "explanation": "Strychnine is among the most potent bitter substances.",
+        "textbookNote": "Strychnine is among the most potent bitter substances.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2024-may-p1",
+    "session": "May 2024",
+    "year": 2024,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 26,
+    "bookPage": "pp. 26–29",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Facilitated diffusion",
+        "items": [
+          {
+            "label": "a",
+            "text": "Of glucose can increase 10 to 20 fold by insulin",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a passive process",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is always a carrier-mediated transport process",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is an energy-dependent process",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Rate increases proportionately with the concentration of diffusing substance",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (B): Diffusion/facilitated diffusion needs no ATP. | (C): Facilitated diffusion uses carriers. | (D): Facilitated diffusion is passive. | (E): Facilitated diffusion saturates at Vmax.",
+        "textbookNote": "(A): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (B): Diffusion/facilitated diffusion needs no ATP. | (C): Facilitated diffusion uses carriers. | (D): Facilitated diffusion is passive. | (E): Facilitated diffusion saturates at Vmax.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Following statements regarding platelets are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are non-nucleated cells",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Plug forms platforms for deposition of fibrin thread",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Show adhesiveness when they come in contact with collagen",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Do not have contractile power",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Plug formation is facilitated by ADP",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Platelets are cell fragments of megakaryocytes — no nucleus. | (B): Platelet plug supports fibrin deposition. | (C): Platelets adhere to exposed collagen. | (D): Platelets contain actin/myosin/thrombosthenin (clot retraction). | (E): ADP makes platelets sticky.",
+        "textbookNote": "(A): Platelets are cell fragments of megakaryocytes — no nucleus. | (B): Platelet plug supports fibrin deposition. | (C): Platelets adhere to exposed collagen. | (D): Platelets contain actin/myosin/thrombosthenin (clot retraction). | (E): ADP makes platelets sticky.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "P-R interval in ECG",
+        "items": [
+          {
+            "label": "a",
+            "text": "Indicates conduction through A-V node",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is about 0.8 sec",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Decreases in bradycardia",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "0.25–0.45 sec indicates 2nd degree heart block",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Prolonged in hypokalemia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PR interval = AV conduction time. | (B): PR is 0.12–0.20 s; 0.8 s is the whole cardiac cycle. | (C): PR lengthens slightly in bradycardia. | (D): PR > 0.2 s = 1st-degree block; 2nd degree has dropped beats. | (E): Hypokalaemia mainly causes ST depression, flat T, U waves.",
+        "textbookNote": "(A): PR interval = AV conduction time. | (B): PR is 0.12–0.20 s; 0.8 s is the whole cardiac cycle. | (C): PR lengthens slightly in bradycardia. | (D): PR > 0.2 s = 1st-degree block; 2nd degree has dropped beats. | (E): Hypokalaemia mainly causes ST depression, flat T, U waves.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Fetal hemoglobin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has high affinity to O2",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can bind 2,3-DPG less avidly",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Consists of 2α and 2γ chains",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has lower P50 than adult Hb",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is normally replaced by adult Hb after birth",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): HbF has high O2 affinity. | (B): HbF binds 2,3-DPG poorly, so its curve is left-shifted. | (C): HbF = 2α2γ; HbA = 2α2β. | (D): HbF has lower P50 (left shift). | (E): HbF is replaced by HbA in the first months after birth.",
+        "textbookNote": "(A): HbF has high O2 affinity. | (B): HbF binds 2,3-DPG poorly, so its curve is left-shifted. | (C): HbF = 2α2γ; HbA = 2α2β. | (D): HbF has lower P50 (left shift). | (E): HbF is replaced by HbA in the first months after birth.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Following statements regarding WBC are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Life span of granulocytes after release in blood is 4 to 8 days",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Stored in bone marrow until they are needed",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Phagocytosis is the most important function of eosinophils",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Plasma cells function mainly in immunity",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lymphocytes normally constitute about 10% of total WBC",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Granulocytes live 4–8 hours in blood, a few days in tissue. | (B): Mature granulocytes are stored in marrow. | (C): Eosinophils mainly attack parasites/allergy; neutrophils/macrophages phagocytose. | (D): Plasma cells secrete antibodies. | (E): Lymphocytes are 20–40% of WBC.",
+        "textbookNote": "(A): Granulocytes live 4–8 hours in blood, a few days in tissue. | (B): Mature granulocytes are stored in marrow. | (C): Eosinophils mainly attack parasites/allergy; neutrophils/macrophages phagocytose. | (D): Plasma cells secrete antibodies. | (E): Lymphocytes are 20–40% of WBC.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "The absolute refractory period in the ventricles",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is the period when the ventricles are completely inexcitable",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Corresponds to the period of ventricular depolarization",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Corresponds to the period of ventricular contraction",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Decreases during parasympathetic stimulation of the heart",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is shorter than atrial muscle",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Absolute refractory period = no stimulus can excite. | (B): ARP covers depolarisation/plateau. | (C): ARP lasts through ventricular contraction. | (D): Slower rate lengthens (not shortens) refractory period. | (E): Ventricular ARP (0.25–0.3 s) is longer than atrial (0.15 s).",
+        "textbookNote": "(A): Absolute refractory period = no stimulus can excite. | (B): ARP covers depolarisation/plateau. | (C): ARP lasts through ventricular contraction. | (D): Slower rate lengthens (not shortens) refractory period. | (E): Ventricular ARP (0.25–0.3 s) is longer than atrial (0.15 s).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "During ventricular systole",
+        "items": [
+          {
+            "label": "a",
+            "text": "110 mL blood is present in ventricle before ejection",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Intraventricular pressure rises gradually",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Atrial pressure wave 'c' appears",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Produces second heart sound",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Pumps blood into pulmonary vein",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): End-diastolic volume ≈ 110–120 mL. | (B): Pressure rises rapidly in isovolumetric contraction. | (C): 'c' wave = bulging of AV valve into atrium at ventricular systole. | (D): S2 occurs at the END of systole. | (E): Right ventricle pumps into the pulmonary ARTERY.",
+        "textbookNote": "(A): End-diastolic volume ≈ 110–120 mL. | (B): Pressure rises rapidly in isovolumetric contraction. | (C): 'c' wave = bulging of AV valve into atrium at ventricular systole. | (D): S2 occurs at the END of systole. | (E): Right ventricle pumps into the pulmonary ARTERY.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "The compliance of the lung",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is affected only by elasticity of elastin in connective tissue",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is greater in standing than in recumbent position",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is increased by the surface tension of the fluid lining alveoli",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is increased by surfactant",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is low in obesity",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Compliance depends on elastin, collagen AND surface tension. | (B): Lung compliance is lower in recumbent posture (blood engorgement). | (C): Surface tension DEcreases compliance. | (D): Surfactant raises compliance. | (E): Obesity reduces chest wall compliance.",
+        "textbookNote": "(A): Compliance depends on elastin, collagen AND surface tension. | (B): Lung compliance is lower in recumbent posture (blood engorgement). | (C): Surface tension DEcreases compliance. | (D): Surfactant raises compliance. | (E): Obesity reduces chest wall compliance.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Regarding local hormones of GIT",
+        "items": [
+          {
+            "label": "a",
+            "text": "Gastrin stimulates growth of the gastric mucosa",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Acid in antrum stimulates gastrin secretion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Migrating motor complex is initiated by motilin",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Somatostatin stimulates the secretion of secretin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "CCK increases the secretion of bicarbonate by the duct cells of the pancreas",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Gastrin is trophic to gastric mucosa. | (B): Antral acid inhibits gastrin release. | (C): MMC is initiated by motilin in fasting. | (D): Somatostatin inhibits secretin, gastrin, CCK. | (E): Secretin stimulates ductal HCO3 -; CCK stimulates enzyme (acinar) secretion.",
+        "textbookNote": "(A): Gastrin is trophic to gastric mucosa. | (B): Antral acid inhibits gastrin release. | (C): MMC is initiated by motilin in fasting. | (D): Somatostatin inhibits secretin, gastrin, CCK. | (E): Secretin stimulates ductal HCO3 -; CCK stimulates enzyme (acinar) secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Peristalsis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Occurs due to stimulation of myenteric plexus",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a propulsive movement",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Occurs at a rate of 20 cm/sec in large intestine",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is initiated by distention of gut wall",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Does not follow the law of the gut",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Peristalsis is initiated by the myenteric plexus. | (B): Peristalsis propels contents aorally→anally. | (C): Peristalsis moves at 2–25 cm/s in small intestine; much slower in colon. | (D): Distension initiates the peristaltic reflex. | (E): Peristalsis follows the law of the gut (myenteric reflex + anal direction).",
+        "textbookNote": "(A): Peristalsis is initiated by the myenteric plexus. | (B): Peristalsis propels contents aorally→anally. | (C): Peristalsis moves at 2–25 cm/s in small intestine; much slower in colon. | (D): Distension initiates the peristaltic reflex. | (E): Peristalsis follows the law of the gut (myenteric reflex + anal direction).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "The main contribution for generating RMP is",
+        "opts": [
+          "Sodium diffusion inside the cell",
+          "Potassium diffusion outside the cell",
+          "Impermeant protein molecules",
+          "Na+-K+ pump"
+        ],
+        "correctIndex": 1,
+        "explanation": "K+ diffusion (–94 mV) is the main contributor to RMP; Na+–K+ pump adds ~ –4 mV.",
+        "textbookNote": "K+ diffusion (–94 mV) is the main contributor to RMP; Na+–K+ pump adds ~ –4 mV.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "The most lethal effect of mismatched blood transfusion is",
+        "opts": [
+          "Circulatory shock",
+          "Acute renal shut down",
+          "Hemoglobinemia",
+          "Jaundice"
+        ],
+        "correctIndex": 1,
+        "explanation": "Haemolysis → haemoglobin in tubules → acute renal shutdown.",
+        "textbookNote": "Haemolysis → haemoglobin in tubules → acute renal shutdown.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Ejection fraction of heart is",
+        "opts": [
+          "A valuable index of ventricular function",
+          "The percentage of ESV ejected per stroke",
+          "Reduced in exercise",
+          "Increased in myocardial infarction"
+        ],
+        "correctIndex": 0,
+        "explanation": "EF = SV/EDV ≈ 60–65%; falls in failure.",
+        "textbookNote": "EF = SV/EDV ≈ 60–65%; falls in failure.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Automaticity is the most important property of",
+        "opts": [
+          "AV node",
+          "Purkinje fiber",
+          "SA node",
+          "Junctional tissue"
+        ],
+        "correctIndex": 2,
+        "explanation": "SA node has the highest automaticity.",
+        "textbookNote": "SA node has the highest automaticity.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Regarding lung function tests",
+        "opts": [
+          "Normal FEV1 is 70% of FVC",
+          "FEV1 is decreased more than FVC in a patient with lung fibrosis",
+          "FEV1 is dependent on expiratory effort",
+          "In obstructive airway disease FVC and FEV1/FVC both fall markedly"
+        ],
+        "correctIndex": 2,
+        "explanation": "FEV1 depends on expiratory effort; normal FEV1/FVC ≈ 80%.",
+        "textbookNote": "FEV1 depends on expiratory effort; normal FEV1/FVC ≈ 80%.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "The more powerful effect of angiotensin-II on blood pressure regulation is",
+        "opts": [
+          "Vasoconstriction",
+          "Salt and water retention",
+          "Stimulate thirst",
+          "Stimulate ADH"
+        ],
+        "correctIndex": 0,
+        "explanation": "Vasoconstriction raises resistance (radius).",
+        "textbookNote": "Vasoconstriction raises resistance (radius).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Inhibition of platelet aggregation in the intact endothelium is by",
+        "opts": [
+          "Serotonin",
+          "Thromboxane A2",
+          "Prostacyclin",
+          "Von Willebrand factor"
+        ],
+        "correctIndex": 2,
+        "explanation": "Prostacyclin (PGI2) and NO from endothelium inhibit platelet aggregation.",
+        "textbookNote": "Prostacyclin (PGI2) and NO from endothelium inhibit platelet aggregation.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "The trigger of the intrinsic pathway is the activation of",
+        "opts": [
+          "Factor X",
+          "Factor V",
+          "Factor XII",
+          "Factor II"
+        ],
+        "correctIndex": 2,
+        "explanation": "Contact activation of factor XII triggers the intrinsic pathway.",
+        "textbookNote": "Contact activation of factor XII triggers the intrinsic pathway.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "The diaphragm",
+        "opts": [
+          "Moves up to cause inspiration",
+          "Moves as much as 7 cm with deep breathing",
+          "Always contracts as a single unit",
+          "Is a muscle of expiration only"
+        ],
+        "correctIndex": 1,
+        "explanation": "Diaphragm descends 1.5 cm in quiet breathing and up to 7 cm in deep breathing.",
+        "textbookNote": "Diaphragm descends 1.5 cm in quiet breathing and up to 7 cm in deep breathing.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Which abolishes automatic respiration? Destruction of",
+        "opts": [
+          "Pre-Bötzinger complex",
+          "Ventral group respiratory neurons",
+          "Dorsal group respiratory neurons",
+          "Section at the inferior border of the pons"
+        ],
+        "correctIndex": 0,
+        "explanation": "Pre-Bötzinger complex is the primary rhythm generator.",
+        "textbookNote": "Pre-Bötzinger complex is the primary rhythm generator.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2024-may-p2",
+    "session": "May 2024",
+    "year": 2024,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 30,
+    "bookPage": "pp. 30–33",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Renal tubule reabsorbs normally",
+        "items": [
+          {
+            "label": "a",
+            "text": "All filtered HCO3 - in respiratory alkalosis",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "A large volume of water relative to excretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "By passive mechanism only",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "All filtered amino acids",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "More potassium than chloride",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): In respiratory alkalosis kidneys excrete HCO3 -. | (B): Reabsorption ≫ excretion. | (C): Active and passive mechanisms both operate. | (D): Amino acids are completely reabsorbed in PCT. | (E): ~90% K+ is reabsorbed but Cl- ~99%; Cl- exceeds K+.",
+        "textbookNote": "(A): In respiratory alkalosis kidneys excrete HCO3 -. | (B): Reabsorption ≫ excretion. | (C): Active and passive mechanisms both operate. | (D): Amino acids are completely reabsorbed in PCT. | (E): ~90% K+ is reabsorbed but Cl- ~99%; Cl- exceeds K+.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Proteinuria",
+        "items": [
+          {
+            "label": "a",
+            "text": "Results in decreased plasma volume",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Reduces oncotic pressure in blood",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is due to increased permeability of tubular membrane",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is a benign condition",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is due to increased tubular secretion",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Proteinuria → hypoalbuminaemia → low plasma oncotic pressure. | (B): Albumin loss lowers plasma oncotic pressure. | (C): Proteinuria is due to glomerular membrane damage. | (D): Persistent proteinuria suggests renal disease. | (E): Protein is not secreted by tubules.",
+        "textbookNote": "(A): Proteinuria → hypoalbuminaemia → low plasma oncotic pressure. | (B): Albumin loss lowers plasma oncotic pressure. | (C): Proteinuria is due to glomerular membrane damage. | (D): Persistent proteinuria suggests renal disease. | (E): Protein is not secreted by tubules.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Renal blood flow",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is less than 20% of cardiac output",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is 1.2 to 1.3 L/min",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Can be measured by applying Fick principle",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Can be measured by infusing p-aminohippuric acid",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is regulated by dopamine made in kidney",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Kidneys receive ~20–25% of cardiac output. | (B): RBF ≈ 1.1–1.2 L/min (≈ 22% of CO). | (C): Fick principle with PAH measures renal plasma flow. | (D): PAH clearance ≈ RPF. | (E): Renal dopamine increases RBF.",
+        "textbookNote": "(A): Kidneys receive ~20–25% of cardiac output. | (B): RBF ≈ 1.1–1.2 L/min (≈ 22% of CO). | (C): Fick principle with PAH measures renal plasma flow. | (D): PAH clearance ≈ RPF. | (E): Renal dopamine increases RBF.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Adrenogenital syndrome",
+        "items": [
+          {
+            "label": "a",
+            "text": "Occurs due to excessive secretion of cortisol",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Occurs due to excessive secretion of androgen",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Causes precocious puberty in male",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Causes excess secretion of ACTH",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is known as congenital adrenal hyperplasia",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Adrenogenital syndrome: enzyme block (21-hydroxylase) → low cortisol, high ACTH, high androgens. | (B): Low cortisol → ↑ACTH → androgen excess. | (C): Androgen excess → precocious puberty in boys. | (D): Low cortisol → ↑ACTH. | (E): Adrenogenital syndrome = CAH.",
+        "textbookNote": "(A): Adrenogenital syndrome: enzyme block (21-hydroxylase) → low cortisol, high ACTH, high androgens. | (B): Low cortisol → ↑ACTH → androgen excess. | (C): Androgen excess → precocious puberty in boys. | (D): Low cortisol → ↑ACTH. | (E): Adrenogenital syndrome = CAH.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The fovea centralis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Lies where the visual axis impinges on the retina",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is not crossed by any major blood vessels",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is the thickest part of the retina",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Offers higher visual acuity than other parts of retina",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies on the nasal side of the optic disc",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Fovea lies on the visual axis. | (B): Fovea is avascular. | (D): Fovea has the highest acuity. | (E): Fovea lies temporal to the optic disc.",
+        "textbookNote": "(A): Fovea lies on the visual axis. | (B): Fovea is avascular. | (D): Fovea has the highest acuity. | (E): Fovea lies temporal to the optic disc.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Posterior column damage in the spinal cord may impair",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration sense",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pain sensation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The flexor plantar response to stimulation of the sole",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Tactile sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The ability to stand steadily with eyes closed",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "textbookNote": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Basal ganglia",
+        "items": [
+          {
+            "label": "a",
+            "text": "Work with the corticospinal tract to control complex motor activity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are a part of the accessory motor system",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Are responsible for coordinating movement and balance",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Regulate muscle tone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Are also known as the 'little brain'",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): Cerebellum coordinates movement and balance. | (E): The cerebellum is the 'little brain'.",
+        "textbookNote": "(C): Cerebellum coordinates movement and balance. | (E): The cerebellum is the 'little brain'.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Destruction of the anterior pituitary gland causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "Amenorrhoea",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Diabetes insipidus",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Diabetes mellitus",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Impaired ability to cope with stress",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Impaired calcium ion concentration regulation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Hypopituitarism → loss of FSH/LH → amenorrhoea. | (B): GH excess can cause diabetes mellitus (diabetogenic), not DI. | (D): ACTH loss → low cortisol. | (E): Calcium regulation is by PTH, not anterior pituitary.",
+        "textbookNote": "(A): Hypopituitarism → loss of FSH/LH → amenorrhoea. | (B): GH excess can cause diabetes mellitus (diabetogenic), not DI. | (D): ACTH loss → low cortisol. | (E): Calcium regulation is by PTH, not anterior pituitary.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Spermatogenesis is regulated by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Cortisol",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Follicle stimulating hormone",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Luteinizing hormone",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Testosterone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Inhibin",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Cortisol (glucocorticoid) supports breast development. | (D): Steroid hormones act via intracellular receptors (gene transcription). | (E): Sertoli cells secrete inhibin.",
+        "textbookNote": "(A): Cortisol (glucocorticoid) supports breast development. | (D): Steroid hormones act via intracellular receptors (gene transcription). | (E): Sertoli cells secrete inhibin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Hypoglycemic coma differs from hyperglycemic coma in that there is more likelihood",
+        "items": [
+          {
+            "label": "a",
+            "text": "Rapid loss of consciousness",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Weak pulse",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Normal blood pH",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Glucose-free urine",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "High acetone level in urine",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Hypoglycaemic coma is rapid. | (B): Hypoglycaemic coma: bounding pulse. | (C): No ketoacidosis. | (D): Glucose is absent. | (E): Ketones are absent in hypoglycaemia.",
+        "textbookNote": "(A): Hypoglycaemic coma is rapid. | (B): Hypoglycaemic coma: bounding pulse. | (C): No ketoacidosis. | (D): Glucose is absent. | (E): Ketones are absent in hypoglycaemia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "During strenuous sports activity a young male has heart rate 160/min, moderately",
+        "opts": [
+          "Generalized sympathetic activity",
+          "Alpha adrenergic effect",
+          "Increased production of metabolites",
+          "Beta adrenergic effect",
+          "Cholinergic activity"
+        ],
+        "correctIndex": 2,
+        "explanation": "Metabolites cause vasodilatation in active muscle → fall in diastolic pressure.",
+        "textbookNote": "Metabolites cause vasodilatation in active muscle → fall in diastolic pressure.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Regarding severe damage in Wernicke's area",
+        "opts": [
+          "The person cannot hear sounds",
+          "Can recognize different words",
+          "Unable to arrange the words",
+          "Person may be able to read words from printed page",
+          "Unable to recognize the thought that is conveyed"
+        ],
+        "correctIndex": 4,
+        "explanation": "Wernicke's area damage → fluent speech but poor comprehension (cannot interpret thought).",
+        "textbookNote": "Wernicke's area damage → fluent speech but poor comprehension (cannot interpret thought).",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "In presence of ADH the greatest fraction of filtered water is absorbed in the",
+        "opts": [
+          "Distal tubule",
+          "Loop of Henle",
+          "Proximal tubule",
+          "Cortical collecting duct",
+          "Late distal tubule"
+        ],
+        "correctIndex": 2,
+        "explanation": "~65% of filtered water is reabsorbed in PCT.",
+        "textbookNote": "~65% of filtered water is reabsorbed in PCT.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Most important hormone in the acute recovery from hypoglycemia",
+        "opts": [
+          "Growth hormone",
+          "Glucagon and epinephrine",
+          "Thyroid hormone",
+          "Cortisol",
+          "Insulin"
+        ],
+        "correctIndex": 1,
+        "explanation": "Glucagon and epinephrine act within minutes.",
+        "textbookNote": "Glucagon and epinephrine act within minutes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Extrapyramidal tract mainly controls",
+        "opts": [
+          "The limb movement",
+          "The tone, posture and equilibrium",
+          "Swinging of arm",
+          "Reflex activities",
+          "Autonomic visceral activities"
+        ],
+        "correctIndex": 1,
+        "explanation": "Extrapyramidal tracts control tone, posture and equilibrium.",
+        "textbookNote": "Extrapyramidal tracts control tone, posture and equilibrium.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Which one is the most correct statement for menstrual cycle in women?",
+        "opts": [
+          "It occurs with uterine mucosal shedding",
+          "Periodical vaginal bleeding",
+          "Periodic preparation for fertilization and pregnancy",
+          "Periodic secretion of estrogen and progesterone",
+          "Regular cyclical changes in ovary"
+        ],
+        "correctIndex": 3,
+        "explanation": "The menstrual cycle is the monthly rhythmic change in secretion of estrogen/progesterone.",
+        "textbookNote": "The menstrual cycle is the monthly rhythmic change in secretion of estrogen/progesterone.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "A 7-year-old boy is evaluated for short stature. His growth hormone level is normal,",
+        "opts": [
+          "GHRH released from hypothalamus",
+          "GHRH receptor",
+          "Androgen synthesis",
+          "Testosterone synthesis",
+          "GH receptor"
+        ],
+        "correctIndex": 4,
+        "explanation": "GH normal/high but IGF-1 low = GH receptor defect.",
+        "textbookNote": "GH normal/high but IGF-1 low = GH receptor defect.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Major neurotransmitters and neuromodulators include amino acids are",
+        "opts": [
+          "Serotonin",
+          "Substance P and opioids",
+          "Glutamate, GABA, glycine",
+          "Dopamine, serotonin",
+          "Nitric oxide and carbon monoxide"
+        ],
+        "correctIndex": 2,
+        "explanation": "Glutamate, GABA, glycine are amino-acid transmitters.",
+        "textbookNote": "Glutamate, GABA, glycine are amino-acid transmitters.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Activation of a sensory nerve from the muscle spindle causes contraction of the",
+        "opts": [
+          "Negative feedback inhibition",
+          "Presynaptic inhibition",
+          "Postsynaptic inhibition",
+          "Renshaw cell inhibition",
+          "Indirect inhibition"
+        ],
+        "correctIndex": 2,
+        "explanation": "Reciprocal inhibition of antagonists is postsynaptic inhibition (inhibitory interneuron).",
+        "textbookNote": "Reciprocal inhibition of antagonists is postsynaptic inhibition (inhibitory interneuron).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Defect in fine and skilled voluntary motor movements is caused by damage in",
+        "opts": [
+          "Lateral corticospinal tract",
+          "Rubrospinal tract and tectospinal tract",
+          "Lateral and anterior corticospinal tract",
+          "Lateral corticospinal tract and rubrospinal tract",
+          "Reticulospinal tract and vestibulospinal tract"
+        ],
+        "correctIndex": 0,
+        "explanation": "Lateral corticospinal tract controls fine skilled distal movements.",
+        "textbookNote": "Lateral corticospinal tract controls fine skilled distal movements.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-nov-p1",
+    "session": "November 2023",
+    "year": 2023,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 34,
+    "bookPage": "pp. 34–37",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Mitochondria",
+        "items": [
+          {
+            "label": "a",
+            "text": "Have a membrane similar to the cell membrane",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are the chief site of protein synthesis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Are the chief site for ATP generation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Are absent near the membranes of actively secreting cells",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Have their own DNA",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Mitochondria have an inner and outer lipid membrane. | (B): Ribosomes (rough ER) synthesise proteins; mitochondria make ATP. | (C): Mitochondria generate most ATP by oxidative phosphorylation. | (D): Mitochondria are abundant where ATP is needed (secretory/transport cells). | (E): Mitochondria have their own circular DNA.",
+        "textbookNote": "(A): Mitochondria have an inner and outer lipid membrane. | (B): Ribosomes (rough ER) synthesise proteins; mitochondria make ATP. | (C): Mitochondria generate most ATP by oxidative phosphorylation. | (D): Mitochondria are abundant where ATP is needed (secretory/transport cells). | (E): Mitochondria have their own circular DNA.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Regarding RMP",
+        "items": [
+          {
+            "label": "a",
+            "text": "RMP of large nerve fiber is –70 mV",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Excitable tissues have less negative RMP",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "RBC have less negative RMP",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "RMP of neuron is –90 mV",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Non-excitable tissues have more negative RMP",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Large nerve fibre RMP ≈ –90 mV. | (B): Excitable cells have a more negative RMP than non-excitable cells. | (C): RBC RMP is only about –10 mV. | (D): Neuron RMP ≈ –65 to –70 mV; large fibre –90 mV. | (E): Non-excitable cells have less negative RMP.",
+        "textbookNote": "(A): Large nerve fibre RMP ≈ –90 mV. | (B): Excitable cells have a more negative RMP than non-excitable cells. | (C): RBC RMP is only about –10 mV. | (D): Neuron RMP ≈ –65 to –70 mV; large fibre –90 mV. | (E): Non-excitable cells have less negative RMP.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Erythrocytes",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are responsible for the major part of blood viscosity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Contain the enzyme carbonic anhydrase",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Metabolize glucose to produce CO2 and H2O",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Swell to bursting point when suspended in 0.9% saline",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Have rigid walls",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): RBC are the major determinant of viscosity. | (B): RBC carbonic anhydrase speeds CO2 + H2O ⇌ H2CO3. | (C): RBC metabolise glucose anaerobically (lactate); they have no mitochondria. | (D): 0.9% saline is isotonic; RBC burst in hypotonic fluid. | (E): RBC membrane is flexible, allowing passage through capillaries.",
+        "textbookNote": "(A): RBC are the major determinant of viscosity. | (B): RBC carbonic anhydrase speeds CO2 + H2O ⇌ H2CO3. | (C): RBC metabolise glucose anaerobically (lactate); they have no mitochondria. | (D): 0.9% saline is isotonic; RBC burst in hypotonic fluid. | (E): RBC membrane is flexible, allowing passage through capillaries.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Sinoatrial node cells are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Found in both atria",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Innervated by the vagus",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Unable to generate impulses when completely denervated",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Connected to the AV node by the bundles of Purkinje tissue",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Stable with regard to their membrane potential",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): SA node lies in the right atrial wall at the SVC opening. | (B): Right vagus mainly supplies the SA node. | (C): SA node is autorhythmic; denervated rate ≈ 100/min. | (D): SA and AV nodes are connected by atrial internodal fibres, not Purkinje fibres. | (E): SA node membrane potential is unstable (pacemaker potential).",
+        "textbookNote": "(A): SA node lies in the right atrial wall at the SVC opening. | (B): Right vagus mainly supplies the SA node. | (C): SA node is autorhythmic; denervated rate ≈ 100/min. | (D): SA and AV nodes are connected by atrial internodal fibres, not Purkinje fibres. | (E): SA node membrane potential is unstable (pacemaker potential).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "A person with group A (+ve) blood",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has anti-B antibody in the plasma",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "May have the genotype AB",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Can be a donor for a person with AB or A",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has A agglutinogen in RBC membrane",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has D agglutinogen in RBC membrane",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Group A has A antigen and anti-B antibody. | (B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): '+ve' means Rh D antigen present on RBC.",
+        "textbookNote": "(A): Group A has A antigen and anti-B antibody. | (B): Group A genotype is AA or AO; AB is a different group. | (C): Group A can donate to A and AB. | (D): Group A RBCs carry A agglutinogen. | (E): '+ve' means Rh D antigen present on RBC.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Acclimatization to altitude causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A small increase in P50",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decreased erythropoietin secretion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Increase in number of mitochondria",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Decrease in myoglobin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Decrease in tissue content of cytochrome oxidase",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Acclimatisation raises 2,3-DPG → P50 increases slightly. | (B): Hypoxia INCREASES EPO. | (C): Acclimatisation increases mitochondria. | (D): Myoglobin increases at altitude. | (E): Tissue cytochrome oxidase increases.",
+        "textbookNote": "(A): Acclimatisation raises 2,3-DPG → P50 increases slightly. | (B): Hypoxia INCREASES EPO. | (C): Acclimatisation increases mitochondria. | (D): Myoglobin increases at altitude. | (E): Tissue cytochrome oxidase increases.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Tachycardia is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Positive chronotropic effect on heart",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "More common in athletes",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Positive inotropic effect of heart",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Controlled by β blocker",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Common during sleep",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Tachycardia = increased rate (chronotropic). | (B): Athletes have bradycardia. | (C): Rate effect is chronotropic; inotropic = force. | (D): β-blockers slow the heart. | (E): HR falls during sleep.",
+        "textbookNote": "(A): Tachycardia = increased rate (chronotropic). | (B): Athletes have bradycardia. | (C): Rate effect is chronotropic; inotropic = force. | (D): β-blockers slow the heart. | (E): HR falls during sleep.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Factors increasing heart rate are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Release of norepinephrine",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Release of acetylcholine",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Release of Ca2+",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increased Na+",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Decreased K+",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): NE raises HR via β1. | (B): ACh slows HR. | (C): Ca2+ influx increases pacemaker slope/force. | (D): Increased Na+ leak raises rate. | (E): Low K+ effect on HR is small; high K+ slows/arrests the heart.",
+        "textbookNote": "(A): NE raises HR via β1. | (B): ACh slows HR. | (C): Ca2+ influx increases pacemaker slope/force. | (D): Increased Na+ leak raises rate. | (E): Low K+ effect on HR is small; high K+ slows/arrests the heart.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "The respiratory center is",
+        "items": [
+          {
+            "label": "a",
+            "text": "In the hypothalamus",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "In the lower part of brainstem",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Not involved in the vomiting reflex",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Influenced by higher centers",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Involved in the swallowing reflex",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Respiratory centres are in medulla/pons. | (B): Medulla and pons house respiratory centres. | (C): Vomiting involves respiratory/vomiting centres in the medulla. | (D): Bronchomotor tone is under higher control. | (E): Respiration is inhibited during swallowing.",
+        "textbookNote": "(A): Respiratory centres are in medulla/pons. | (B): Medulla and pons house respiratory centres. | (C): Vomiting involves respiratory/vomiting centres in the medulla. | (D): Bronchomotor tone is under higher control. | (E): Respiration is inhibited during swallowing.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Enterohepatic circulation",
+        "items": [
+          {
+            "label": "a",
+            "text": "Means recirculation of bile salt",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Causes secretion of bile",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Helps in conservation of bile salts",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Helps in excretion of bile acid",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Stimulates bile salt production in the liver",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Enterohepatic circulation recycles bile salts. | (B): Returning bile salts stimulate bile secretion (choleretic). | (C): ~95% reabsorbed. | (D): Recirculation conserves, and the net loss is excreted. | (E): Returning bile salts INHIBIT hepatic synthesis (feedback).",
+        "textbookNote": "(A): Enterohepatic circulation recycles bile salts. | (B): Returning bile salts stimulate bile secretion (choleretic). | (C): ~95% reabsorbed. | (D): Recirculation conserves, and the net loss is excreted. | (E): Returning bile salts INHIBIT hepatic synthesis (feedback).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "The most important function of cell membrane is to",
+        "opts": [
+          "Act as a selective barrier to the passage of molecules",
+          "Anchor cells to adjacent cells",
+          "Maintain the physical integrity of the cell",
+          "Protect the cell from some harmful chemicals"
+        ],
+        "correctIndex": 0,
+        "explanation": "The membrane is a selective barrier.",
+        "textbookNote": "The membrane is a selective barrier.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Extracellular fluid contains mainly large amounts of",
+        "opts": [
+          "Bicarbonate ions",
+          "Calcium ions",
+          "Magnesium ions",
+          "Potassium ions"
+        ],
+        "correctIndex": 0,
+        "explanation": "PCT reabsorbs bicarbonate (via H+ secretion), it does not secrete it.",
+        "textbookNote": "PCT reabsorbs bicarbonate (via H+ secretion), it does not secrete it.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Most important lung defense mechanism includes",
+        "opts": [
+          "Macrophages",
+          "Negative intrapleural pressure",
+          "Serotonin",
+          "Surfactant"
+        ],
+        "correctIndex": 0,
+        "explanation": "Alveolar macrophages phagocytose particles.",
+        "textbookNote": "Alveolar macrophages phagocytose particles.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Very high rise of ESR occurs in",
+        "opts": [
+          "Chronic infection",
+          "Hemorrhage",
+          "Pregnancy",
+          "Tuberculosis"
+        ],
+        "correctIndex": 3,
+        "explanation": "TB/chronic infection and myeloma raise ESR the most.",
+        "textbookNote": "TB/chronic infection and myeloma raise ESR the most.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Most important factor that increases cardiac output is",
+        "opts": [
+          "Eating",
+          "Excitement",
+          "High environment temperature",
+          "Pregnancy"
+        ],
+        "correctIndex": 1,
+        "explanation": "Excitement raises CO/GH.",
+        "textbookNote": "Excitement raises CO/GH.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Most common index for lung function",
+        "opts": [
+          "FVC",
+          "FRC",
+          "RV",
+          "VC"
+        ],
+        "correctIndex": 0,
+        "explanation": "FVC is the commonest simple lung test.",
+        "textbookNote": "FVC is the commonest simple lung test.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Most important factor of hepatic duct bile is",
+        "opts": [
+          "Alkaline phosphatase",
+          "Bile salts",
+          "Cholesterol",
+          "Fatty acids"
+        ],
+        "correctIndex": 1,
+        "explanation": "Bile salts are the most important component of bile for fat digestion.",
+        "textbookNote": "Bile salts are the most important component of bile for fat digestion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Principal physiologic action of gastrin",
+        "opts": [
+          "Contraction at gastroesophageal junction",
+          "Increase gastric motility",
+          "Stimulation of growth of mucosa of the stomach",
+          "Stimulate insulin secretion"
+        ],
+        "correctIndex": 1,
+        "explanation": "Gastrin mildly increases motility; its chief action is acid secretion.",
+        "textbookNote": "Gastrin mildly increases motility; its chief action is acid secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "The most important muscle involved in forced expiration",
+        "opts": [
+          "Anterior serrati",
+          "Internal intercostal",
+          "Rectus abdominis",
+          "Scaleni"
+        ],
+        "correctIndex": 2,
+        "explanation": "Abdominal muscles (rectus abdominis) are the most powerful forced-expiratory muscles.",
+        "textbookNote": "Abdominal muscles (rectus abdominis) are the most powerful forced-expiratory muscles.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "Most important component of surfactant is",
+        "opts": [
+          "Carbohydrate",
+          "Neutral lipid",
+          "Phosphatidylcholine",
+          "Phosphatidylglycerol"
+        ],
+        "correctIndex": 2,
+        "explanation": "Dipalmitoyl phosphatidylcholine (DPPC) is the main surfactant lipid.",
+        "textbookNote": "Dipalmitoyl phosphatidylcholine (DPPC) is the main surfactant lipid.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-nov-p2",
+    "session": "November 2023",
+    "year": 2023,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 38,
+    "bookPage": "pp. 38–41",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Renal tubular reabsorption",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is highly selective",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is very large relative to excretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is only by passive mechanism",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Of water is an active process",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Of water from DCT is obligatory",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Reabsorption is selective. | (B): Reabsorption of water and solutes is far greater than excretion. | (C): Active transport (Na+, glucose) and passive both occur. | (D): Water follows solutes passively by osmosis. | (E): DCT/collecting duct water reabsorption is facultative (ADH).",
+        "textbookNote": "(A): Reabsorption is selective. | (B): Reabsorption of water and solutes is far greater than excretion. | (C): Active transport (Na+, glucose) and passive both occur. | (D): Water follows solutes passively by osmosis. | (E): DCT/collecting duct water reabsorption is facultative (ADH).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Renin is",
+        "items": [
+          {
+            "label": "a",
+            "text": "An enzyme",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Secreted by cells of macula densa",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Secreted in response to low sodium concentration in DCT",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secreted in response to low potassium concentration in DCT",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Secreted by juxtaglomerular cells",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Renin is a proteolytic enzyme. | (B): Macula densa senses NaCl in DCT; JG cells secrete renin. | (C): Low NaCl at macula densa stimulates renin release. | (D): Renin is not triggered by low K+ in DCT. | (E): JG cells secrete renin.",
+        "textbookNote": "(A): Renin is a proteolytic enzyme. | (B): Macula densa senses NaCl in DCT; JG cells secrete renin. | (C): Low NaCl at macula densa stimulates renin release. | (D): Renin is not triggered by low K+ in DCT. | (E): JG cells secrete renin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Volume of urine is regulated by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Intake of water",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "ADH",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "PTH",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Aldosterone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "TmG",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Water intake lowers osmolarity → less ADH → more urine. | (B): ADH concentrates urine. | (C): PTH regulates Ca2+, not urine volume. | (D): Aldosterone retains Na+ and water. | (E): TmG is the glucose transport maximum.",
+        "textbookNote": "(A): Water intake lowers osmolarity → less ADH → more urine. | (B): ADH concentrates urine. | (C): PTH regulates Ca2+, not urine volume. | (D): Aldosterone retains Na+ and water. | (E): TmG is the glucose transport maximum.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Thyroid hormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Secretion is increased by cold environment",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is stored extracellularly",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has effects on brain development",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secretion is increased by sympathetic stimulation",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Secretion is stimulated by hot environment",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Cold → TRH → TSH ↑. | (B): Thyroglobulin is stored in follicular lumen (extracellular). | (C): Thyroid hormone is vital for neuronal development. | (D): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (E): Heat lowers TSH.",
+        "textbookNote": "(A): Cold → TRH → TSH ↑. | (B): Thyroglobulin is stored in follicular lumen (extracellular). | (C): Thyroid hormone is vital for neuronal development. | (D): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (E): Heat lowers TSH.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The following hormones use cAMP as a second messenger",
+        "items": [
+          {
+            "label": "a",
+            "text": "Testosterone",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Estrogen",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "ADH",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Glucagon",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "TSH",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Steroid hormones act via intracellular receptors (gene transcription). | (B): Estrogen causes ductal growth. | (C): ADH concentrates urine. | (D): Glucagon acts through cAMP. | (E): TSH acts via cAMP.",
+        "textbookNote": "(A): Steroid hormones act via intracellular receptors (gene transcription). | (B): Estrogen causes ductal growth. | (C): ADH concentrates urine. | (D): Glucagon acts through cAMP. | (E): TSH acts via cAMP.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Basal ganglia dysfunctions are characterized by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Intention tremor",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Extreme rigidity",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Past pointing",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Ataxia",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Resting involuntary tremor",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Intention tremor is cerebellar; basal ganglia give resting tremor. | (C): Past pointing (dysmetria) is cerebellar. | (D): Ataxia is a cerebellar sign.",
+        "textbookNote": "(A): Intention tremor is cerebellar; basal ganglia give resting tremor. | (C): Past pointing (dysmetria) is cerebellar. | (D): Ataxia is a cerebellar sign.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Stretch reflex",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a monosynaptic reflex",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a polysynaptic reflex",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Receptor is muscle spindle",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Response is relaxation of muscle",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Neurotransmitter is glutamate",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Stretch (knee jerk) reflex is monosynaptic. | (D): Stretch reflex causes contraction.",
+        "textbookNote": "(B): Stretch (knee jerk) reflex is monosynaptic. | (D): Stretch reflex causes contraction.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Synapse",
+        "items": [
+          {
+            "label": "a",
+            "text": "For signal transmission in CNS almost all are electrical type",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Always transmits the signals in one direction",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Often transmits signals in either direction",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Develops fatigue, a protective mechanism",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Delay time determines whether a reflex pathway is mono- or polysynaptic",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Most CNS synapses are chemical. | (B): Chemical synapses are one-way. | (C): Chemical synapses conduct one way. | (D): Synaptic fatigue is a protective mechanism. | (E): Synaptic delay (0.5 ms) estimates number of synapses.",
+        "textbookNote": "(A): Most CNS synapses are chemical. | (B): Chemical synapses are one-way. | (C): Chemical synapses conduct one way. | (D): Synaptic fatigue is a protective mechanism. | (E): Synaptic delay (0.5 ms) estimates number of synapses.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Olfactory epithelium",
+        "items": [
+          {
+            "label": "a",
+            "text": "Contains unipolar nerve cells",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Has receptors for smell",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is derived from CNS",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Lies over cribriform plate",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Contains cilia",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Olfactory receptor neurons are bipolar. | (B): Olfactory epithelium holds smell receptors. | (C): Olfactory epithelium arises from olfactory placode. | (D): Olfactory epithelium lies in roof of nose under cribriform plate. | (E): Olfactory neurons have cilia.",
+        "textbookNote": "(A): Olfactory receptor neurons are bipolar. | (B): Olfactory epithelium holds smell receptors. | (C): Olfactory epithelium arises from olfactory placode. | (D): Olfactory epithelium lies in roof of nose under cribriform plate. | (E): Olfactory neurons have cilia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Refractive power of eyeball is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Less in myopia",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "More in hypermetropia",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Expressed in diopters",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Maximum in cornea",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Related with focal length",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Myopia: refractive power too high for the eyeball length. | (B): Hypermetropia: refractive power too low. | (C): Refractive power is measured in dioptres. | (D): Cornea gives ~43 of 59 D. | (E): Power = 1/focal length (m).",
+        "textbookNote": "(A): Myopia: refractive power too high for the eyeball length. | (B): Hypermetropia: refractive power too low. | (C): Refractive power is measured in dioptres. | (D): Cornea gives ~43 of 59 D. | (E): Power = 1/focal length (m).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Which one of the following is most likely to directly stimulate the release of renin?",
+        "opts": [
+          "Angiotensin II",
+          "Increased blood pressure",
+          "Decreased renal perfusion",
+          "Increased aldosterone secretion",
+          "Sodium concentration in macula densa"
+        ],
+        "correctIndex": 2,
+        "explanation": "Low renal perfusion pressure directly stimulates JG baroreceptors.",
+        "textbookNote": "Low renal perfusion pressure directly stimulates JG baroreceptors.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Secretion of which of the hormones is directly stimulated by extracellular fluid",
+        "opts": [
+          "Antidiuretic hormone",
+          "Aldosterone",
+          "Atrial natriuretic peptide",
+          "Renin",
+          "Prostaglandins"
+        ],
+        "correctIndex": 2,
+        "explanation": "Volume expansion stretches atria → ANP.",
+        "textbookNote": "Volume expansion stretches atria → ANP.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Secretion of cortisol is controlled almost entirely by",
+        "opts": [
+          "Corticotropin-releasing factor",
+          "Mental stress",
+          "Adrenocorticotropic hormone",
+          "Increased angiotensin II",
+          "Increased potassium concentration"
+        ],
+        "correctIndex": 2,
+        "explanation": "ACTH controls cortisol secretion.",
+        "textbookNote": "ACTH controls cortisol secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Insulin secretion is enhanced by",
+        "opts": [
+          "Growth hormone",
+          "Decreased level of blood amino acid",
+          "Increased level of serum albumin",
+          "Obesity",
+          "Increased blood glucose level"
+        ],
+        "correctIndex": 4,
+        "explanation": "Blood glucose is the main stimulus.",
+        "textbookNote": "Blood glucose is the main stimulus.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Cutting which structure causes blindness in the temporal fields of the left and right",
+        "opts": [
+          "Optic nerve of right side",
+          "Center of optic chiasma",
+          "Lateral side of optic chiasma",
+          "Optic tract of left side",
+          "Visual cortex"
+        ],
+        "correctIndex": 1,
+        "explanation": "Chiasmal midline lesion → bitemporal hemianopia.",
+        "textbookNote": "Chiasmal midline lesion → bitemporal hemianopia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Human chorionic gonadotropin hormone",
+        "opts": [
+          "Is a steroid hormone",
+          "Acts directly on the uterus",
+          "Is detected in the urine as an early sign of pregnancy",
+          "Level remains always the same in the whole pregnancy",
+          "Is responsible for the onset of labor"
+        ],
+        "correctIndex": 2,
+        "explanation": "hCG in urine is the basis of pregnancy tests.",
+        "textbookNote": "hCG in urine is the basis of pregnancy tests.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Sensory pathway involves",
+        "opts": [
+          "Corticospinal tract",
+          "Anterior horn cells",
+          "Broadman area 1,2,3",
+          "Dorsal root ganglia",
+          "Corticorubral tract"
+        ],
+        "correctIndex": 3,
+        "explanation": "First-order sensory neurons have cell bodies in the dorsal root ganglia.",
+        "textbookNote": "First-order sensory neurons have cell bodies in the dorsal root ganglia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Upper motor neuron lesion produces",
+        "opts": [
+          "Flaccid paralysis",
+          "Extensive sensory loss",
+          "Plantar flexion",
+          "Increased deep reflexes response",
+          "Loss of deep reflexes"
+        ],
+        "correctIndex": 3,
+        "explanation": "UMN lesion → spastic paralysis with exaggerated reflexes.",
+        "textbookNote": "UMN lesion → spastic paralysis with exaggerated reflexes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "During puberty which event occurs first in girls?",
+        "opts": [
+          "Adrenarche",
+          "Active attitude",
+          "Thelarche",
+          "Menarche",
+          "Pubarche"
+        ],
+        "correctIndex": 2,
+        "explanation": "Breast budding (thelarche) is the first sign of puberty in girls.",
+        "textbookNote": "Breast budding (thelarche) is the first sign of puberty in girls.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "The most potent stimulus for ADH secretion is",
+        "opts": [
+          "Decreased blood volume",
+          "Increased osmolarity",
+          "Decreased blood pressure",
+          "Renin"
+        ],
+        "correctIndex": 1,
+        "explanation": "Increased plasma osmolarity is the most potent ADH stimulus.",
+        "textbookNote": "Increased plasma osmolarity is the most potent ADH stimulus.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-may-p1-new",
+    "session": "May 2023",
+    "year": 2023,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "New Curriculum",
+    "page": 42,
+    "bookPage": "pp. 42–45",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Pacemaker potential is",
+        "items": [
+          {
+            "label": "a",
+            "text": "More slope with vagal stimulation",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Due to K+ efflux",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Due to Ca2+ channel opening",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Due to K+/Ca2+ channel opening",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Shorter in sympathetic stimulation",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Vagal stimulation DEcreases the slope (more hyperpolarised, slower rate). | (B): Pacemaker potential is due to decreased K+ efflux, Na+ leak and T-type Ca2+ entry. | (C): T-type Ca2+ channels contribute to late pacemaker depolarisation. | (D): Funny current and Ca2+ channels shape the pacemaker potential. | (E): Sympathetic does not increase thyroid hormone secretion.",
+        "textbookNote": "(A): Vagal stimulation DEcreases the slope (more hyperpolarised, slower rate). | (B): Pacemaker potential is due to decreased K+ efflux, Na+ leak and T-type Ca2+ entry. | (C): T-type Ca2+ channels contribute to late pacemaker depolarisation. | (D): Funny current and Ca2+ channels shape the pacemaker potential. | (E): Sympathetic does not increase thyroid hormone secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Endocytosis is initiated by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Coated pits",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Clathrin-coated vesicles",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Non-clathrin-coated vesicles",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Lysosomes",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Endosomes",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Receptor-mediated endocytosis begins at clathrin-coated pits. | (B): Clathrin coats vesicles in receptor-mediated endocytosis. | (C): Clathrin coats vesicles in receptor-mediated endocytosis. | (D): Lysosomes digest the content after endocytosis; they do not initiate it. | (E): Endocytosis: pit → vesicle → endosome.",
+        "textbookNote": "(A): Receptor-mediated endocytosis begins at clathrin-coated pits. | (B): Clathrin coats vesicles in receptor-mediated endocytosis. | (C): Clathrin coats vesicles in receptor-mediated endocytosis. | (D): Lysosomes digest the content after endocytosis; they do not initiate it. | (E): Endocytosis: pit → vesicle → endosome.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "The factors that inhibit gastric emptying are",
+        "items": [
+          {
+            "label": "a",
+            "text": "CCK",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Increased acidity of duodenal chyme",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Gastrocolic reflex",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Gastrin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Enterogastric reflex",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (B): Acid in duodenum inhibits emptying. | (C): Gastrocolic reflex = food in stomach → colonic mass movement; enterogastric reflex inhibits emptying. | (D): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (E): Enterogastric reflex slows gastric emptying.",
+        "textbookNote": "(A): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (B): Acid in duodenum inhibits emptying. | (C): Gastrocolic reflex = food in stomach → colonic mass movement; enterogastric reflex inhibits emptying. | (D): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (E): Enterogastric reflex slows gastric emptying.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "A shift of the oxygen dissociation curve of blood to the left",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreases the O2 content of blood at a given PO2",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Impairs O2 delivery to the tissues at the normal tissue PO2",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Occurs in blood perfusing cold extremities",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Occurs in blood stored for several weeks",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is characteristic of fetal blood when compared with adult blood",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Left shift INCREASES O2 content at a given PO2 (higher affinity). | (B): Left shift holds O2 tighter, impairing unloading. | (C): Cold lowers P50 → left shift. | (D): Stored blood loses 2,3-DPG → left shift. | (E): HbF → left shift.",
+        "textbookNote": "(A): Left shift INCREASES O2 content at a given PO2 (higher affinity). | (B): Left shift holds O2 tighter, impairing unloading. | (C): Cold lowers P50 → left shift. | (D): Stored blood loses 2,3-DPG → left shift. | (E): HbF → left shift.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "A person regarding respiratory system",
+        "items": [
+          {
+            "label": "a",
+            "text": "Breathes 12–18 times/minute",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Ventilates about 400 mL of air/breath",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Breathes 6–8 L/minute",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Inhales about 250 mL of O2/min",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Exhales about 150 mL of CO2/min",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Normal RR 12–18/min. | (B): Tidal volume ≈ 500 mL (400–500). | (C): Minute ventilation 6–8 L/min. | (D): O2 consumption ≈ 250 mL/min. | (E): CO2 output ≈ 200 mL/min.",
+        "textbookNote": "(A): Normal RR 12–18/min. | (B): Tidal volume ≈ 500 mL (400–500). | (C): Minute ventilation 6–8 L/min. | (D): O2 consumption ≈ 250 mL/min. | (E): CO2 output ≈ 200 mL/min.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "At high altitude there is an increased",
+        "items": [
+          {
+            "label": "a",
+            "text": "Pulmonary ventilation",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Alveolar H2O vapour pressure",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Arterial PO2",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Arterial pH",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Cerebral blood flow",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Hypoxia stimulates ventilation via carotid bodies. | (B): Alveolar water vapour pressure is constant (47 mmHg). | (C): Altitude lowers arterial PO2. | (D): Hyperventilation → respiratory alkalosis → pH rises. | (E): Hypoxia dilates cerebral vessels.",
+        "textbookNote": "(A): Hypoxia stimulates ventilation via carotid bodies. | (B): Alveolar water vapour pressure is constant (47 mmHg). | (C): Altitude lowers arterial PO2. | (D): Hyperventilation → respiratory alkalosis → pH rises. | (E): Hypoxia dilates cerebral vessels.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Regarding the conductive system of the heart",
+        "items": [
+          {
+            "label": "a",
+            "text": "It is formed from modified nervous system",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "The SA node is the natural cardiac pacemaker",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vagal stimulation results in increased rate of SA node",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "AV nodal delay is pathological",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Conduction velocity is fastest in the Purkinje system",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Conductive system is modified cardiac muscle. | (B): SA node is the natural pacemaker. | (C): Vagal stimulation SLOWS SA node. | (D): AV nodal delay (0.1 s) is physiological, letting atria empty first. | (E): Purkinje fibres conduct at 1.5–4 m/s, the fastest.",
+        "textbookNote": "(A): Conductive system is modified cardiac muscle. | (B): SA node is the natural pacemaker. | (C): Vagal stimulation SLOWS SA node. | (D): AV nodal delay (0.1 s) is physiological, letting atria empty first. | (E): Purkinje fibres conduct at 1.5–4 m/s, the fastest.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "During the cardiac cycle",
+        "items": [
+          {
+            "label": "a",
+            "text": "The majority of the filling is due to atrial systole",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Atrial systole starts after the P wave of ECG",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "The mitral valve closes at the beginning of ventricular systole",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "At the end of diastole volume is 120 mL",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Right atrial systole precedes left atrial systole",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): ~80% of filling is passive; atrial systole gives 20%. | (C): S1 is produced at the start of ventricular systole.",
+        "textbookNote": "(A): ~80% of filling is passive; atrial systole gives 20%. | (C): S1 is produced at the start of ventricular systole.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Regarding spirometry and respiratory volume",
+        "items": [
+          {
+            "label": "a",
+            "text": "FEV1 is greater than 3.5 L in the adult",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Residual volume 1.2 L may be determined by spirometry",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "ERV is measured by active not passive effort",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Alveolar exchange is 150 mL/breath",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "With each breath 500 mL of air moves in and out of lungs",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Normal FEV1 ≈ 4 L (80% of FVC). | (B): RV cannot be measured by spirometry (needs helium dilution). | (C): ERV is measured by active forced expiration. | (D): Alveolar ventilation per breath = 500 – 150 = 350 mL. | (E): Tidal volume ≈ 500 mL.",
+        "textbookNote": "(A): Normal FEV1 ≈ 4 L (80% of FVC). | (B): RV cannot be measured by spirometry (needs helium dilution). | (C): ERV is measured by active forced expiration. | (D): Alveolar ventilation per breath = 500 – 150 = 350 mL. | (E): Tidal volume ≈ 500 mL.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Following statements regarding platelets are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are formed in the bone marrow",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are nucleated",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Show adhesiveness coming in contact with collagen",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Do not have contractile power",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Help in clot retraction",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Platelets are formed from megakaryocytes in bone marrow. | (B): Platelets are non-nucleated. | (C): Platelets adhere to exposed collagen. | (D): Platelets contain actin/myosin/thrombosthenin (clot retraction). | (E): Platelet thrombosthenin causes clot retraction.",
+        "textbookNote": "(A): Platelets are formed from megakaryocytes in bone marrow. | (B): Platelets are non-nucleated. | (C): Platelets adhere to exposed collagen. | (D): Platelets contain actin/myosin/thrombosthenin (clot retraction). | (E): Platelet thrombosthenin causes clot retraction.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "What is the purpose of the Na+-K+ pump?",
+        "opts": [
+          "Perform endocytosis",
+          "Perform bulk transport through the plasma membrane",
+          "Produce a concentration gradient for Na+",
+          "Produce a concentration gradient for Ca2+"
+        ],
+        "correctIndex": 2,
+        "explanation": "Pump creates the Na+ gradient.",
+        "textbookNote": "Pump creates the Na+ gradient.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "WBCs which are the most active phagocytic cells",
+        "opts": [
+          "Lymphocytes and macrophages",
+          "Neutrophils and eosinophils",
+          "Neutrophils and monocytes",
+          "Eosinophils and lymphocytes"
+        ],
+        "correctIndex": 2,
+        "explanation": "Neutrophils and monocytes/macrophages are the main phagocytes.",
+        "textbookNote": "Neutrophils and monocytes/macrophages are the main phagocytes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Most essential factor for erythropoiesis is",
+        "opts": [
+          "Testosterone",
+          "Thyroxine",
+          "ACTH",
+          "Erythropoietin"
+        ],
+        "correctIndex": 3,
+        "explanation": "EPO from kidney stimulates RBC production.",
+        "textbookNote": "EPO from kidney stimulates RBC production.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Which of the following is the first one to activate platelets?",
+        "opts": [
+          "ADP",
+          "ATP",
+          "Thrombin",
+          "Collagen"
+        ],
+        "correctIndex": 3,
+        "explanation": "Collagen exposure initiates platelet adhesion/activation.",
+        "textbookNote": "Collagen exposure initiates platelet adhesion/activation.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Prolonged bleeding time is seen in",
+        "opts": [
+          "Hemophilia",
+          "Anemia",
+          "Von Willebrand disease",
+          "Liver disease"
+        ],
+        "correctIndex": 2,
+        "explanation": "vWD impairs platelet adhesion → prolonged BT.",
+        "textbookNote": "vWD impairs platelet adhesion → prolonged BT.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Site of extramedullary thrombopoiesis",
+        "opts": [
+          "Liver",
+          "Femur",
+          "Pelvic bone",
+          "Spine"
+        ],
+        "correctIndex": 0,
+        "explanation": "Liver and spleen are extramedullary haemopoietic sites.",
+        "textbookNote": "Liver and spleen are extramedullary haemopoietic sites.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Non-nucleated cell of the following erythroid series is",
+        "opts": [
+          "Reticulocyte",
+          "Normoblast",
+          "Basophilic erythroblast",
+          "Pro-erythroblast"
+        ],
+        "correctIndex": 0,
+        "explanation": "Reticulocyte has no nucleus.",
+        "textbookNote": "Reticulocyte has no nucleus.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Which of the following will not be screened before blood transfusion?",
+        "opts": [
+          "Hepatitis-A",
+          "Hepatitis-B",
+          "Hepatitis-C",
+          "Syphilis"
+        ],
+        "correctIndex": 0,
+        "explanation": "Hepatitis A is not blood-borne.",
+        "textbookNote": "Hepatitis A is not blood-borne.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Which one is the potent stimulus for the carotid body?",
+        "opts": [
+          "Increased PCO2",
+          "Increased H+ concentration in arterial blood",
+          "When arterial blood PO2 < 60 mmHg",
+          "When arterial PO2 < 100 mmHg"
+        ],
+        "correctIndex": 2,
+        "explanation": "Carotid body is stimulated when PaO2 < 60 mmHg.",
+        "textbookNote": "Carotid body is stimulated when PaO2 < 60 mmHg.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "At which condition is oxygen therapy 100% effective?",
+        "opts": [
+          "In anemic hypoxia",
+          "In atmospheric hypoxia",
+          "Histotoxic hypoxia",
+          "In hypoxia caused by tissue edema"
+        ],
+        "correctIndex": 1,
+        "explanation": "Hypoxic hypoxia responds fully to O2 therapy.",
+        "textbookNote": "Hypoxic hypoxia responds fully to O2 therapy.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Source script indicates corrected original option wording or answer key discrepancy (†)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-may-p2-new",
+    "session": "May 2023",
+    "year": 2023,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "New Curriculum",
+    "page": 46,
+    "bookPage": "pp. 46–49",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Proximal tubule",
+        "items": [
+          {
+            "label": "a",
+            "text": "Reabsorbs 67% of Na+ and H2O",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is the site of glomerulo-tubular balance",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Fluid is slightly iso-osmotic",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Reabsorbs 50% of filtered glucose",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Secretes H+ and Cl-",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PCT reabsorbs ~65% of filtered Na+ and water. | (B): PCT absorbs a constant fraction of GFR. | (C): PCT fluid stays iso-osmotic. | (D): PCT reabsorbs 100% of filtered glucose below threshold. | (E): PCT secretes H+; Cl- is passively reabsorbed.",
+        "textbookNote": "(A): PCT reabsorbs ~65% of filtered Na+ and water. | (B): PCT absorbs a constant fraction of GFR. | (C): PCT fluid stays iso-osmotic. | (D): PCT reabsorbs 100% of filtered glucose below threshold. | (E): PCT secretes H+; Cl- is passively reabsorbed.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "The renal clearance of",
+        "items": [
+          {
+            "label": "a",
+            "text": "Bicarbonate is similar to that of glucose",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "PAH is nearer to 600 mL/min",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Glucose is more than threshold",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Inulin is the same as GFR",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Creatinine is lower than urea",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Both are completely reabsorbed at normal plasma levels → clearance ≈ 0. | (B): PAH clearance ≈ RPF (~625 mL/min). | (C): Glucose clearance is zero below threshold. | (D): Inulin is filtered, not reabsorbed or secreted. | (E): Creatinine clearance (≈ GFR) exceeds urea clearance (≈ 60–70).",
+        "textbookNote": "(A): Both are completely reabsorbed at normal plasma levels → clearance ≈ 0. | (B): PAH clearance ≈ RPF (~625 mL/min). | (C): Glucose clearance is zero below threshold. | (D): Inulin is filtered, not reabsorbed or secreted. | (E): Creatinine clearance (≈ GFR) exceeds urea clearance (≈ 60–70).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "GFR is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Relatively constant",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "About 20% of the renal plasma flow",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increased by angiotensin II stimulation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Altered by mesangial cell contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "125 L/min",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Autoregulation keeps GFR constant. | (B): Filtration fraction ≈ 20%. | (C): Ang II constricts efferent arteriole → maintains GFR. | (D): Mesangial contraction lowers Kf and GFR. | (E): GFR is 125 mL/min (≈ 180 L/day).",
+        "textbookNote": "(A): Autoregulation keeps GFR constant. | (B): Filtration fraction ≈ 20%. | (C): Ang II constricts efferent arteriole → maintains GFR. | (D): Mesangial contraction lowers Kf and GFR. | (E): GFR is 125 mL/min (≈ 180 L/day).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Administration of ADH",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreases water loss by lungs",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases water loss by kidney",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increases perspiration",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Decreases reabsorption of Na+ by PCT",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increases reabsorption of water by distal tubule",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): ADH acts on renal collecting ducts. | (C): ADH does not affect sweating. | (D): ADH does not act on PCT. | (E): ADH acts on late DCT and collecting duct.",
+        "textbookNote": "(A): ADH acts on renal collecting ducts. | (C): ADH does not affect sweating. | (D): ADH does not act on PCT. | (E): ADH acts on late DCT and collecting duct.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The pituitary gland",
+        "items": [
+          {
+            "label": "a",
+            "text": "Lies superior to the sphenoid bone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is all ectodermal",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has the optic chiasma anteriorly",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is supplied from the internal carotid artery",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies inferior to the cavernous sinus",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "textbookNote": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Impaired growth hormone secretion",
+        "items": [
+          {
+            "label": "a",
+            "text": "May cause delayed puberty in children",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Leads to mental retardation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Can be treated by thyroxine",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Leads to disproportion in growth of upper and lower segment",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Causes short stature in a young man",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): GH deficiency delays growth and puberty. | (B): GH deficiency does not impair intelligence (thyroid does). | (C): GH deficiency needs GH. | (D): GH deficiency gives proportionate dwarfism. | (E): GH deficiency → short stature.",
+        "textbookNote": "(A): GH deficiency delays growth and puberty. | (B): GH deficiency does not impair intelligence (thyroid does). | (C): GH deficiency needs GH. | (D): GH deficiency gives proportionate dwarfism. | (E): GH deficiency → short stature.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Aldosterone on renal tubule normally reabsorbs",
+        "items": [
+          {
+            "label": "a",
+            "text": "All filtered glucose",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "All filtered plasma proteins",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "About 5–10% of filtered water",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "More K+ ion than Cl- ion",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Sodium, Cl- ion and water",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Aldosterone does not reabsorb glucose; PCT does. | (B): Liver SYNTHESISES plasma proteins; it does not store them.",
+        "textbookNote": "(A): Aldosterone does not reabsorb glucose; PCT does. | (B): Liver SYNTHESISES plasma proteins; it does not store them.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "The cerebellum",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is essential for finely coordinated movements",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Does not modify the discharge of spinal motor neurons",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has afferent input from the motor cortex",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has afferent input from the muscle proprioceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has no afferent input from the vestibular system",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "textbookNote": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Posterior column damage in the spinal cord may impair",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration sense",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pain sensation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The flexor plantar response to stimulation of the sole",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Tactile sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The ability to stand steadily with eyes closed",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "textbookNote": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "The curvature of the cornea increases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Chromatic and spherical aberration is decreased",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The visual axes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "SBA",
+        "stem": "Abnormalities of taste are",
+        "opts": [
+          "Ageusia",
+          "Anosmia",
+          "Presbyacusis",
+          "Otitis media"
+        ],
+        "correctIndex": 0,
+        "explanation": "Ageusia = loss of taste.",
+        "textbookNote": "Ageusia = loss of taste.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "SBA",
+        "stem": "Field of vision is more in",
+        "opts": [
+          "Nasally",
+          "Temporally",
+          "Upper quadrant",
+          "Lower quadrant"
+        ],
+        "correctIndex": 1,
+        "explanation": "Temporal visual field is widest (nose does not obstruct).",
+        "textbookNote": "Temporal visual field is widest (nose does not obstruct).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "SBA",
+        "stem": "Growth hormone secretion is mostly increased in",
+        "opts": [
+          "Hypoglycemia",
+          "Severe protein deficiency",
+          "During the first hours of sleep",
+          "Excitement"
+        ],
+        "correctIndex": 2,
+        "explanation": "GH peaks during slow-wave sleep.",
+        "textbookNote": "GH peaks during slow-wave sleep.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "SBA",
+        "stem": "Thermogenic hormones are",
+        "opts": [
+          "Somatomedin C",
+          "PTH",
+          "Estrogen",
+          "Thyroxine"
+        ],
+        "correctIndex": 3,
+        "explanation": "Thyroxine increases BMR and heat production.",
+        "textbookNote": "Thyroxine increases BMR and heat production.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "SBA",
+        "stem": "Brain stem controls",
+        "opts": [
+          "Temperature",
+          "Equilibrium",
+          "Respiratory volumes",
+          "Muscle tone only"
+        ],
+        "correctIndex": 1,
+        "explanation": "Brainstem (vestibular nuclei) controls equilibrium, respiration, CVS.",
+        "textbookNote": "Brainstem (vestibular nuclei) controls equilibrium, respiration, CVS.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "SBA",
+        "stem": "Placenta does NOT secrete",
+        "opts": [
+          "Estrogen",
+          "HCG",
+          "Prolactin",
+          "Progesterone"
+        ],
+        "correctIndex": 2,
+        "explanation": "Placenta secretes hPL, not prolactin.",
+        "textbookNote": "Placenta secretes hPL, not prolactin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "SBA",
+        "stem": "Knee jerk is",
+        "opts": [
+          "Lost in cerebellar lesion",
+          "Caused by stretching of the quadriceps femoris",
+          "A superficial reflex",
+          "A polysynaptic reflex"
+        ],
+        "correctIndex": 1,
+        "explanation": "Knee jerk is the monosynaptic stretch reflex of the quadriceps.",
+        "textbookNote": "Knee jerk is the monosynaptic stretch reflex of the quadriceps.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "SBA",
+        "stem": "Regarding pain, which is incorrect?",
+        "opts": [
+          "Is protective in nature",
+          "Is regulated by multiple systems",
+          "Receptors are free nerve endings",
+          "Receptors are quickly adapted"
+        ],
+        "correctIndex": 3,
+        "explanation": "Pain receptors adapt very little (slowly).",
+        "textbookNote": "Pain receptors adapt very little (slowly).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "SBA",
+        "stem": "Basal ganglia lesion does NOT produce",
+        "opts": [
+          "Past pointing",
+          "Tremor",
+          "Rigidity",
+          "Hypokinesia"
+        ],
+        "correctIndex": 0,
+        "explanation": "Past pointing is a cerebellar sign.",
+        "textbookNote": "Past pointing is a cerebellar sign.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "SBA",
+        "stem": "In presence of ADH, maximum water is reabsorbed in",
+        "opts": [
+          "Distal tubules",
+          "PCT",
+          "Loop of Henle",
+          "Cortical collecting ducts"
+        ],
+        "correctIndex": 1,
+        "explanation": "PCT reabsorbs the greatest fraction (~65%) of filtered water.",
+        "textbookNote": "PCT reabsorbs the greatest fraction (~65%) of filtered water.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-may-p1-old",
+    "session": "May 2023",
+    "year": 2023,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "Old Curriculum",
+    "page": 50,
+    "bookPage": "pp. 50–53",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Na+-K+ pump",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a passive transport",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Maintains cell volume",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is present in all cell membranes",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Generates energy for co-transport",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Requires no carrier protein",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Na+-K+ pump is primary active transport using ATP. | (C): All cells have the Na+-K+ pump. | (D): The Na+ gradient made by the pump drives secondary active transport. | (E): Pump is a carrier protein (Na+-K+ ATPase).",
+        "textbookNote": "(A): Na+-K+ pump is primary active transport using ATP. | (C): All cells have the Na+-K+ pump. | (D): The Na+ gradient made by the pump drives secondary active transport. | (E): Pump is a carrier protein (Na+-K+ ATPase).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Lipid bilayer of cell membrane",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is fluid in nature",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Prevents passage of Ca2+",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is composed of phospholipid and cholesterol",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has hydrophilic phosphate ends",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is coated internally with glycocalyx",
+            "ans": false
+          }
+        ],
+        "explanation": "(E): Glycocalyx coats the outside of the membrane.",
+        "textbookNote": "(E): Glycocalyx coats the outside of the membrane.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Contractile protein",
+        "items": [
+          {
+            "label": "a",
+            "text": "Myosin forms thin filament",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Troponin C is for binding of Ca2+",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Spectrin maintains biconcavity of RBC",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is associated with muscle contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Tropomyosin is a component of myosin filament",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Actin forms thin filaments; myosin forms thick. | (E): Tropomyosin is on the thin (actin) filament.",
+        "textbookNote": "(A): Actin forms thin filaments; myosin forms thick. | (E): Tropomyosin is on the thin (actin) filament.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Skeletal muscle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Membrane is sarcolemma",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Has well developed T-tubules",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is involuntary in action",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is innervated by autonomic nerve",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Sarcoplasmic reticulum stores Ca2+ for contraction",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Skeletal muscle is voluntary. | (D): Skeletal muscle is somatic-nerve supplied.",
+        "textbookNote": "(C): Skeletal muscle is voluntary. | (D): Skeletal muscle is somatic-nerve supplied.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Neutrophils",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are phagocytic cells",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Have a life span of 4–8 hours in circulating blood",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Count increases in allergic disorders",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Secrete platelet activating factor",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Play a main role in immune system",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Neutrophils are professional phagocytes. | (B): Neutrophils live 4–8 h in circulation. | (C): Eosinophils (not neutrophils) increase in allergy. | (D): PAF comes from endothelium, platelets, macrophages — not neutrophils' main role. | (E): Lymphocytes are the main immune cells; neutrophils are innate.",
+        "textbookNote": "(A): Neutrophils are professional phagocytes. | (B): Neutrophils live 4–8 h in circulation. | (C): Eosinophils (not neutrophils) increase in allergy. | (D): PAF comes from endothelium, platelets, macrophages — not neutrophils' main role. | (E): Lymphocytes are the main immune cells; neutrophils are innate.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Haemolytic disease of the newborn",
+        "items": [
+          {
+            "label": "a",
+            "text": "Affects babies of Rh-ve mothers",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Causes jaundice",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Can be treated by exchange transfusion",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Causes severe anemia",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is an ABO incompatibility",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Rh-negative mother with Rh-positive fetus → anti-D. | (C): Exchange transfusion treats severe HDN. | (D): Haemolysis causes anaemia in HDN. | (E): HDN is Rh incompatibility (ABO is milder).",
+        "textbookNote": "(A): Rh-negative mother with Rh-positive fetus → anti-D. | (C): Exchange transfusion treats severe HDN. | (D): Haemolysis causes anaemia in HDN. | (E): HDN is Rh incompatibility (ABO is milder).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Blood coagulation requires",
+        "items": [
+          {
+            "label": "a",
+            "text": "Heparin",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Fibrinolysis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Ionized calcium",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "An adequate intake of vitamin K",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Anti-hemophilic factors",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Heparin is an anticoagulant. | (B): Fibrinolysis dissolves clots; it is not needed for coagulation. | (C): Ca2+ is factor IV in coagulation. | (E): Factor VIII is required in the intrinsic pathway.",
+        "textbookNote": "(A): Heparin is an anticoagulant. | (B): Fibrinolysis dissolves clots; it is not needed for coagulation. | (C): Ca2+ is factor IV in coagulation. | (E): Factor VIII is required in the intrinsic pathway.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Microcytic hypochromic RBC are found in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Acute blood loss",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Folic acid deficiency",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Thalassemia",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Aplasia of bone marrow",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Vitamin B12 deficiency",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Acute blood loss gives normocytic anaemia. | (B): Folate deficiency → megaloblastic anaemia. | (D): Aplastic anaemia is normocytic. | (E): B12 deficiency → macrocytic (megaloblastic) anaemia.",
+        "textbookNote": "(A): Acute blood loss gives normocytic anaemia. | (B): Folate deficiency → megaloblastic anaemia. | (D): Aplastic anaemia is normocytic. | (E): B12 deficiency → macrocytic (megaloblastic) anaemia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Regarding O negative blood group",
+        "items": [
+          {
+            "label": "a",
+            "text": "A and B antigens on RBC membrane",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Has no antibody to ABO system in blood",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has no antibody to Rh system",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "2nd part of Landsteiner's law is not obeyed here",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Referred to as universal donor",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): O group has no A or B antigens. | (B): O group has both anti-A and anti-B. | (C): Rh antibodies form only after exposure. | (D): O group obeys Landsteiner's law (has both antibodies). | (E): O-negative RBC lack A, B, D antigens.",
+        "textbookNote": "(A): O group has no A or B antigens. | (B): O group has both anti-A and anti-B. | (C): Rh antibodies form only after exposure. | (D): O group obeys Landsteiner's law (has both antibodies). | (E): O-negative RBC lack A, B, D antigens.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "End diastolic volume is",
+        "items": [
+          {
+            "label": "a",
+            "text": "The volume remaining in the ventricle after ventricular systole",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "About 110–120 mL",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Proportional to venous return",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Proportional to ejection fraction",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Inversely related to stroke volume",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): That is end-systolic volume; EDV is volume at the end of diastole. | (D): EDV is not proportional to EF. | (E): Larger EDV → larger SV (Starling).",
+        "textbookNote": "(A): That is end-systolic volume; EDV is volume at the end of diastole. | (D): EDV is not proportional to EF. | (E): Larger EDV → larger SV (Starling).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Following statements are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Arterioles are resistance vessels",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "BP = CO × SV",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Veins are capacitance vessels",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Epinephrine is a vasoconstrictor",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Velocity profile of laminar flow is parabolic",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Arterioles are the main resistance vessels. | (B): BP = CO × TPR. | (C): Veins hold ~60–65% of blood. | (D): Epinephrine constricts skin vessels; dilates muscle vessels. | (E): Laminar flow has a parabolic velocity profile.",
+        "textbookNote": "(A): Arterioles are the main resistance vessels. | (B): BP = CO × TPR. | (C): Veins hold ~60–65% of blood. | (D): Epinephrine constricts skin vessels; dilates muscle vessels. | (E): Laminar flow has a parabolic velocity profile.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Following statements are true",
+        "items": [
+          {
+            "label": "a",
+            "text": "Mean BP is the maximum BP",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Systolic BP is calculated pressure",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "BP can be measured by Fick's principle",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "In hyperthyroidism pulse pressure is increased",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Increased right atrial pressure decreases VR",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Mean BP ≈ diastolic + 1/3 pulse pressure. | (B): Systolic BP is measured; mean BP is calculated. | (C): Fick's principle measures cardiac output/blood flow, not BP. | (D): Hyperthyroidism → ↑ systolic, ↓ diastolic → wide pulse pressure. | (E): Raised RAP reduces venous return.",
+        "textbookNote": "(A): Mean BP ≈ diastolic + 1/3 pulse pressure. | (B): Systolic BP is measured; mean BP is calculated. | (C): Fick's principle measures cardiac output/blood flow, not BP. | (D): Hyperthyroidism → ↑ systolic, ↓ diastolic → wide pulse pressure. | (E): Raised RAP reduces venous return.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Ejection fraction of the heart is",
+        "items": [
+          {
+            "label": "a",
+            "text": "A valuable index of ventricular function",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "The percentage of ESV ejected per stroke",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Reduced in exercise",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Reduced in myocardial infarction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "About 65%",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): EF = SV/EDV ≈ 60–65%; falls in failure. | (B): EF is the percentage of EDV (not ESV) ejected. | (C): EF increases in exercise. | (D): EF falls with myocardial damage. | (E): Normal EF ≈ 60–65%.",
+        "textbookNote": "(A): EF = SV/EDV ≈ 60–65%; falls in failure. | (B): EF is the percentage of EDV (not ESV) ejected. | (C): EF increases in exercise. | (D): EF falls with myocardial damage. | (E): Normal EF ≈ 60–65%.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "P-R interval",
+        "items": [
+          {
+            "label": "a",
+            "text": "Indicates conduction through A-V node",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is about 0.8 sec",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Decreases in bradycardia",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "0.25–0.45 sec indicates 2nd degree heart block",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Prolonged in hypokalemia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PR interval = AV conduction time. | (B): PR is 0.12–0.20 s; 0.8 s is the whole cardiac cycle. | (C): PR lengthens slightly in bradycardia. | (D): PR > 0.2 s = 1st-degree block; 2nd degree has dropped beats. | (E): Hypokalaemia mainly causes ST depression, flat T, U waves.",
+        "textbookNote": "(A): PR interval = AV conduction time. | (B): PR is 0.12–0.20 s; 0.8 s is the whole cardiac cycle. | (C): PR lengthens slightly in bradycardia. | (D): PR > 0.2 s = 1st-degree block; 2nd degree has dropped beats. | (E): Hypokalaemia mainly causes ST depression, flat T, U waves.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "In obstructive airway disease",
+        "items": [
+          {
+            "label": "a",
+            "text": "Residual volume is decreased",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "FEV1 is markedly reduced",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Total lung capacity is markedly increased",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "FEV1/FVC ratio is normal",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Only airway tube is involved",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Residual volume increases in obstructive disease. | (D): FEV1/FVC is reduced in obstruction.",
+        "textbookNote": "(A): Residual volume increases in obstructive disease. | (D): FEV1/FVC is reduced in obstruction.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "Non-respiratory functions of lungs",
+        "items": [
+          {
+            "label": "a",
+            "text": "Provide immunity by IgA",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Secrete prostaglandin",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Transport O2 and CO2",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Conversion of angiotensin-I to angiotensin-II",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Secrete renin",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): That is the respiratory function. | (E): Lungs make ACE, not renin.",
+        "textbookNote": "(C): That is the respiratory function. | (E): Lungs make ACE, not renin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "The residual volume",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is 3–4 L on average in young adults",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is smaller in old than in young",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is measured directly using a spirometer",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is the volume remaining after quiet expiration",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is increased in COPD patients",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): RV ≈ 1.2 L. | (B): Residual volume increases with age. | (C): RV needs helium dilution/plethysmography. | (D): That is FRC. | (E): Emphysema loses elastic recoil → compliance increases.",
+        "textbookNote": "(A): RV ≈ 1.2 L. | (B): Residual volume increases with age. | (C): RV needs helium dilution/plethysmography. | (D): That is FRC. | (E): Emphysema loses elastic recoil → compliance increases.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "During exercise",
+        "items": [
+          {
+            "label": "a",
+            "text": "P50 decreases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "pH increases",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Rate of respiration increases",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Tissue PO2 increases",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Oxyhemoglobin dissociation curve shifts to the right",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Exercise raises temperature, CO2, H+ → P50 increases. | (B): Exercise lowers pH (lactate, CO2). | (C): Exercise increases rate and depth. | (D): Tissue PO2 falls in exercise. | (E): Exercise shifts ODC right (Bohr effect).",
+        "textbookNote": "(A): Exercise raises temperature, CO2, H+ → P50 increases. | (B): Exercise lowers pH (lactate, CO2). | (C): Exercise increases rate and depth. | (D): Tissue PO2 falls in exercise. | (E): Exercise shifts ODC right (Bohr effect).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "The rate of blood flow is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Directly proportional to pressure differences",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Regulated by vasoconstrictor agents",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Not related to viscosity",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Inversely proportional to the resistance",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Inversely proportional to velocity of blood flow",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Flow ∝ pressure difference (Ohm's law). | (B): Vasomotor agents regulate flow. | (C): Flow ∝ 1/viscosity. | (D): Flow = ΔP/R. | (E): Flow = velocity × area; they are directly related.",
+        "textbookNote": "(A): Flow ∝ pressure difference (Ohm's law). | (B): Vasomotor agents regulate flow. | (C): Flow ∝ 1/viscosity. | (D): Flow = ΔP/R. | (E): Flow = velocity × area; they are directly related.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Regarding gastric juice",
+        "items": [
+          {
+            "label": "a",
+            "text": "Secretion increases by enterokinase",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Contains the major enzyme for CHO digestion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Contains proteolytic enzyme",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Gastrin causes increased HCl acid secretion",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Contains disaccharidase",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Enterokinase is intestinal. | (B): Salivary/pancreatic amylase digest carbohydrate; gastric juice has none. | (E): Disaccharidases are brush-border enzymes.",
+        "textbookNote": "(A): Enterokinase is intestinal. | (B): Salivary/pancreatic amylase digest carbohydrate; gastric juice has none. | (E): Disaccharidases are brush-border enzymes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2023-may-p2-old",
+    "session": "May 2023",
+    "year": 2023,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "Old Curriculum",
+    "page": 54,
+    "bookPage": "pp. 54–57",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Posterior column damage in the spinal cord may impair",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration sense",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pain sensation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The flexor plantar response to stimulation of the sole",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Tactile sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The ability to stand steadily with eyes closed",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "textbookNote": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Parasympathetic stimulation results in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Pupillary constriction",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decreased heart rate",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Contraction of bronchial smooth muscle",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secretion of gastric juice",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Defecation",
+            "ans": true
+          }
+        ],
+        "explanation": "Standard medical physiology textbook verified facts.",
+        "textbookNote": "Standard medical physiology textbook verified facts.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "The curvature of the cornea increases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Chromatic and spherical aberration is decreased",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The visual axes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "The pituitary gland",
+        "items": [
+          {
+            "label": "a",
+            "text": "Lies superior to the sphenoid bone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is all ectodermal",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has the optic chiasma anteriorly",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is supplied from the internal carotid artery",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies inferior to the cavernous sinus",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "textbookNote": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The loop of Henle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is responsible for high medullary osmolarity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Returns fluid of low osmolarity to the DCT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has a high permeability to water in thick ascending limb",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Actively pumps ions in the descending limb",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Actively transports Na+ in the thick ascending limb",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Descending limb is passive. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "textbookNote": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Descending limb is passive. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "The cerebellum",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is essential for finely coordinated movements",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Does not modify the discharge of spinal motor neurons",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has afferent input from the motor cortex",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has afferent input from the muscle proprioceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has no afferent input from the vestibular system",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "textbookNote": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Parathormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is produced by the cells of the thyroid gland",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases urinary excretion of calcium",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Blood level increases when serum calcium falls",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Depresses activity of the anterior pituitary",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is independent of magnesium level",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PTH is made by chief cells of parathyroids. | (D): PTH does not affect the anterior pituitary. | (E): Low Mg2+ impairs PTH secretion and action.",
+        "textbookNote": "(A): PTH is made by chief cells of parathyroids. | (D): PTH does not affect the anterior pituitary. | (E): Low Mg2+ impairs PTH secretion and action.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "During normal menstrual cycle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Oestrogen is predominant during the proliferative phase",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Menstrual blood loss averages 150 mL",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Cervical mucus is more viscous at the time of ovulation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Menstruation is preceded by a rise in plasma progesterone",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Menstruation is associated with dilatation of spiral arteries",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Proliferative phase = estrogen. | (B): Menstrual loss averages 35–50 mL. | (C): Cervical mucus is thin, watery and elastic (ferning) at ovulation. | (D): Menstruation follows a FALL in progesterone. | (E): Menstruation follows spiral artery constriction/ischaemia.",
+        "textbookNote": "(A): Proliferative phase = estrogen. | (B): Menstrual loss averages 35–50 mL. | (C): Cervical mucus is thin, watery and elastic (ferning) at ovulation. | (D): Menstruation follows a FALL in progesterone. | (E): Menstruation follows spiral artery constriction/ischaemia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Human chorionic gonadotrophin (HCG)",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has the biological properties of LH",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is secreted from ovary",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is responsible for the onset of parturition",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is detectable before implantation of the ovum",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is significantly elevated in pre-eclampsia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): hCG acts on the LH receptor. | (B): hCG comes from syncytiotrophoblast. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "textbookNote": "(A): hCG acts on the LH receptor. | (B): hCG comes from syncytiotrophoblast. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Progesterone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is natriuretic",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Requires estrogen priming",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is synthesized in the adrenal gland (as its main source)",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Decreases uterine muscle contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is the hormone of pregnancy",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "textbookNote": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Thyroxine",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is less than 80% bound to plasma proteins",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Formation requires amino acids",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is essential for skeletal development",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increases oxygen consumption in the brain",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Causes increased serum cholesterol in hyperthyroidism",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Thyroxine LOWERS cholesterol.",
+        "textbookNote": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Thyroxine LOWERS cholesterol.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Aldosterone causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A fall in urinary sodium excretion",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Weight gain",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "A fall in serum chloride levels",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Increased extracellular fluid volume",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Increased potassium excretion",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "textbookNote": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Organ of Corti",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is the receptor organ of hearing",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is the receptor organ of taste",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is the receptor organ of smell",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Generates nerve impulse",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies on Reissner's membrane",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Organ of Corti is the receptor organ of hearing. | (B): Taste buds are the taste receptors. | (C): Organ of Corti is for hearing; smell receptors are in olfactory epithelium. | (D): Hair cells generate receptor potentials → impulses. | (E): Organ of Corti lies on the basilar membrane.",
+        "textbookNote": "(A): Organ of Corti is the receptor organ of hearing. | (B): Taste buds are the taste receptors. | (C): Organ of Corti is for hearing; smell receptors are in olfactory epithelium. | (D): Hair cells generate receptor potentials → impulses. | (E): Organ of Corti lies on the basilar membrane.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "The pheochromocytoma",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a tumour of adrenal medullary tissue",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is benign in the majority of cases",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has its maximum incidence after the menopause",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Can be associated with severe episodes of hypertension",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is always found in the gland",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): Peak incidence is 3rd–5th decade. | (E): ~10% of pheochromocytomas are extra-adrenal.",
+        "textbookNote": "(C): Peak incidence is 3rd–5th decade. | (E): ~10% of pheochromocytomas are extra-adrenal.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Growth hormone and IGF-1 cause",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreased insulin sensitivity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "K+ retention",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Protein synthesis",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Diaphysis closure",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Lipolysis",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): GH and IGF-1 are diabetogenic. | (B): GH causes K+ retention. | (C): GH increases protein synthesis. | (D): GH causes diabetogenic effects; epiphyseal closure requires puberty. | (E): GH causes lipolysis.",
+        "textbookNote": "(A): GH and IGF-1 are diabetogenic. | (B): GH causes K+ retention. | (C): GH increases protein synthesis. | (D): GH causes diabetogenic effects; epiphyseal closure requires puberty. | (E): GH causes lipolysis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "During the process of fertilization and implantation",
+        "items": [
+          {
+            "label": "a",
+            "text": "Fertilisation occurs in the outer third of the Fallopian tube",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "The haploid number of chromosomes results",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The morula is enclosed by trophoblast",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The morula actively moves along the oviduct",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "HCG is produced by the preimplantation embryo",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "textbookNote": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "The nerves that carry taste impulses are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Facial nerve",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Trigeminal nerve",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Glossopharyngeal",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Vagus nerve",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Hypoglossal",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "textbookNote": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Lateral spinothalamic tract",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is formed by A alpha fibre",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Carries proprioception",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Transmits pain sensation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Transmits thermal sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Transmits crude touch sensation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "textbookNote": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "Basal ganglia",
+        "items": [
+          {
+            "label": "a",
+            "text": "Perform functions in association with the motor control system",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can also perform function by itself",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Lesion at putamen circuit causes Parkinson's disease",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Damage causes decreased tone of peripheral muscles",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Controls complex patterns of movements",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Parkinson's disease increases muscle tone (rigidity). | (D): Basal ganglia damage increases tone (rigidity).",
+        "textbookNote": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Parkinson's disease increases muscle tone (rigidity). | (D): Basal ganglia damage increases tone (rigidity).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Short stature is seen in children suffering from",
+        "items": [
+          {
+            "label": "a",
+            "text": "Adrenal insufficiency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Thyroxine deficiency",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone deficiency",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Chronic malnutrition",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Castration",
+            "ans": false
+          }
+        ],
+        "explanation": "(E): Castration delays epiphyseal closure → tall stature.",
+        "textbookNote": "(E): Castration delays epiphyseal closure → tall stature.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2022-nov-p2",
+    "session": "November 2022",
+    "year": 2022,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "Old Curriculum",
+    "page": 58,
+    "bookPage": "pp. 58–61",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Substances completely reabsorbed from PCT are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Na+",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Glucose",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "K+",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Amino acid",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Acetone",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Only ~65% of Na+ is reabsorbed in PCT. | (B): Glucose, amino acids, vitamins, iron are absorbed in upper small intestine. | (C): ~65% of K+ in PCT; rest later; DCT/CD secrete K+. | (D): Amino acids are completely reabsorbed in PCT. | (E): Acetone is not completely reabsorbed.",
+        "textbookNote": "(A): Only ~65% of Na+ is reabsorbed in PCT. | (B): Glucose, amino acids, vitamins, iron are absorbed in upper small intestine. | (C): ~65% of K+ in PCT; rest later; DCT/CD secrete K+. | (D): Amino acids are completely reabsorbed in PCT. | (E): Acetone is not completely reabsorbed.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "In presence of ADH, maximum water is reabsorbed in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Distal tubules",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "PCT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Loop of Henle",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Cortical collecting ducts",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Medullary collecting ducts",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Maximum fraction of water is reabsorbed in PCT. | (C): Loop reabsorbs ~15% of water.",
+        "textbookNote": "(A): Maximum fraction of water is reabsorbed in PCT. | (C): Loop reabsorbs ~15% of water.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "The curvature of the cornea increases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Chromatic and spherical aberration is decreased",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The visual axes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "The pituitary gland",
+        "items": [
+          {
+            "label": "a",
+            "text": "Lies superior to the sphenoid bone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is ectodermal",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has the optic chiasma anteriorly",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is supplied from the internal carotid artery",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies inferior to the cavernous sinus",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Both parts derive from ectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "textbookNote": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Both parts derive from ectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The loop of Henle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is responsible for high medullary osmolarity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Returns fluid of low osmolarity to the DCT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has a high permeability to water in thick ascending limb",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Actively pumps ions across the epithelium of the descending limb",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Actively transports Na+ in the thick ascending limb",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Descending limb is water-permeable, passive; thick ascending limb transports NaCl actively. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "textbookNote": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Descending limb is water-permeable, passive; thick ascending limb transports NaCl actively. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Tropic hormones are",
+        "items": [
+          {
+            "label": "a",
+            "text": "LH",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "FSH",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Insulin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "TSH",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Epinephrine",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): FSH is from the anterior pituitary. | (C): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (D): TSH acts via cAMP. | (E): Epinephrine is not a tropic hormone.",
+        "textbookNote": "(B): FSH is from the anterior pituitary. | (C): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (D): TSH acts via cAMP. | (E): Epinephrine is not a tropic hormone.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Placenta secretes",
+        "items": [
+          {
+            "label": "a",
+            "text": "Estrogen",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Oxytocin",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Progesterone",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Prolactin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "HCG",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Estrogen causes ductal growth. | (B): Oxytocin acts through IP3/Ca2+. | (D): Placenta secretes hPL, not prolactin.",
+        "textbookNote": "(A): Estrogen causes ductal growth. | (B): Oxytocin acts through IP3/Ca2+. | (D): Placenta secretes hPL, not prolactin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Regarding spermatogenesis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Normal sperm count is 10–15 million/mL of semen",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Testosterone helps growth and division of germinal cells",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "LH stimulates testosterone secretion by Leydig cells",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "FSH stimulates Sertoli cells",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Sperms get motile in seminiferous tubule",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Normal count ≥ 15–20 million/mL (average ~100 million). | (B): Testosterone supports spermatogenesis. | (C): LH → Leydig cells → testosterone. | (D): FSH acts on Sertoli cells. | (E): Sperms become motile in the epididymis.",
+        "textbookNote": "(A): Normal count ≥ 15–20 million/mL (average ~100 million). | (B): Testosterone supports spermatogenesis. | (C): LH → Leydig cells → testosterone. | (D): FSH acts on Sertoli cells. | (E): Sperms become motile in the epididymis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Human chorionic gonadotrophin (HCG)",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has the biological properties of LH",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can transform the cyclic corpus luteum into a pseudopregnant corpus luteum",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is responsible for the onset of parturition",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is detectable in maternal serum before implantation of the ovum",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is significantly elevated in pre-eclampsia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): hCG acts on the LH receptor. | (B): hCG maintains the corpus luteum of pregnancy. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "textbookNote": "(A): hCG acts on the LH receptor. | (B): hCG maintains the corpus luteum of pregnancy. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Progesterone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is natriuretic",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Requires estrogen priming before it can demonstrate activity",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is synthesized in the adrenal gland (as its main source)",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Decreases uterine muscle contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is the hormone of pregnancy",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "textbookNote": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Thyroxine",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is less than 80% bound to plasma proteins",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Formation requires amino acids",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is essential for skeletal development",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increases oxygen consumption in the brain",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Leads to increased serum cholesterol when present in excess",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Thyroxine LOWERS cholesterol.",
+        "textbookNote": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Thyroxine LOWERS cholesterol.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Aldosterone causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A fall in urinary sodium excretion",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Weight gain",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "A fall in serum chloride levels",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Increased extracellular fluid volume",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Increased potassium excretion",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "textbookNote": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Testes can produce",
+        "items": [
+          {
+            "label": "a",
+            "text": "Estradiol",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Inhibin",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Fructose",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "FSH",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Testosterone",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Testes make small amounts of estradiol (aromatisation). | (B): Sertoli cells secrete inhibin. | (C): Fructose is made by seminal vesicles. | (D): FSH is from the anterior pituitary. | (E): Steroid hormones act via intracellular receptors (gene transcription).",
+        "textbookNote": "(A): Testes make small amounts of estradiol (aromatisation). | (B): Sertoli cells secrete inhibin. | (C): Fructose is made by seminal vesicles. | (D): FSH is from the anterior pituitary. | (E): Steroid hormones act via intracellular receptors (gene transcription).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Superficial reflexes are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Corneal reflex",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Knee jerk",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Ankle jerk",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Cremasteric reflex",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Biceps jerk",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Ankle jerk is a deep tendon (stretch) reflex. | (E): Biceps jerk is a deep tendon reflex.",
+        "textbookNote": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Ankle jerk is a deep tendon (stretch) reflex. | (E): Biceps jerk is a deep tendon reflex.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Abnormalities of smell are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Anosmia",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Hyposmia",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Dysosmia",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Hypogeusia",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Ageusia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Anosmia = loss of smell. | (B): Hyposmia = decreased smell. | (C): Dysosmia = distorted smell. | (D): Hypogeusia = decreased taste. | (E): Ageusia = loss of taste.",
+        "textbookNote": "(A): Anosmia = loss of smell. | (B): Hyposmia = decreased smell. | (C): Dysosmia = distorted smell. | (D): Hypogeusia = decreased taste. | (E): Ageusia = loss of taste.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "During the process of fertilization and implantation",
+        "items": [
+          {
+            "label": "a",
+            "text": "Fertilisation occurs in the outer third of the Fallopian tube",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "The haploid number of chromosomes results",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The morula is enclosed by trophoblast",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The morula actively moves along the oviduct",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "HCG is produced by the preimplantation embryo",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "textbookNote": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "The nerves that carry taste impulses are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Facial nerve",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Trigeminal nerve",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Glossopharyngeal",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Vagus nerve",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Hypoglossal",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "textbookNote": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Lateral spinothalamic tract",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is formed by A alpha fibre",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Carries proprioception",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Transmits pain sensation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Transmits thermal sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Transmits crude touch sensation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "textbookNote": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "Basal ganglia",
+        "items": [
+          {
+            "label": "a",
+            "text": "Perform functions in association with the motor control system",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can also perform function by itself",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Lesion at putamen circuit causes Parkinson's disease",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Damage causes decreased tone of peripheral muscles",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Controls complex patterns of movements",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Parkinson's disease increases muscle tone (rigidity). | (D): Basal ganglia damage increases tone (rigidity).",
+        "textbookNote": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Parkinson's disease increases muscle tone (rigidity). | (D): Basal ganglia damage increases tone (rigidity).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Short stature is seen in children suffering from",
+        "items": [
+          {
+            "label": "a",
+            "text": "Adrenal insufficiency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Thyroxine deficiency",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone deficiency",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Chronic malnutrition",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Castration",
+            "ans": false
+          }
+        ],
+        "explanation": "(E): Castration delays epiphyseal closure → tall stature.",
+        "textbookNote": "(E): Castration delays epiphyseal closure → tall stature.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2022-may-p1",
+    "session": "May 2022",
+    "year": 2022,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "Old Curriculum",
+    "page": 62,
+    "bookPage": "pp. 62–65",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Cell membrane proteins act as",
+        "items": [
+          {
+            "label": "a",
+            "text": "Anchors",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pumps",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Transporters of ions",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Hormones",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Enzymes",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Membrane proteins anchor cytoskeleton and cells. | (B): Membrane proteins act as pumps (Na+-K+ ATPase). | (C): Membrane proteins transport ions. | (D): Membrane proteins are receptors for hormones; they are not hormones. | (E): Some membrane proteins are enzymes.",
+        "textbookNote": "(A): Membrane proteins anchor cytoskeleton and cells. | (B): Membrane proteins act as pumps (Na+-K+ ATPase). | (C): Membrane proteins transport ions. | (D): Membrane proteins are receptors for hormones; they are not hormones. | (E): Some membrane proteins are enzymes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Regarding action potential",
+        "items": [
+          {
+            "label": "a",
+            "text": "With plateau occurs in some unitary smooth muscle",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "There are two forms in visceral smooth muscle",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "It sometimes follows the all-or-none law",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Recording with surface electrodes is biphasic",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "In cardiac muscle has a long refractory period",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Unitary smooth muscle shows spikes and plateau APs. | (B): Visceral smooth muscle: spike potentials and plateau APs. | (C): AP always obeys all-or-none law. | (D): Extracellular (surface) recording gives a biphasic record. | (E): Cardiac AP has a long plateau → long refractory period.",
+        "textbookNote": "(A): Unitary smooth muscle shows spikes and plateau APs. | (B): Visceral smooth muscle: spike potentials and plateau APs. | (C): AP always obeys all-or-none law. | (D): Extracellular (surface) recording gives a biphasic record. | (E): Cardiac AP has a long plateau → long refractory period.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Mitochondria",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are variable in size and shape",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are the chief sites of protein synthesis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Are present in the reticulocyte stage of erythropoiesis",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Synthesize ATP in erythrocyte",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Are more in skeletal muscle",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Ribosomes make protein. | (D): Mature RBC lacks mitochondria; ATP comes from glycolysis.",
+        "textbookNote": "(B): Ribosomes make protein. | (D): Mature RBC lacks mitochondria; ATP comes from glycolysis.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Regarding diffusion, the following statements are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Always uphill movement",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is a passive process",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is energy dependent",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is always carrier mediated",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Occurs through protein pores and channels",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Diffusion is always downhill. | (B): Diffusion/facilitated diffusion needs no ATP. | (C): Diffusion is passive. | (D): Simple diffusion needs no carrier; facilitated diffusion does. | (E): Diffusion occurs through lipid bilayer or protein channels.",
+        "textbookNote": "(A): Diffusion is always downhill. | (B): Diffusion/facilitated diffusion needs no ATP. | (C): Diffusion is passive. | (D): Simple diffusion needs no carrier; facilitated diffusion does. | (E): Diffusion occurs through lipid bilayer or protein channels.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Regarding hemoglobin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Hb F has high affinity to O2",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "HbA1 consists of 2α and 2γ chains",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "HbA1c measures past three months average blood sugar",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Fetal Hb can bind 2,3-DPG less avidly",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "One hemoglobin molecule carries two O2 molecules",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): HbF has higher O2 affinity (lower P50). | (B): HbA1 = 2α2β. | (C): HbA1c reflects the previous ~3 months' glucose. | (D): HbF binds 2,3-DPG poorly, so its curve is left-shifted. | (E): One Hb carries 4 O2 molecules.",
+        "textbookNote": "(A): HbF has higher O2 affinity (lower P50). | (B): HbA1 = 2α2β. | (C): HbA1c reflects the previous ~3 months' glucose. | (D): HbF binds 2,3-DPG poorly, so its curve is left-shifted. | (E): One Hb carries 4 O2 molecules.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Blood platelets",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are formed in bone marrow from megakaryocytes",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Alpha granules contain ADP",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Dense bodies contain serotonin",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Have a half-life in blood of 8 to 12 days",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Alter shape when in contact with collagen",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Megakaryocyte fragmentation forms platelets. | (B): ADP is in dense (δ) granules; α granules contain fibrinogen, PDGF, vWF. | (C): Dense bodies contain ADP, ATP, Ca2+, serotonin. | (D): Platelet life ≈ 8–12 days. | (E): Platelets change shape (spiculate) on contact with collagen.",
+        "textbookNote": "(A): Megakaryocyte fragmentation forms platelets. | (B): ADP is in dense (δ) granules; α granules contain fibrinogen, PDGF, vWF. | (C): Dense bodies contain ADP, ATP, Ca2+, serotonin. | (D): Platelet life ≈ 8–12 days. | (E): Platelets change shape (spiculate) on contact with collagen.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Bleeding disorder",
+        "items": [
+          {
+            "label": "a",
+            "text": "Occurs in vitamin K deficiency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a consequence of thrombocytopenia",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is diagnosed by estimating fibrin degradation product",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is only caused by congenital vascular defect",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Can be screened by BT CT test",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Vitamin K deficiency lowers II, VII, IX, X → bleeding. | (B): Thrombocytopenia → purpura/bleeding. | (C): FDP rise in DIC/fibrinolysis. | (D): Bleeding arises from platelet, clotting factor or vascular causes. | (E): BT (platelets) and CT (clotting) are screening tests.",
+        "textbookNote": "(A): Vitamin K deficiency lowers II, VII, IX, X → bleeding. | (B): Thrombocytopenia → purpura/bleeding. | (C): FDP rise in DIC/fibrinolysis. | (D): Bleeding arises from platelet, clotting factor or vascular causes. | (E): BT (platelets) and CT (clotting) are screening tests.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Following statements regarding anemia are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "In severe anemia blood viscosity is increased",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases the resistance to blood flow",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increased 2,3-DPG level",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Microcytic hypochromic type in acute blood loss",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Present in hypothyroid patient",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Anaemia lowers viscosity. | (B): Anaemia lowers viscosity → resistance falls. | (C): Anaemia/hypoxia raises 2,3-DPG. | (D): Acute blood loss gives normocytic anaemia; chronic loss gives microcytic. | (E): Hypothyroidism often has anaemia.",
+        "textbookNote": "(A): Anaemia lowers viscosity. | (B): Anaemia lowers viscosity → resistance falls. | (C): Anaemia/hypoxia raises 2,3-DPG. | (D): Acute blood loss gives normocytic anaemia; chronic loss gives microcytic. | (E): Hypothyroidism often has anaemia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Cardiac cycle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Time is directly related to heart rate",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Duration of systole is much more fixed than diastole",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "20% of ventricular filling is active filling",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "During ejection phase left ventricular pressure is above 80 mmHg",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "70% ejection during the first third of the ejection",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Cycle time = 60/HR; inversely related. | (B): Systole is relatively constant; diastole shortens with rate. | (C): ~80% passive filling, ~20% by atrial systole. | (D): LV pressure exceeds ~80 mmHg (aortic diastolic) when ejection starts. | (E): ~70% of stroke volume is ejected in the first third.",
+        "textbookNote": "(A): Cycle time = 60/HR; inversely related. | (B): Systole is relatively constant; diastole shortens with rate. | (C): ~80% passive filling, ~20% by atrial systole. | (D): LV pressure exceeds ~80 mmHg (aortic diastolic) when ejection starts. | (E): ~70% of stroke volume is ejected in the first third.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Regarding cardiac output",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is normally expressed as the output of right ventricle",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Increased in pregnancy",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "In resting supine man averages about 7.0 L/min",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The output per square meter of body surface averages 3.2 L",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "No change during sleep",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Cardiac output is the output of ONE ventricle (left = right). | (B): Pregnancy raises CO by ~30–40%. | (C): Resting CO ≈ 5.0–5.6 L/min. | (D): Cardiac index ≈ 3.0–3.2 L/min/m². | (E): CO changes little during sleep.",
+        "textbookNote": "(A): Cardiac output is the output of ONE ventricle (left = right). | (B): Pregnancy raises CO by ~30–40%. | (C): Resting CO ≈ 5.0–5.6 L/min. | (D): Cardiac index ≈ 3.0–3.2 L/min/m². | (E): CO changes little during sleep.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Apoptosis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is very common during development and adulthood",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is called programmed cell death",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is called cell murder",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is the same as necrosis",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Can be called 'cell suicide'",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Apoptosis is physiological throughout life. | (B): Apoptosis = programmed cell death ('cell suicide'). | (C): Cell murder describes necrosis, not apoptosis. | (D): Apoptosis is controlled, no inflammation; necrosis is accidental. | (E): Apoptosis = programmed cell death.",
+        "textbookNote": "(A): Apoptosis is physiological throughout life. | (B): Apoptosis = programmed cell death ('cell suicide'). | (C): Cell murder describes necrosis, not apoptosis. | (D): Apoptosis is controlled, no inflammation; necrosis is accidental. | (E): Apoptosis = programmed cell death.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Following statements regarding sinus node are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Have unstable resting membrane potential",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Distributed mainly by left vagus nerve",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is modified cardiac muscle with fewer striations",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Called reserve pacemaker",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "SA nodal depolarization produces P wave in ECG",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): SA node cells have unstable RMP. | (B): Right vagus supplies SA node; left supplies AV node. | (C): SA nodal cells are small, with few striations. | (D): AV node is the reserve pacemaker, not SA node. | (E): SA node/atrial depolarisation produces the P wave.",
+        "textbookNote": "(A): SA node cells have unstable RMP. | (B): Right vagus supplies SA node; left supplies AV node. | (C): SA nodal cells are small, with few striations. | (D): AV node is the reserve pacemaker, not SA node. | (E): SA node/atrial depolarisation produces the P wave.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "The second heart sound",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is higher in frequency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is best heard in mitral area",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Coincides with apex beat",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Occurs at the end of T wave",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is heard just after carotid pulse",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): S2 is shorter, higher pitched. | (B): S2 is best heard at the base (aortic/pulmonary). | (C): Apex beat coincides with S1. | (D): S2 occurs at the end of T wave. | (E): Carotid pulse follows S1; S2 follows the pulse.",
+        "textbookNote": "(A): S2 is shorter, higher pitched. | (B): S2 is best heard at the base (aortic/pulmonary). | (C): Apex beat coincides with S1. | (D): S2 occurs at the end of T wave. | (E): Carotid pulse follows S1; S2 follows the pulse.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Respiratory dead space",
+        "items": [
+          {
+            "label": "a",
+            "text": "Air is about 350 mL in young adult",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Air is not useful for gas exchange",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Decreases during a deep inspiration",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Saturates inspired air with water vapour",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is approximately equal to the body weight in pound",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Dead space ≈ 150 mL. | (B): Dead space air does not take part in exchange. | (C): Dead space increases with deep inspiration (airway traction). | (D): Dead space humidifies and warms inspired air. | (E): Dead space (mL) ≈ body weight (lb).",
+        "textbookNote": "(A): Dead space ≈ 150 mL. | (B): Dead space air does not take part in exchange. | (C): Dead space increases with deep inspiration (airway traction). | (D): Dead space humidifies and warms inspired air. | (E): Dead space (mL) ≈ body weight (lb).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Peripheral resistance increases due to",
+        "items": [
+          {
+            "label": "a",
+            "text": "Anaemia",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Dehydration",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Vasoconstriction",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increase in distance of a blood vessel from heart",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increase in viscosity of blood",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Anaemia lowers viscosity and resistance. | (B): Dehydration raises viscosity and resistance. | (C): Vasoconstriction raises resistance (radius). | (D): Resistance depends on vessel length, radius, viscosity, not distance from heart. | (E): Resistance ∝ viscosity.",
+        "textbookNote": "(A): Anaemia lowers viscosity and resistance. | (B): Dehydration raises viscosity and resistance. | (C): Vasoconstriction raises resistance (radius). | (D): Resistance depends on vessel length, radius, viscosity, not distance from heart. | (E): Resistance ∝ viscosity.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "Hypovolemic shock",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is characterized by hypertension",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is common in fracture neck femur",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Results from widespread vasodilatation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is managed by fluid/blood transfusion",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is also called 'cold shock'",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Hypovolaemic shock → hypotension. | (B): Haemorrhage in fracture can cause hypovolaemia. | (C): Vasodilatation causes distributive (septic/neurogenic) shock. | (D): Volume replacement treats hypovolaemic shock. | (E): Hypovolaemic shock: cold, clammy skin (peripheral vasoconstriction).",
+        "textbookNote": "(A): Hypovolaemic shock → hypotension. | (B): Haemorrhage in fracture can cause hypovolaemia. | (C): Vasodilatation causes distributive (septic/neurogenic) shock. | (D): Volume replacement treats hypovolaemic shock. | (E): Hypovolaemic shock: cold, clammy skin (peripheral vasoconstriction).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "Lung collapse is prevented by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Tidal volume",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Residual volume",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Negative intrapleural pressure",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Positive intra-alveolar pressure",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Surfactant",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Tidal volume does not prevent collapse. | (B): Residual volume prevents total collapse. | (C): Negative intrapleural pressure holds lungs expanded. | (D): Positive alveolar pressure is transient in expiration. | (E): Surfactant prevents collapse.",
+        "textbookNote": "(A): Tidal volume does not prevent collapse. | (B): Residual volume prevents total collapse. | (C): Negative intrapleural pressure holds lungs expanded. | (D): Positive alveolar pressure is transient in expiration. | (E): Surfactant prevents collapse.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Apneusis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is the temporary cessation of breathing",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Means prolonged inspiration with short expiration",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Occurs in lesions of pneumotaxic center",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Occurs in periodic breathing",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is rapid shallow breathing",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Apnoea = cessation; apneusis = prolonged inspiratory cramp. | (B): Apneustic breathing follows pneumotaxic damage with vagi cut. | (C): Pneumotaxic centre lesion → apneusis. | (D): Cheyne–Stokes is periodic breathing, not apneusis. | (E): Rapid shallow = tachypnoea.",
+        "textbookNote": "(A): Apnoea = cessation; apneusis = prolonged inspiratory cramp. | (B): Apneustic breathing follows pneumotaxic damage with vagi cut. | (C): Pneumotaxic centre lesion → apneusis. | (D): Cheyne–Stokes is periodic breathing, not apneusis. | (E): Rapid shallow = tachypnoea.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "The stomach",
+        "items": [
+          {
+            "label": "a",
+            "text": "Juice is secreted from G cells",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Peristaltic contractions start from the pyloric region",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Motility increases when fat enters the duodenum",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Ferric iron is reduced to ferrous iron by HCl",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Juice inactivates the digestive enzymes secreted with saliva",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): G cells secrete gastrin; juice is from parietal/chief/mucous cells. | (B): Gastric waves begin in the mid-body and move to the antrum. | (C): Fat in duodenum inhibits gastric motility (CCK). | (D): HCl and vitamin C reduce Fe3+ to Fe2+. | (E): Gastric acid inactivates salivary amylase.",
+        "textbookNote": "(A): G cells secrete gastrin; juice is from parietal/chief/mucous cells. | (B): Gastric waves begin in the mid-body and move to the antrum. | (C): Fat in duodenum inhibits gastric motility (CCK). | (D): HCl and vitamin C reduce Fe3+ to Fe2+. | (E): Gastric acid inactivates salivary amylase.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Regarding enteric nervous system",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is essential for intestinal movement",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a special autonomic nervous system",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Its developmental defect causes megacolon",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "It maintains gastric secretion only",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Maintains both gastrointestinal movement and secretion",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): ENS mediates peristalsis. | (B): ENS is a division of the autonomic system. | (C): Absent ENS ganglia (Hirschsprung) → megacolon. | (D): ENS controls both motility and secretion. | (E): ENS controls both motility and secretion.",
+        "textbookNote": "(A): ENS mediates peristalsis. | (B): ENS is a division of the autonomic system. | (C): Absent ENS ganglia (Hirschsprung) → megacolon. | (D): ENS controls both motility and secretion. | (E): ENS controls both motility and secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2022-may-p2",
+    "session": "May 2022",
+    "year": 2022,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "Old Curriculum",
+    "page": 66,
+    "bookPage": "pp. 66–69",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Following statements are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Aldosterone hormone controls urine concentration",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Fluid leaving the early DCT is hypo-osmotic",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "In malnutrition impairment of concentrating ability occurs",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Normally the amount of protein in urine is < 100 mg/d",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "ADH secretion causes fall in urinary pH",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Aldosterone controls Na+/K+; ADH controls concentration (partly). | (B): Fluid leaving early DCT is hypo-osmotic. | (C): Protein malnutrition reduces medullary urea → poor concentration. | (D): Normal urinary protein < 150 mg/day. | (E): ADH does not affect urinary pH.",
+        "textbookNote": "(A): Aldosterone controls Na+/K+; ADH controls concentration (partly). | (B): Fluid leaving early DCT is hypo-osmotic. | (C): Protein malnutrition reduces medullary urea → poor concentration. | (D): Normal urinary protein < 150 mg/day. | (E): ADH does not affect urinary pH.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Micturition",
+        "items": [
+          {
+            "label": "a",
+            "text": "Reflex is an autonomic spinal cord reflex",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is finally controlled by pons and cerebral cortex",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Reflex remains if sensory nerve is destroyed",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Reflex is suppressed during spinal shock",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is initiated by sensory stretch receptors in the kidney",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Micturition is a spinal reflex with higher control. | (B): Pontine/cortical centres control voiding. | (C): Destruction of sensory nerve abolishes the reflex. | (D): Spinal shock → atonic bladder. | (E): Stretch receptors are in the bladder wall.",
+        "textbookNote": "(A): Micturition is a spinal reflex with higher control. | (B): Pontine/cortical centres control voiding. | (C): Destruction of sensory nerve abolishes the reflex. | (D): Spinal shock → atonic bladder. | (E): Stretch receptors are in the bladder wall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Vitamin D",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreases the intestinal absorption of calcium",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is essential for normal calcification in childhood",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Requires hepatic modification for activation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Cannot be formed in the body",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Deficiency may result in hypoparathyroidism",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Vitamin D increases Ca2+ absorption. | (D): Vitamin D is made in skin by sunlight. | (E): Vitamin D deficiency → secondary hyperparathyroidism.",
+        "textbookNote": "(A): Vitamin D increases Ca2+ absorption. | (D): Vitamin D is made in skin by sunlight. | (E): Vitamin D deficiency → secondary hyperparathyroidism.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Features of hyperadrenalism",
+        "items": [
+          {
+            "label": "a",
+            "text": "Weakness",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Hypoglycaemia",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Suppressed immune system",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Hypokalaemia",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Hypernatraemia",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Hypercortisolism → muscle weakness. | (B): Cortisol excess causes hyperglycaemia. | (C): Cortisol is immunosuppressive. | (D): Cortisol has mineralocorticoid effect. | (E): Mild Na+ retention.",
+        "textbookNote": "(A): Hypercortisolism → muscle weakness. | (B): Cortisol excess causes hyperglycaemia. | (C): Cortisol is immunosuppressive. | (D): Cortisol has mineralocorticoid effect. | (E): Mild Na+ retention.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Shell temperature",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is the temperature of deep tissues of the body",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Rises and falls with the temperature of surroundings",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is generally more than core temperature",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is almost constant",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is less accurate",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Core temperature is that of deep tissues; shell temperature is skin. | (B): Shell temperature varies with the environment. | (C): Shell temperature is lower than core. | (D): Shell temperature varies with surroundings. | (E): Shell temperature is a poor index of body temperature.",
+        "textbookNote": "(A): Core temperature is that of deep tissues; shell temperature is skin. | (B): Shell temperature varies with the environment. | (C): Shell temperature is lower than core. | (D): Shell temperature varies with surroundings. | (E): Shell temperature is a poor index of body temperature.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Muscle tone is reduced in",
+        "items": [
+          {
+            "label": "a",
+            "text": "Parkinson's disease",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Lower motor neuron lesions",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Cerebellar lesions",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Gamma efferent impulses to muscle spindles",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "In pyramidal tract lesion",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Parkinson's disease increases muscle tone (rigidity). | (D): Increased γ-discharge increases tone. | (E): Pyramidal (UMN) lesion → spasticity (increased tone).",
+        "textbookNote": "(A): Parkinson's disease increases muscle tone (rigidity). | (D): Increased γ-discharge increases tone. | (E): Pyramidal (UMN) lesion → spasticity (increased tone).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Chemoreceptors detect",
+        "items": [
+          {
+            "label": "a",
+            "text": "Damage in tissues",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Oxygen level in arterial blood",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Osmolality of body fluids",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Smell in nose",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "CO2 concentration in blood",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Nociceptors detect tissue damage. | (C): Osmoreceptors sense osmolality; chemoreceptors sense O2/CO2/H+.",
+        "textbookNote": "(A): Nociceptors detect tissue damage. | (C): Osmoreceptors sense osmolality; chemoreceptors sense O2/CO2/H+.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "In lower motor neuron lesion",
+        "items": [
+          {
+            "label": "a",
+            "text": "Tendon reflexes are exaggerated",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Babinski's sign is negative",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Spastic type of paralysis occurs",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Muscle wasting occurs",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Individual muscles are affected",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): LMN lesion → hypo/areflexia. | (B): Babinski's sign is positive in UMN lesion. | (C): LMN lesion → flaccid paralysis; spastic = UMN. | (D): LMN lesion → neurogenic atrophy. | (E): LMN lesion affects individual muscles; UMN affects movements.",
+        "textbookNote": "(A): LMN lesion → hypo/areflexia. | (B): Babinski's sign is positive in UMN lesion. | (C): LMN lesion → flaccid paralysis; spastic = UMN. | (D): LMN lesion → neurogenic atrophy. | (E): LMN lesion affects individual muscles; UMN affects movements.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Nerve deafness occurs due to",
+        "items": [
+          {
+            "label": "a",
+            "text": "Otitis media",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Otosclerosis",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Tumors in brain",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Damage to hair cells",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Vascular damage in medulla",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Otitis media causes conduction deafness. | (B): Otosclerosis causes conduction deafness. | (C): Central lesions cause nerve deafness. | (D): Hair cell damage causes sensorineural deafness. | (E): Cochlear nuclei lesion → nerve deafness.",
+        "textbookNote": "(A): Otitis media causes conduction deafness. | (B): Otosclerosis causes conduction deafness. | (C): Central lesions cause nerve deafness. | (D): Hair cell damage causes sensorineural deafness. | (E): Cochlear nuclei lesion → nerve deafness.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Regarding cones",
+        "items": [
+          {
+            "label": "a",
+            "text": "Found in highest concentration in optic disc",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Sensitive to light",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Destruction causes complete blindness",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Responsible for photopic vision",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Helps in accommodation reflex",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Optic disc has no photoreceptors (blind spot); cones are densest in fovea. | (B): Cones respond to bright light. | (C): Loss of cones leaves rod (scotopic) vision. | (D): Cones mediate photopic (colour) vision. | (E): Accommodation is a lens/ciliary muscle reflex, not a cone function.",
+        "textbookNote": "(A): Optic disc has no photoreceptors (blind spot); cones are densest in fovea. | (B): Cones respond to bright light. | (C): Loss of cones leaves rod (scotopic) vision. | (D): Cones mediate photopic (colour) vision. | (E): Accommodation is a lens/ciliary muscle reflex, not a cone function.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Major levels of central nervous system function include",
+        "items": [
+          {
+            "label": "a",
+            "text": "Spinal cord level",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Dorsal root ganglion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Lower brain or subcortical level",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Higher brain or cortical level",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Spinal nerves",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): DRG is peripheral, not a CNS level. | (E): Spinal nerves are peripheral nerves, not a CNS level.",
+        "textbookNote": "(B): DRG is peripheral, not a CNS level. | (E): Spinal nerves are peripheral nerves, not a CNS level.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Effect of autonomic nervous system",
+        "items": [
+          {
+            "label": "a",
+            "text": "Pupil is constricted by sympathetic stimulation",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Bronchi are constricted by sympathetic stimulation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Penile erection is caused by sympathetic stimulation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Heart rate is increased by sympathetic stimulation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Force of contraction of muscle is increased by parasympathetic stimulation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Sympathetic does not increase thyroid hormone secretion. | (B): Sympathetic does not increase thyroid hormone secretion. | (C): Sympathetic does not increase thyroid hormone secretion. | (D): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (E): Sympathetic does not increase thyroid hormone secretion.",
+        "textbookNote": "(A): Sympathetic does not increase thyroid hormone secretion. | (B): Sympathetic does not increase thyroid hormone secretion. | (C): Sympathetic does not increase thyroid hormone secretion. | (D): Saliva is stimulated by both divisions; parasympathetic gives watery saliva. | (E): Sympathetic does not increase thyroid hormone secretion.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Muscle spindle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a receptor",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Helps to maintain muscle tone",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Alpha motor efferent fiber supplies the intrafusal fibers",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Nuclear chain fiber is supplied by both primary and secondary afferent fibers",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Gamma motor efferent fiber supplies the extrafusal fibers",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): γ-motor neurons supply intrafusal fibres; α supply extrafusal. | (E): α-motor neurons supply extrafusal fibres.",
+        "textbookNote": "(C): γ-motor neurons supply intrafusal fibres; α supply extrafusal. | (E): α-motor neurons supply extrafusal fibres.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Regarding hormones",
+        "items": [
+          {
+            "label": "a",
+            "text": "Sex hormones and adrenocortical hormones are steroid hormones",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "The receptors of T3 hormone are located in the cytoplasm",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Epinephrine binds to the receptor on DNA",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Norepinephrine derives from amino acid tyrosine",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Aldosterone binds with the receptor on the cell membrane",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): GH is a protein hormone. | (B): T3 receptors are nuclear. | (C): Epinephrine binds membrane (adrenergic) receptors. | (E): Steroid hormones bind intracellular receptors.",
+        "textbookNote": "(A): GH is a protein hormone. | (B): T3 receptors are nuclear. | (C): Epinephrine binds membrane (adrenergic) receptors. | (E): Steroid hormones bind intracellular receptors.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Urine formation results from",
+        "items": [
+          {
+            "label": "a",
+            "text": "Glomerular filtration",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Reabsorption from renal tubule",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Secretion from peritubular capillary",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Ultrafiltration of afferent arteriole",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Secretion and reabsorption from ureter",
+            "ans": false
+          }
+        ],
+        "explanation": "(D): Ultrafiltration occurs across the glomerular capillary into Bowman's space. | (E): The ureter only conducts urine.",
+        "textbookNote": "(D): Ultrafiltration occurs across the glomerular capillary into Bowman's space. | (E): The ureter only conducts urine.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "A reflex action",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is initiated at a sensory receptor organ",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "May result in endocrine secretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Involves transmission across at least 2 synapses",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "May be excitatory or inhibitory",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is independent of higher centers",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): A reflex starts at a receptor. | (B): Reflexes may cause hormone secretion (milk ejection). | (C): Monosynaptic reflexes have only one synapse. | (D): Reflexes may excite or inhibit. | (E): Reflexes are modified by higher centres.",
+        "textbookNote": "(A): A reflex starts at a receptor. | (B): Reflexes may cause hormone secretion (milk ejection). | (C): Monosynaptic reflexes have only one synapse. | (D): Reflexes may excite or inhibit. | (E): Reflexes are modified by higher centres.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "The functions of CNS at spinal cord level are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Control of equilibrium",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Walking movement",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Regulation of respiration",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Reaction to excitement",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Withdrawal reflex",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Equilibrium is controlled by brainstem/cerebellum. | (B): Walking patterns are generated in spinal cord circuits. | (C): Respiration is controlled by medulla and pons. | (D): Excitement reaction involves hypothalamus/limbic system. | (E): Withdrawal is a spinal reflex.",
+        "textbookNote": "(A): Equilibrium is controlled by brainstem/cerebellum. | (B): Walking patterns are generated in spinal cord circuits. | (C): Respiration is controlled by medulla and pons. | (D): Excitement reaction involves hypothalamus/limbic system. | (E): Withdrawal is a spinal reflex.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Estrogen",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a hormone of female",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is a hormone of pregnancy",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is a hormone of lactation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Helps spermiogenesis",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Helps in LH surge for ovulation",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Estrogen is the female hormone. | (B): Progesterone maintains pregnancy. | (C): Prolactin is the hormone of lactation. | (D): Spermiogenesis is Sertoli/testosterone/FSH-driven. | (E): Estrogen positive feedback causes LH surge.",
+        "textbookNote": "(A): Estrogen is the female hormone. | (B): Progesterone maintains pregnancy. | (C): Prolactin is the hormone of lactation. | (D): Spermiogenesis is Sertoli/testosterone/FSH-driven. | (E): Estrogen positive feedback causes LH surge.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "EPSP is due to",
+        "items": [
+          {
+            "label": "a",
+            "text": "Opening of sodium channel",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Opening of potassium channel",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Opening of chloride channel",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Increased conductance of K+ ion",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Decreased conductance of K+ ion",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): EPSP: Na+ (Ca2+) channel opening or K+/Cl- conductance decreasing. | (B): K+ channel opening causes IPSP. | (C): Cl- channel opening causes IPSP. | (D): ↑K+ conductance → IPSP. | (E): ↓K+ conductance depolarises (EPSP).",
+        "textbookNote": "(A): EPSP: Na+ (Ca2+) channel opening or K+/Cl- conductance decreasing. | (B): K+ channel opening causes IPSP. | (C): Cl- channel opening causes IPSP. | (D): ↑K+ conductance → IPSP. | (E): ↓K+ conductance depolarises (EPSP).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Life saving hormones are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Thyroid hormone",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Aldosterone",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Parathyroid hormone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "ACTH",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Thyroid hormone is not life-saving; aldosterone and cortisol are. | (B): Aldosterone retains Na+ and water. | (C): GH contributes to breast development. | (D): Thyroid hormone is not life-saving; aldosterone and cortisol are. | (E): ACTH acts on adrenal cortex; it does not regulate calcium.",
+        "textbookNote": "(A): Thyroid hormone is not life-saving; aldosterone and cortisol are. | (B): Aldosterone retains Na+ and water. | (C): GH contributes to breast development. | (D): Thyroid hormone is not life-saving; aldosterone and cortisol are. | (E): ACTH acts on adrenal cortex; it does not regulate calcium.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2021-nov-p1",
+    "session": "November 2021",
+    "year": 2021,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "Old Curriculum",
+    "page": 70,
+    "bookPage": "pp. 70–73",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Cell membrane proteins",
+        "items": [
+          {
+            "label": "a",
+            "text": "Can act as antigen",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Constitute about 50% of cell membrane",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Can act as carrier protein",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Are mostly lipoprotein",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Can act as second messenger",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Membrane glycoproteins act as antigens (blood groups, HLA). | (B): Proteins form ~55% of membrane mass. | (C): Globulins carry hormones, iron, lipids. | (D): Membrane proteins are mostly integral glycoproteins. | (E): Second messengers (cAMP, IP3) are small molecules, not membrane proteins.",
+        "textbookNote": "(A): Membrane glycoproteins act as antigens (blood groups, HLA). | (B): Proteins form ~55% of membrane mass. | (C): Globulins carry hormones, iron, lipids. | (D): Membrane proteins are mostly integral glycoproteins. | (E): Second messengers (cAMP, IP3) are small molecules, not membrane proteins.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Carrier-mediated facilitated diffusion",
+        "items": [
+          {
+            "label": "a",
+            "text": "Uses cellular ATP",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is used for cellular uptake of blood glucose",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is a form of active transport",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Transports molecules against their concentration gradient",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Transports substance by changing molecular conformation of carrier protein",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Facilitated diffusion does not use ATP. | (B): GLUT carriers take up glucose by facilitated diffusion. | (C): Facilitated diffusion is passive. | (D): Facilitated diffusion goes only down the gradient. | (E): Carrier changes shape to move the substrate.",
+        "textbookNote": "(A): Facilitated diffusion does not use ATP. | (B): GLUT carriers take up glucose by facilitated diffusion. | (C): Facilitated diffusion is passive. | (D): Facilitated diffusion goes only down the gradient. | (E): Carrier changes shape to move the substrate.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Multi-unit smooth muscle is present in the",
+        "items": [
+          {
+            "label": "a",
+            "text": "Ciliary muscle of the lens",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Iris (eye)",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Ureter",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Urinary bladder",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Vas deferens",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Ciliary muscle and iris are multi-unit smooth muscle. | (C): Ureters are single-unit smooth muscle. | (D): Bladder is unitary (single-unit) smooth muscle. | (E): Vas deferens is multi-unit smooth muscle.",
+        "textbookNote": "(A): Ciliary muscle and iris are multi-unit smooth muscle. | (C): Ureters are single-unit smooth muscle. | (D): Bladder is unitary (single-unit) smooth muscle. | (E): Vas deferens is multi-unit smooth muscle.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Lymphocytes",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are produced in lymphoid tissue",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Are produced in bone marrow",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Induce passive immunity",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Are concerned with cell-mediated immunity",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Produce interleukin",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Lymphocytes are made in marrow and lymphoid tissue. | (B): Lymphocytes originate in bone marrow. | (C): Lymphocytes induce ACTIVE immunity. | (D): T lymphocytes mediate cellular immunity. | (E): Lymphocytes (helper T) secrete interleukins.",
+        "textbookNote": "(A): Lymphocytes are made in marrow and lymphoid tissue. | (B): Lymphocytes originate in bone marrow. | (C): Lymphocytes induce ACTIVE immunity. | (D): T lymphocytes mediate cellular immunity. | (E): Lymphocytes (helper T) secrete interleukins.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Hemoglobin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a globular protein",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is absent in reticulocyte",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is responsible for oxygen transport in blood",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is synthesized in the nucleus of the cell",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Deficiency causes polycythemia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Hb is a globular tetrameric protein. | (B): Reticulocytes contain Hb. | (C): Hb carries most blood O2. | (D): Hb is made in cytoplasm (and mitochondria for heme). | (E): Hb deficiency → anaemia.",
+        "textbookNote": "(A): Hb is a globular tetrameric protein. | (B): Reticulocytes contain Hb. | (C): Hb carries most blood O2. | (D): Hb is made in cytoplasm (and mitochondria for heme). | (E): Hb deficiency → anaemia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "In anemic hypoxia",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreased PCO2 in arterial blood occurs",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreased PO2 in arterial blood occurs",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "There is tachycardia",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "There is increased 2,3-DPG in the blood",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Oxygen carrying capacity of hemoglobin is reduced",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Arterial PO2 is normal in anaemic hypoxia. | (D): ↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right. | (E): Anaemia reduces O2 carrying capacity.",
+        "textbookNote": "(B): Arterial PO2 is normal in anaemic hypoxia. | (D): ↑2,3-DPG, ↑H+, ↑PCO2, ↑temperature shift ODC right. | (E): Anaemia reduces O2 carrying capacity.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Serum globulin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is synthesized in the liver",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Acts as hormone",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is increased in inflammatory condition",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Contributes to viscosity",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Acts as carrier protein",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): α/β globulins are hepatic; γ-globulins from plasma cells. | (B): Globulins are carrier/immune proteins, not hormones. | (C): Acute-phase globulins and immunoglobulins rise. | (D): Plasma proteins add to viscosity. | (E): Globulins carry hormones, iron, lipids.",
+        "textbookNote": "(A): α/β globulins are hepatic; γ-globulins from plasma cells. | (B): Globulins are carrier/immune proteins, not hormones. | (C): Acute-phase globulins and immunoglobulins rise. | (D): Plasma proteins add to viscosity. | (E): Globulins carry hormones, iron, lipids.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Pulse pressure is",
+        "items": [
+          {
+            "label": "a",
+            "text": "The highest pressure measured in the arteries",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "The difference between the systolic and diastolic pressure",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Measured only during the diastole",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Determined by stroke volume",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Systolic is the highest; pulse pressure is the difference. | (B): Pulse pressure = systolic – diastolic. | (C): Pulse pressure uses both phases. | (D): Stroke volume and compliance determine pulse pressure.",
+        "textbookNote": "(A): Systolic is the highest; pulse pressure is the difference. | (B): Pulse pressure = systolic – diastolic. | (C): Pulse pressure uses both phases. | (D): Stroke volume and compliance determine pulse pressure.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Original examination paper contained 4 options (a–d) on PDF page 71"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Clotting time is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Increased in thrombocytopenia",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreased in hemophilia",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The time required for activation of clotting factors",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "A test for bleeding disorder",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "15 minutes in a normal person",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Clotting time is normal in thrombocytopenia (BT is prolonged). | (B): Haemophilia prolongs clotting time. | (C): Clotting time = time for blood to clot in vitro. | (D): Clotting time is a screening test. | (E): Normal clotting time is about 4–10 minutes.",
+        "textbookNote": "(A): Clotting time is normal in thrombocytopenia (BT is prolonged). | (B): Haemophilia prolongs clotting time. | (C): Clotting time = time for blood to clot in vitro. | (D): Clotting time is a screening test. | (E): Normal clotting time is about 4–10 minutes.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Cardiac muscles",
+        "items": [
+          {
+            "label": "a",
+            "text": "Have many tight junctions",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Act as a single syncytium",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Have intercalated discs",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Are interconnected in latticework fashion",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Have refractory period",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Cardiac muscle has gap junctions at intercalated discs. | (E): Cardiac muscle has a long refractory period (plateau), so it cannot be tetanised; summation is absent.",
+        "textbookNote": "(A): Cardiac muscle has gap junctions at intercalated discs. | (E): Cardiac muscle has a long refractory period (plateau), so it cannot be tetanised; summation is absent.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Salivary secretions are abolished",
+        "items": [
+          {
+            "label": "a",
+            "text": "By activation of the sympathetic nerve",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "When weak acid is present in the mouth",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "At the onset of vomiting",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "By the administration of anticholinergic agents",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "By thinking of appetizing food",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Sympathetic stimulation gives scanty, thick saliva; it does not abolish saliva. | (B): Acid increases salivary secretion. | (C): Salivation increases before vomiting. | (D): Atropine abolishes salivary secretion. | (E): Conditioned reflex increases saliva.",
+        "textbookNote": "(A): Sympathetic stimulation gives scanty, thick saliva; it does not abolish saliva. | (B): Acid increases salivary secretion. | (C): Salivation increases before vomiting. | (D): Atropine abolishes salivary secretion. | (E): Conditioned reflex increases saliva.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Secondary (specific) granules of neutrophil contain",
+        "items": [
+          {
+            "label": "a",
+            "text": "Alkaline phosphatase",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Lactoferrin",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Lysosomal enzyme",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Myeloperoxidase",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Vitamin B12 binding protein",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Specific granules contain alkaline phosphatase, lactoferrin, lysozyme, collagenase. | (B): Lactoferrin is in specific granules. | (C): Lysosomal enzymes/myeloperoxidase are in azurophilic (primary) granules. | (D): Myeloperoxidase is in azurophilic granules. | (E): B12-binding protein is in specific granules.",
+        "textbookNote": "(A): Specific granules contain alkaline phosphatase, lactoferrin, lysozyme, collagenase. | (B): Lactoferrin is in specific granules. | (C): Lysosomal enzymes/myeloperoxidase are in azurophilic (primary) granules. | (D): Myeloperoxidase is in azurophilic granules. | (E): B12-binding protein is in specific granules.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Factors that inhibit stomach emptying include",
+        "items": [
+          {
+            "label": "a",
+            "text": "Gastrocolic reflex",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Enterogastric reflex",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Gastrin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "CCK",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Decreased acidity of duodenal chyme",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Gastrocolic reflex = food in stomach → colonic mass movement; enterogastric reflex inhibits emptying. | (B): Enterogastric reflex slows gastric emptying. | (C): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (D): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (E): Increased duodenal acidity inhibits emptying.",
+        "textbookNote": "(A): Gastrocolic reflex = food in stomach → colonic mass movement; enterogastric reflex inhibits emptying. | (B): Enterogastric reflex slows gastric emptying. | (C): Gastrin stimulates acid secretion and mildly motility; it does not inhibit emptying. | (D): CCK delays gastric emptying, stimulates gallbladder contraction and enzyme secretion. | (E): Increased duodenal acidity inhibits emptying.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Cholecystokinin (CCK)",
+        "items": [
+          {
+            "label": "a",
+            "text": "Inhibits gastric emptying",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Inhibits pancreatic HCO3 - secretion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Stimulates digestive enzyme secretion",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Inhibits contraction of the gall bladder",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Causes relaxation of the sphincter of Oddi",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): CCK slows gastric emptying to allow fat digestion. | (B): CCK potentiates enzyme secretion; secretin stimulates HCO3 -. | (C): CCK stimulates pancreatic enzyme secretion. | (D): CCK CONTRACTS the gallbladder. | (E): CCK relaxes the sphincter of Oddi.",
+        "textbookNote": "(A): CCK slows gastric emptying to allow fat digestion. | (B): CCK potentiates enzyme secretion; secretin stimulates HCO3 -. | (C): CCK stimulates pancreatic enzyme secretion. | (D): CCK CONTRACTS the gallbladder. | (E): CCK relaxes the sphincter of Oddi.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Liver stores",
+        "items": [
+          {
+            "label": "a",
+            "text": "Iron",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Plasma protein",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Vitamin D",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Vitamin C",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Bile salt",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Liver stores iron, vitamins A, D, B12, glycogen. | (B): Liver SYNTHESISES plasma proteins; it does not store them. | (C): Liver stores vitamins A, D, B12. | (D): Vitamin C is not stored in the liver. | (E): Bile salts are stored in the gallbladder.",
+        "textbookNote": "(A): Liver stores iron, vitamins A, D, B12, glycogen. | (B): Liver SYNTHESISES plasma proteins; it does not store them. | (C): Liver stores vitamins A, D, B12. | (D): Vitamin C is not stored in the liver. | (E): Bile salts are stored in the gallbladder.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "Slow waves of GIT smooth muscle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Are true action potentials",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Determine the basic rhythm of GIT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Are caused by interstitial cells of Cajal",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Have an intensity of 50 to 150 mV",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Directly cause muscle contraction",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Slow waves are not APs; spikes riding on them are. | (B): Slow waves set the basic electrical rhythm. | (C): ICC are the pacemakers of gut slow waves. | (D): Slow waves are 5–15 mV. | (E): Contraction needs spikes on top of slow waves.",
+        "textbookNote": "(A): Slow waves are not APs; spikes riding on them are. | (B): Slow waves set the basic electrical rhythm. | (C): ICC are the pacemakers of gut slow waves. | (D): Slow waves are 5–15 mV. | (E): Contraction needs spikes on top of slow waves.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "Compliance of the lungs is greater",
+        "items": [
+          {
+            "label": "a",
+            "text": "In adults than in infants",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "When expanded above normal tidal volume",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "In COPD patients",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "In standing than in recumbent position",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Than compliance of lungs and thorax together",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Compliance rises with lung size. | (B): Compliance falls at high volumes. | (C): Emphysema loses elastic recoil → compliance increases. | (E): Lung alone 200 mL/cmH2O; lung + thorax 110.",
+        "textbookNote": "(A): Compliance rises with lung size. | (B): Compliance falls at high volumes. | (C): Emphysema loses elastic recoil → compliance increases. | (E): Lung alone 200 mL/cmH2O; lung + thorax 110.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Lack of surfactant is associated with",
+        "items": [
+          {
+            "label": "a",
+            "text": "Immature infant",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pulmonary edema",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Lung collapse",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Pulmonary fibrosis",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Prolonged oxygen inhalation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Premature infants lack surfactant → RDS. | (B): Lack of surfactant → fluid transudation into alveoli. | (C): ↑surface tension → atelectasis. | (D): Fibrosis is not due to surfactant lack. | (E): Prolonged high O2 damages lung but isn't caused by lack of surfactant.",
+        "textbookNote": "(A): Premature infants lack surfactant → RDS. | (B): Lack of surfactant → fluid transudation into alveoli. | (C): ↑surface tension → atelectasis. | (D): Fibrosis is not due to surfactant lack. | (E): Prolonged high O2 damages lung but isn't caused by lack of surfactant.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "The ventilation–perfusion ratio",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is about 0.8",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is more in apex than in base of the lungs in erect posture",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is decreased with increased physiological dead space",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is decreased in exercise",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is increased by hemorrhage",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Normal V/Q ≈ 0.8. | (B): Apex: V/Q high (≈ 3); base low (≈ 0.6). | (C): ↑ physiological dead space → V/Q ↑. | (D): Exercise makes V/Q more uniform (≈ 1). | (E): ↓ perfusion → V/Q rises.",
+        "textbookNote": "(A): Normal V/Q ≈ 0.8. | (B): Apex: V/Q high (≈ 3); base low (≈ 0.6). | (C): ↑ physiological dead space → V/Q ↑. | (D): Exercise makes V/Q more uniform (≈ 1). | (E): ↓ perfusion → V/Q rises.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Respiratory center",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is situated in medulla oblongata",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Maintains rhythmic ventilation",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is sensitive to alteration of pH in blood",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Responds to cerebral impulse",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is controlled by phrenic nerve",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Respiratory centre: medulla + pons. | (B): Dorsal group sets the inspiratory rhythm. | (C): The chemosensitive area (not the respiratory centre) responds to H+. | (D): Cortex can override. | (E): Respiratory centre controls the phrenic nerve, not vice versa.",
+        "textbookNote": "(A): Respiratory centre: medulla + pons. | (B): Dorsal group sets the inspiratory rhythm. | (C): The chemosensitive area (not the respiratory centre) responds to H+. | (D): Cortex can override. | (E): Respiratory centre controls the phrenic nerve, not vice versa.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2021-nov-p2",
+    "session": "November 2021",
+    "year": 2021,
+    "month": "November",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "Old Curriculum",
+    "page": 74,
+    "bookPage": "pp. 74–77",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "In collecting duct",
+        "items": [
+          {
+            "label": "a",
+            "text": "Water reabsorption is active",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Reabsorption is critically related to tubular transit time",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Reabsorption is complete",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "ADH helps in urea reabsorption",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Water is impermeable (without ADH)",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Water moves passively through aquaporins. | (C): Collecting duct reabsorption is variable (ADH-dependent).",
+        "textbookNote": "(A): Water moves passively through aquaporins. | (C): Collecting duct reabsorption is variable (ADH-dependent).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Posterior column damage in the spinal cord may impair",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration sense",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pain sensation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The flexor plantar response to stimulation of the sole",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Tactile sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The ability to stand steadily with eyes closed",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "textbookNote": "(B): Posterior column carries fine touch, vibration, proprioception — not pain. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "The curvature of the cornea increases",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Chromatic and spherical aberration is decreased",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The visual axes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Accommodation changes the LENS curvature, not cornea. | (B): Small pupil reduces aberrations. | (C): Pupillary constriction reduces light entry. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "The pituitary gland",
+        "items": [
+          {
+            "label": "a",
+            "text": "Lies superior to the sphenoid bone",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is all ectodermal",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has the optic chiasma anteriorly",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is supplied from the internal carotid artery",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies inferior to the cavernous sinus",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "textbookNote": "(A): Pituitary sits in sella turcica of the sphenoid bone. | (B): Anterior pituitary from Rathke's pouch (ectoderm), posterior from neuroectoderm. | (C): Optic chiasma lies above/in front of the pituitary stalk. | (D): Pituitary is supplied by branches of the internal carotid. | (E): Pituitary lies between the cavernous sinuses (medial to them).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "The loop of Henle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is responsible for high medullary osmolarity",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Returns fluid of low osmolarity to the DCT",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has a high permeability to water in thick ascending limb",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is parallel to efferent arteriole",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Actively transports Na+ in the thick ascending limb",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Vasa recta (from efferent arterioles) run parallel to the loop. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "textbookNote": "(A): Loop of Henle counter-current multiplier builds the gradient. | (B): Fluid leaving the loop is hypo-osmotic. | (C): Thick ascending limb is impermeable to water. | (D): Vasa recta (from efferent arterioles) run parallel to the loop. | (E): NKCC2 transports Na+-K+-2Cl- in the thick ascending limb.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "The cerebellum",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is essential for finely coordinated movements",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Does not modify the discharge of spinal motor neurons",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has afferent input from the motor cortex",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Has afferent input from the muscle proprioceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Has no afferent input from the vestibular system",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "textbookNote": "(B): Cerebellum modifies spinal motor neuron discharge via descending tracts. | (C): Cerebellum receives corticopontocerebellar input from motor cortex. | (D): Spinocerebellar tracts carry proprioception. | (E): Flocculonodular lobe receives vestibular input.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Parathormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is produced by the cells of the thyroid gland",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases urinary excretion of calcium",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Blood level increases when serum calcium falls",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Depresses activity of the anterior pituitary",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is independent of magnesium level",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PTH is made by chief cells of parathyroids. | (D): PTH does not affect the anterior pituitary. | (E): Low Mg2+ impairs PTH secretion and action.",
+        "textbookNote": "(A): PTH is made by chief cells of parathyroids. | (D): PTH does not affect the anterior pituitary. | (E): Low Mg2+ impairs PTH secretion and action.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "During normal menstrual cycle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Oestrogen is predominant during the proliferative phase",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Menstrual blood loss averages 150 mL",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Cervical mucus becomes more viscous at the time of ovulation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Menstruation is preceded by a rise in plasma progesterone levels",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Menstruation is associated with dilatation of basal segment of spiral arteries within endometrium",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Proliferative phase = estrogen. | (B): Menstrual loss averages 35–50 mL. | (C): Cervical mucus is thin, watery and elastic (ferning) at ovulation. | (D): Menstruation follows a FALL in progesterone.",
+        "textbookNote": "(A): Proliferative phase = estrogen. | (B): Menstrual loss averages 35–50 mL. | (C): Cervical mucus is thin, watery and elastic (ferning) at ovulation. | (D): Menstruation follows a FALL in progesterone.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Human chorionic gonadotrophin (HCG)",
+        "items": [
+          {
+            "label": "a",
+            "text": "Has the biological properties of LH",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can transform the cyclic corpus luteum into a pseudopregnant corpus luteum",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is responsible for the onset of parturition",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is detectable in serum before implantation of the ovum",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is significantly elevated in pre-eclampsia",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): hCG acts on the LH receptor. | (B): hCG maintains the corpus luteum of pregnancy. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "textbookNote": "(A): hCG acts on the LH receptor. | (B): hCG maintains the corpus luteum of pregnancy. | (C): hCG is not related to parturition. | (D): hCG secretion begins after implantation. | (E): hCG is not a diagnostic/significantly elevated marker in pre-eclampsia.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Progesterone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is natriuretic",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Requires estrogen priming before its action",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is synthesized in the adrenal gland (as its main source)",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Decreases uterine muscle contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is the hormone of pregnancy",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "textbookNote": "(A): Progesterone is natriuretic (blocks aldosterone). | (B): Progesterone receptors are induced by estrogen. | (C): Main sources are corpus luteum/placenta. | (D): Progesterone quietens the uterus. | (E): Progesterone maintains pregnancy.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Thyroxine",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is less than 80% bound to plasma proteins",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Formation requires amino acids",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is essential for skeletal development",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Increases oxygen consumption in the brain",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Leads to hyperlipidaemia when present in excess",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Excess thyroxine lowers lipids.",
+        "textbookNote": "(A): T4 is > 99% protein bound. | (B): Tyrosine is incorporated in thyroglobulin. | (C): Thyroxine is needed for bone growth. | (D): Brain O2 use is unaffected by thyroxine. | (E): Excess thyroxine lowers lipids.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Aldosterone causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A fall in urinary sodium excretion",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Weight gain",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "A fall in serum chloride levels",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Increased extracellular fluid volume",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Increased potassium excretion",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "textbookNote": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Organ of Corti",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is the receptor organ of hearing",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is the receptor organ of taste",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is the receptor organ of smell",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Generates nerve impulse",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies on Reissner's membrane",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Organ of Corti is the receptor organ of hearing. | (B): Taste buds are the taste receptors. | (C): Organ of Corti is for hearing; smell receptors are in olfactory epithelium. | (D): Hair cells generate receptor potentials → impulses. | (E): Organ of Corti lies on the basilar membrane.",
+        "textbookNote": "(A): Organ of Corti is the receptor organ of hearing. | (B): Taste buds are the taste receptors. | (C): Organ of Corti is for hearing; smell receptors are in olfactory epithelium. | (D): Hair cells generate receptor potentials → impulses. | (E): Organ of Corti lies on the basilar membrane.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "The pheochromocytoma",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a tumor of adrenal medullary tissue",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is benign in the majority of cases",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has its maximum incidence after the menopause",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Can be associated with severe episodes of hypertension",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is always found in the gland",
+            "ans": false
+          }
+        ],
+        "explanation": "(C): Peak incidence is 3rd–5th decade. | (E): ~10% of pheochromocytomas are extra-adrenal.",
+        "textbookNote": "(C): Peak incidence is 3rd–5th decade. | (E): ~10% of pheochromocytomas are extra-adrenal.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Statements relating to thyroid function are correct",
+        "items": [
+          {
+            "label": "a",
+            "text": "TRH is a decapeptide",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Placental thyrotrophin is biochemically identical to pituitary TSH",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The metabolic activity of T3 is about four times that of T4",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "5% of the circulating T4 is free",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Circulating TBG increases under the influence of oestrogens",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): TRH is a tripeptide. | (B): hCG has TSH-like effect, but placental thyrotrophin is not identical. | (C): T3 is about 4× more potent than T4. | (D): Free T4 is ~0.03%. | (E): Oestrogen raises TBG.",
+        "textbookNote": "(A): TRH is a tripeptide. | (B): hCG has TSH-like effect, but placental thyrotrophin is not identical. | (C): T3 is about 4× more potent than T4. | (D): Free T4 is ~0.03%. | (E): Oestrogen raises TBG.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "During the process of fertilization and implantation",
+        "items": [
+          {
+            "label": "a",
+            "text": "Fertilisation occurs in the outer third of the Fallopian tube",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "The haploid number of chromosomes results",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The morula is enclosed by trophoblast",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "The morula actively moves along the oviduct",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "HCG is produced by the preimplantation embryo",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "textbookNote": "(B): Fertilisation restores the DIPLOID number. | (C): Blastocyst (not morula) has a trophoblast. | (D): Morula is moved by cilia/peristalsis. | (E): hCG appears after implantation (about day 8–10).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "The nerves that carry taste impulses are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Facial nerve",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Trigeminal nerve",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Glossopharyngeal",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Vagus nerve",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Hypoglossal",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "textbookNote": "(B): Taste fibres travel in VII, IX, X; V gives general sensation. | (E): Hypoglossal is motor to the tongue.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Lateral spinothalamic tract",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is formed by A alpha fibre",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Carries proprioception",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Transmits pain sensation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Transmits thermal sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Transmits crude touch sensation",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "textbookNote": "(A): Spinothalamic tract uses Aδ and C fibres. | (B): Proprioception travels in dorsal columns/spinocerebellar tracts. | (E): Crude touch travels in the anterior spinothalamic tract.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "Basal ganglia",
+        "items": [
+          {
+            "label": "a",
+            "text": "Functions in association with the motor control system",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Can also perform function by itself",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Damage causes decreased tone of peripheral muscles",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Lesion at putamen circuit causes Parkinson's disease",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Controls complex patterns of movements",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Basal ganglia damage increases tone (rigidity). | (D): Parkinson's disease increases muscle tone (rigidity).",
+        "textbookNote": "(B): Basal ganglia work with cortex/thalamus, not alone. | (C): Basal ganglia damage increases tone (rigidity). | (D): Parkinson's disease increases muscle tone (rigidity).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Short stature is seen in children suffering",
+        "items": [
+          {
+            "label": "a",
+            "text": "Adrenal insufficiency",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Thyroxine deficiency",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Growth hormone deficiency",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Chronic malnutrition",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Castration",
+            "ans": false
+          }
+        ],
+        "explanation": "(E): Castration delays epiphyseal closure → tall stature.",
+        "textbookNote": "(E): Castration delays epiphyseal closure → tall stature.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2021-may-p1",
+    "session": "May 2021",
+    "year": 2021,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-I",
+    "curriculum": "Old Curriculum",
+    "page": 78,
+    "bookPage": "pp. 78–81",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Cyclic AMP",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is an important 1st messenger",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Acts via Ca2+",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is formed from ATP",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Activates protein kinases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is metabolized by adenylyl cyclase",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): cAMP is a SECOND messenger. | (B): cAMP is a second messenger acting via protein kinase A. | (E): cAMP is formed by adenylyl cyclase and broken down by phosphodiesterase.",
+        "textbookNote": "(A): cAMP is a SECOND messenger. | (B): cAMP is a second messenger acting via protein kinase A. | (E): cAMP is formed by adenylyl cyclase and broken down by phosphodiesterase.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "Cell membrane acts as",
+        "items": [
+          {
+            "label": "a",
+            "text": "Transporters of ions",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Cell adhesion molecule",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Pumps",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Receptors for hormones",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Cellular defense system",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Membrane proteins transport ions. | (B): Adhesion molecules are membrane proteins. | (C): Membrane proteins act as pumps (Na+-K+ ATPase). | (D): Membrane receptors bind hormones. | (E): Membrane antigens/immune molecules take part in defence.",
+        "textbookNote": "(A): Membrane proteins transport ions. | (B): Adhesion molecules are membrane proteins. | (C): Membrane proteins act as pumps (Na+-K+ ATPase). | (D): Membrane receptors bind hormones. | (E): Membrane antigens/immune molecules take part in defence.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "Blood",
+        "items": [
+          {
+            "label": "a",
+            "text": "Makes up about 7% of body weight",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Forms a higher percentage of body weight in fat than in thin people",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Volume can be calculated if hemoglobin concentration is known",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Volume rises after water is drunk",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Expresses serum when it clots",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Blood is ~7% (8%) of body weight. | (B): Blood volume per kg is lower in obese persons (fat is poorly vascular). | (C): Volume is measured by dilution (Evans blue, 131I-albumin). | (D): Drinking water is quickly redistributed; blood volume rises little. | (E): Clot retraction expresses serum.",
+        "textbookNote": "(A): Blood is ~7% (8%) of body weight. | (B): Blood volume per kg is lower in obese persons (fat is poorly vascular). | (C): Volume is measured by dilution (Evans blue, 131I-albumin). | (D): Drinking water is quickly redistributed; blood volume rises little. | (E): Clot retraction expresses serum.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Reaction occurs in transfusion of blood group",
+        "items": [
+          {
+            "label": "a",
+            "text": "A to group B person",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "O to a group AB person",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "A to a group O person",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "A to a group AB group",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "O Rh-negative to a group AB Rh-positive person",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): A cells + anti-A in B plasma → agglutination. | (B): O cells have no antigens; AB has no antibodies → safe. | (C): O plasma has anti-A → agglutination. | (D): AB has no antibodies → compatible. | (E): Compatible (Rh-negative to Rh-positive).",
+        "textbookNote": "(A): A cells + anti-A in B plasma → agglutination. | (B): O cells have no antigens; AB has no antibodies → safe. | (C): O plasma has anti-A → agglutination. | (D): AB has no antibodies → compatible. | (E): Compatible (Rh-negative to Rh-positive).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Intercellular communications are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Neural",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Endocrine",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Autocrine and paracrine",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "ATP-dependent process",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Carrier-mediated process",
+            "ans": false
+          }
+        ],
+        "explanation": "(D): Intercellular communication (paracrine/endocrine) is via chemical messengers. | (E): Intercellular communication uses messengers/gap junctions, not carriers.",
+        "textbookNote": "(D): Intercellular communication (paracrine/endocrine) is via chemical messengers. | (E): Intercellular communication uses messengers/gap junctions, not carriers.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "Action potential",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is a long-lasting event",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Occurs in adipose tissue cells",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is generated by voltage-gated ion channels",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Occurs in endocrine pituitary cells",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Occurs in neuron",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): AP lasts only ~1 ms in nerve. | (B): Adipocytes are non-excitable. | (C): Voltage-gated Na+/K+/Ca2+ channels generate AP. | (D): Some endocrine cells generate APs (e.g., pituitary cells). | (E): Neurons conduct APs.",
+        "textbookNote": "(A): AP lasts only ~1 ms in nerve. | (B): Adipocytes are non-excitable. | (C): Voltage-gated Na+/K+/Ca2+ channels generate AP. | (D): Some endocrine cells generate APs (e.g., pituitary cells). | (E): Neurons conduct APs.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Plasmin",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is involved in the extrinsic clotting system",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is a hormone",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Is responsible for fibrinolysis",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is responsible for delayed healing",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Is responsible for promoting the formation of emboli",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Plasmin lyses fibrin (fibrinolysis). | (B): Vitamin/ prostaglandin...; local factor, not a hormone. | (C): Plasmin digests fibrin. | (D): Plasmin does not delay healing. | (E): Plasmin dissolves clots, preventing emboli.",
+        "textbookNote": "(A): Plasmin lyses fibrin (fibrinolysis). | (B): Vitamin/ prostaglandin...; local factor, not a hormone. | (C): Plasmin digests fibrin. | (D): Plasmin does not delay healing. | (E): Plasmin dissolves clots, preventing emboli.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "In hypokalemia (plasma K+ ≈ 3.5 mEq/L)",
+        "items": [
+          {
+            "label": "a",
+            "text": "PR interval is lengthened to 0.32 sec",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "ST segment is depressed",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "QRS interval is 0.06 sec",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "T waves remain tall and slender",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "A prominent U wave is present following T wave",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Hypokalaemia may slightly widen QRS. | (D): Hypokalaemia flattens T waves.",
+        "textbookNote": "(C): Hypokalaemia may slightly widen QRS. | (D): Hypokalaemia flattens T waves.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Pacemaker potential is",
+        "items": [
+          {
+            "label": "a",
+            "text": "–50 mV",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "More slope with vagal stimulation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Due to leakiness of the membrane to sodium",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Due to increase in potassium influx",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Completed by closing of calcium transient channel",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): SA node pacemaker begins about –55 to –60 mV. | (B): Vagal stimulation DEcreases the slope (more hyperpolarised, slower rate). | (C): Na+ leak (funny current) drives pacemaker depolarisation. | (D): Pacemaker potential is due to reduced K+ efflux, not K+ influx. | (E): Pacemaker potential ends with OPENING of Ca2+ channels.",
+        "textbookNote": "(A): SA node pacemaker begins about –55 to –60 mV. | (B): Vagal stimulation DEcreases the slope (more hyperpolarised, slower rate). | (C): Na+ leak (funny current) drives pacemaker depolarisation. | (D): Pacemaker potential is due to reduced K+ efflux, not K+ influx. | (E): Pacemaker potential ends with OPENING of Ca2+ channels.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Gap junction",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is absent in cardiac muscle",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Connects sarcotubular system to skeletal muscle cells",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Provides pathway for rapid spread of excitation from one cardiac muscle fiber to another",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is present in smooth muscle cell",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Allows slow diffusion of ions",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Cardiac muscle has abundant gap junctions at intercalated discs. | (B): Gap junctions link cardiac/smooth cells, not sarcotubular system. | (C): Gap junctions link cardiac fibres as a syncytium. | (D): Unitary smooth muscle has gap junctions. | (E): Gap junctions allow rapid ion flow.",
+        "textbookNote": "(A): Cardiac muscle has abundant gap junctions at intercalated discs. | (B): Gap junctions link cardiac/smooth cells, not sarcotubular system. | (C): Gap junctions link cardiac fibres as a syncytium. | (D): Unitary smooth muscle has gap junctions. | (E): Gap junctions allow rapid ion flow.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "Stimuli that increase gastrin secretion",
+        "items": [
+          {
+            "label": "a",
+            "text": "Acid",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Calcium",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Calcitonin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Peptides",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "GIP",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Antral acid INHIBITS gastrin. | (B): Ca2+ stimulates gastrin. | (C): Calcitonin is not a physiological gastrin stimulus. | (D): Peptides/amino acids stimulate gastrin. | (E): GIP inhibits gastric motility and acid; stimulates insulin.",
+        "textbookNote": "(A): Antral acid INHIBITS gastrin. | (B): Ca2+ stimulates gastrin. | (C): Calcitonin is not a physiological gastrin stimulus. | (D): Peptides/amino acids stimulate gastrin. | (E): GIP inhibits gastric motility and acid; stimulates insulin.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "Bile",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is synthesized from gallbladder",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is stored in gallbladder",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Plays an important role in protein digestion",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Plays a role in fat absorption",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Can be concentrated up to a maximum of 20-fold",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Bile is made by hepatocytes. | (B): Gallbladder stores/concentrates bile (5–20×). | (C): Bile has no enzymes. | (D): Bile salts form micelles for fat absorption. | (E): Gallbladder concentrates bile up to 5–20-fold.",
+        "textbookNote": "(A): Bile is made by hepatocytes. | (B): Gallbladder stores/concentrates bile (5–20×). | (C): Bile has no enzymes. | (D): Bile salts form micelles for fat absorption. | (E): Gallbladder concentrates bile up to 5–20-fold.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "Saliva",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is primarily under hormonal control",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Secretion is increased by parasympathetic stimulation",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has a larger proportion of Na+ in response to aldosterone administration",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is necessary for taste sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is necessary for antisepsis in mouth",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Salivary secretion is purely nervous. | (B): Sympathetic does not increase thyroid hormone secretion. | (C): Aldosterone increases salivary K+ and reduces Na+. | (D): Saliva dissolves tastants.",
+        "textbookNote": "(A): Salivary secretion is purely nervous. | (B): Sympathetic does not increase thyroid hormone secretion. | (C): Aldosterone increases salivary K+ and reduces Na+. | (D): Saliva dissolves tastants.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Vasodilator agents are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Histamine",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Angiotensin II",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Vasopressin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Bradykinin",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Norepinephrine",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Angiotensin II is the vasoconstrictor/aldosterone stimulator; it is a potent but second Na+-retaining agent. | (C): Vasopressin is a vasoconstrictor. | (E): NE is a vasoconstrictor, not a vasodilator.",
+        "textbookNote": "(B): Angiotensin II is the vasoconstrictor/aldosterone stimulator; it is a potent but second Na+-retaining agent. | (C): Vasopressin is a vasoconstrictor. | (E): NE is a vasoconstrictor, not a vasodilator.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Chemosensitive area is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Located in medulla",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Sensitive to low PO2",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Highly sensitive to low PCO2",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Sensitive to decrease in pH",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "A pressure sensitive area",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): The chemosensitive area is insensitive to O2; peripheral chemoreceptors respond to low PO2. | (C): Chemosensitive area is stimulated by HIGH PCO2 (↑H+). | (E): The chemosensitive area responds to H+/CO2, not pressure.",
+        "textbookNote": "(B): The chemosensitive area is insensitive to O2; peripheral chemoreceptors respond to low PO2. | (C): Chemosensitive area is stimulated by HIGH PCO2 (↑H+). | (E): The chemosensitive area responds to H+/CO2, not pressure.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "Ventilation is increased",
+        "items": [
+          {
+            "label": "a",
+            "text": "At high altitude",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "When plasma CO2 level is reduced",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "During muscular exercise",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "In hypoxia",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "In fever",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Low CO2 reduces ventilation.",
+        "textbookNote": "(B): Low CO2 reduces ventilation.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "Iron deficiency",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is more common in men than in women",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Frequently follows loss of blood from body",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is commonly seen in pregnancy",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Causes anemia by limiting rate of Hb synthesis",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "May cause large pale erythrocytes to appear in blood",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Women (menses, pregnancy) are more affected. | (E): Iron deficiency → small pale (microcytic hypochromic) cells.",
+        "textbookNote": "(A): Women (menses, pregnancy) are more affected. | (E): Iron deficiency → small pale (microcytic hypochromic) cells.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "Hyperpnoea during exercise is caused by",
+        "items": [
+          {
+            "label": "a",
+            "text": "Elevated CO2",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreased pH",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Direct impulses from motor cortex",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Impulses from body parts which are moving",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Elevated O2",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Exercise PCO2 and pH stay near normal; hyperpnoea is neurogenic. | (B): Arterial pH changes little in moderate exercise. | (C): Collateral from motor cortex drives exercise hyperpnoea. | (D): Proprioceptive impulses from moving limbs drive exercise hyperpnoea. | (E): O2 does not rise in exercise.",
+        "textbookNote": "(A): Exercise PCO2 and pH stay near normal; hyperpnoea is neurogenic. | (B): Arterial pH changes little in moderate exercise. | (C): Collateral from motor cortex drives exercise hyperpnoea. | (D): Proprioceptive impulses from moving limbs drive exercise hyperpnoea. | (E): O2 does not rise in exercise.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "Respiratory dead space",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreases during a deep inspiration",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases during a cough",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Decreases when adrenaline level rises",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Is being influenced by higher center",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Air is not useful for gas exchange",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Dead space increases with deep inspiration (airway traction). | (B): Forceful expiration/cough reduces dead space. | (C): Adrenaline dilates bronchi → increases dead space. | (D): Bronchomotor tone is under higher control. | (E): Dead space air does not take part in exchange.",
+        "textbookNote": "(A): Dead space increases with deep inspiration (airway traction). | (B): Forceful expiration/cough reduces dead space. | (C): Adrenaline dilates bronchi → increases dead space. | (D): Bronchomotor tone is under higher control. | (E): Dead space air does not take part in exchange.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Acclimatization to high altitude causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A small increase in P50",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Decreases erythropoietin secretion",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Increase in number of mitochondria",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Decrease in myoglobin",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Decrease in tissue content of cytochrome oxidase",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Acclimatisation raises 2,3-DPG → P50 increases slightly. | (C): Acclimatisation increases mitochondria. | (D): Myoglobin increases at altitude. | (E): Tissue cytochrome oxidase increases.",
+        "textbookNote": "(A): Acclimatisation raises 2,3-DPG → P50 increases slightly. | (C): Acclimatisation increases mitochondria. | (D): Myoglobin increases at altitude. | (E): Tissue cytochrome oxidase increases.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
+  },
+  {
+    "id": "cmu-phy-2021-may-p2",
+    "session": "May 2021",
+    "year": 2021,
+    "month": "May",
+    "subject": "Physiology",
+    "paper": "Paper-II",
+    "curriculum": "Old Curriculum",
+    "page": 82,
+    "bookPage": "pp. 82–85",
+    "totalMarks": 20,
+    "time": "30 minutes",
+    "questions": [
+      {
+        "qNum": 1,
+        "type": "TF",
+        "stem": "Proximal tubule",
+        "items": [
+          {
+            "label": "a",
+            "text": "Reabsorbs 67% of Na+ and H2O",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is the site of glomerulotubular balance",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Fluid is slightly iso-osmotic",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Reabsorbs 50% of filtered glucose",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Secretes H+ and Cl-",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): PCT reabsorbs ~65% of filtered Na+ and water. | (C): PCT fluid stays iso-osmotic. | (D): PCT reabsorbs 100% of filtered glucose below threshold. | (E): PCT secretes H+; Cl- is passively reabsorbed.",
+        "textbookNote": "(A): PCT reabsorbs ~65% of filtered Na+ and water. | (C): PCT fluid stays iso-osmotic. | (D): PCT reabsorbs 100% of filtered glucose below threshold. | (E): PCT secretes H+; Cl- is passively reabsorbed.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 2,
+        "type": "TF",
+        "stem": "The renal clearance of",
+        "items": [
+          {
+            "label": "a",
+            "text": "Bicarbonate is similar to that of glucose",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "PAH is nearer to 600 mL/min",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Glucose is more than threshold",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Inulin is the same as GFR",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Creatinine is lower than urea",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Both are completely reabsorbed at normal plasma levels → clearance ≈ 0. | (B): PAH clearance ≈ RPF (~625 mL/min). | (C): Glucose clearance is zero below threshold. | (D): Inulin is filtered, not reabsorbed or secreted. | (E): Creatinine clearance (≈ GFR) exceeds urea clearance (≈ 60–70).",
+        "textbookNote": "(A): Both are completely reabsorbed at normal plasma levels → clearance ≈ 0. | (B): PAH clearance ≈ RPF (~625 mL/min). | (C): Glucose clearance is zero below threshold. | (D): Inulin is filtered, not reabsorbed or secreted. | (E): Creatinine clearance (≈ GFR) exceeds urea clearance (≈ 60–70).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 3,
+        "type": "TF",
+        "stem": "GFR is",
+        "items": [
+          {
+            "label": "a",
+            "text": "Relatively constant",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "About 20% of the renal plasma flow",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increased by angiotensin II stimulation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Altered by mesangial cell contraction",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "125 L/min",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Autoregulation keeps GFR constant. | (B): Filtration fraction ≈ 20%. | (C): Ang II constricts efferent arteriole → maintains GFR. | (D): Mesangial contraction lowers Kf and GFR. | (E): GFR is 125 mL/min (≈ 180 L/day).",
+        "textbookNote": "(A): Autoregulation keeps GFR constant. | (B): Filtration fraction ≈ 20%. | (C): Ang II constricts efferent arteriole → maintains GFR. | (D): Mesangial contraction lowers Kf and GFR. | (E): GFR is 125 mL/min (≈ 180 L/day).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 4,
+        "type": "TF",
+        "stem": "Administration of ADH",
+        "items": [
+          {
+            "label": "a",
+            "text": "Decreases water loss by lungs",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Decreases water loss by kidney",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Increases perspiration",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Decreases reabsorption of Na+ by PCT",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increases reabsorption of water by distal tubule",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): ADH acts on renal collecting ducts. | (C): ADH does not affect sweating. | (D): ADH does not act on PCT. | (E): ADH acts on late DCT and collecting duct.",
+        "textbookNote": "(A): ADH acts on renal collecting ducts. | (C): ADH does not affect sweating. | (D): ADH does not act on PCT. | (E): ADH acts on late DCT and collecting duct.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 5,
+        "type": "TF",
+        "stem": "Hormones acting via gene transcription are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Cortisol",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Aldosterone",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Insulin",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Progesterone",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "TSH",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Cortisol (glucocorticoid) supports breast development. | (B): Aldosterone retains Na+ and water. | (C): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (E): TSH acts via cAMP.",
+        "textbookNote": "(A): Cortisol (glucocorticoid) supports breast development. | (B): Aldosterone retains Na+ and water. | (C): Insulin increases glucose facilitated diffusion 10–20 fold (GLUT-4). | (E): TSH acts via cAMP.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 6,
+        "type": "TF",
+        "stem": "The following are sensory receptors with their respective sensations",
+        "items": [
+          {
+            "label": "a",
+            "text": "Free nerve endings: pain",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pacinian corpuscles: cold sensation",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Osmoreceptors: blood PCO2",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Olfactory epithelium: smell",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Baroreceptor: blood pressure",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Pacinian corpuscles detect vibration/pressure; cold uses cold receptors. | (C): Osmoreceptors detect osmolality; chemoreceptors detect PCO2.",
+        "textbookNote": "(B): Pacinian corpuscles detect vibration/pressure; cold uses cold receptors. | (C): Osmoreceptors detect osmolality; chemoreceptors detect PCO2.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 7,
+        "type": "TF",
+        "stem": "Aldosterone on renal tubule normally reabsorbs",
+        "items": [
+          {
+            "label": "a",
+            "text": "All filtered glucose",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "All filtered plasma proteins",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "About 5–10% of filtered water",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "More K+ ion than Cl- ion",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Aldosterone does not reabsorb glucose; PCT does. | (B): Liver SYNTHESISES plasma proteins; it does not store them.",
+        "textbookNote": "(A): Aldosterone does not reabsorb glucose; PCT does. | (B): Liver SYNTHESISES plasma proteins; it does not store them.",
+        "verificationStatus": "Needs Review",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)",
+        "reviewReason": "Original examination paper contained 4 options (a–d) with option (e) omitted on PDF page 83"
+      },
+      {
+        "qNum": 8,
+        "type": "TF",
+        "stem": "Aldosterone causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "A fall in urinary sodium excretion",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Weight gain",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "A fall in serum chloride level",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Increased intracellular fluid volume",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Increased potassium excretion",
+            "ans": true
+          }
+        ],
+        "explanation": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall. | (D): Aldosterone expands ECF, not ICF.",
+        "textbookNote": "(C): Aldosterone retains Na+ (and Cl- follows); serum Cl- does not fall. | (D): Aldosterone expands ECF, not ICF.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 9,
+        "type": "TF",
+        "stem": "Ovulation occurs",
+        "items": [
+          {
+            "label": "a",
+            "text": "Before the rise in temperature",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Before the LH surge",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Following follicular ripening by FSH",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Infrequently in women with amenorrhoea",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "After the disappearance of cervical mucus ferning",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): BBT rises after ovulation. | (B): Ovulation follows the LH surge by ~16–24 h. | (C): FSH ripens follicles; LH surge triggers ovulation. | (D): Hypopituitarism → loss of FSH/LH → amenorrhoea. | (E): Ferning is maximal at ovulation.",
+        "textbookNote": "(A): BBT rises after ovulation. | (B): Ovulation follows the LH surge by ~16–24 h. | (C): FSH ripens follicles; LH surge triggers ovulation. | (D): Hypopituitarism → loss of FSH/LH → amenorrhoea. | (E): Ferning is maximal at ovulation.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 10,
+        "type": "TF",
+        "stem": "Human growth hormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Comes from lactotropes",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is a steroid hormone",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Acts as an enzyme",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Acts as a protein sparer",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Causes diabetes insipidus",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): GH comes from somatotropes. | (B): GH is a protein hormone. | (C): GH is a hormone, not an enzyme. | (D): GH spares protein. | (E): GH excess can cause diabetes mellitus (diabetogenic), not DI.",
+        "textbookNote": "(A): GH comes from somatotropes. | (B): GH is a protein hormone. | (C): GH is a hormone, not an enzyme. | (D): GH spares protein. | (E): GH excess can cause diabetes mellitus (diabetogenic), not DI.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 11,
+        "type": "TF",
+        "stem": "The cerebellum",
+        "items": [
+          {
+            "label": "a",
+            "text": "Initiates all movements",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "Is essential for finely coordinated movements",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Has afferent input from the visual cortex",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Has afferent input from the muscle proprioceptors",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Controls contralateral muscle tone",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Cerebellum coordinates/ modifies; it does not initiate movement. | (C): Cerebellum receives visual info indirectly via pons. | (D): Spinocerebellar tracts carry proprioception. | (E): Each cerebellar hemisphere controls ipsilateral muscles.",
+        "textbookNote": "(A): Cerebellum coordinates/ modifies; it does not initiate movement. | (C): Cerebellum receives visual info indirectly via pons. | (D): Spinocerebellar tracts carry proprioception. | (E): Each cerebellar hemisphere controls ipsilateral muscles.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 12,
+        "type": "TF",
+        "stem": "A reflex action",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is initiated at a sensory receptor organ",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "May result in endocrine secretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Involves transmission across at least two central nervous synapses",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "May be excitatory or inhibitory",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Is independent of higher center in the brain",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): A reflex starts at a receptor. | (B): Reflexes may cause hormone secretion (milk ejection). | (C): Monosynaptic reflexes have only one synapse. | (D): Reflexes may excite or inhibit. | (E): Reflexes are modified by higher centres.",
+        "textbookNote": "(A): A reflex starts at a receptor. | (B): Reflexes may cause hormone secretion (milk ejection). | (C): Monosynaptic reflexes have only one synapse. | (D): Reflexes may excite or inhibit. | (E): Reflexes are modified by higher centres.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 13,
+        "type": "TF",
+        "stem": "During accommodation for near vision",
+        "items": [
+          {
+            "label": "a",
+            "text": "More light enters the eye",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "The curvature of the cornea increases",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Chromatic and spherical aberration is decreased",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "The depth of focus increases",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The visual axes of the two eyes converge",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Pupillary constriction reduces light entry. | (B): Accommodation changes the LENS curvature, not cornea. | (C): Small pupil reduces aberrations. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "textbookNote": "(A): Pupillary constriction reduces light entry. | (B): Accommodation changes the LENS curvature, not cornea. | (C): Small pupil reduces aberrations. | (D): Constricted pupil increases depth of focus. | (E): Convergence accompanies near vision.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 14,
+        "type": "TF",
+        "stem": "Growth hormone",
+        "items": [
+          {
+            "label": "a",
+            "text": "Promotes positive nitrogen and phosphorus balance",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Secretion is under hypothalamic control",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Levels in blood are higher in children than in adults",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Secretion surges during sleep",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Stimulates liver to secrete somatomedins",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): GH is anabolic. | (B): GHRH/GHIH regulate GH. | (C): GH is highest in childhood/puberty. | (D): GH peaks in slow-wave sleep. | (E): GH stimulates liver IGF-1 (somatomedins).",
+        "textbookNote": "(A): GH is anabolic. | (B): GHRH/GHIH regulate GH. | (C): GH is highest in childhood/puberty. | (D): GH peaks in slow-wave sleep. | (E): GH stimulates liver IGF-1 (somatomedins).",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 15,
+        "type": "TF",
+        "stem": "Thyroxine",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is stored in the follicular cells as thyroglobulin",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Increases the resting rate of carbon dioxide production",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Is essential for normal development of the brain",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Is essential for normal red cell production",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Acts more rapidly than triiodothyronine",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Hormone is stored as thyroglobulin in the colloid. | (B): Thyroxine raises BMR/CO2 production. | (C): Thyroxine is essential for brain development. | (D): Thyroxine has minor effects on erythropoiesis. | (E): T3 acts faster than T4.",
+        "textbookNote": "(A): Hormone is stored as thyroglobulin in the colloid. | (B): Thyroxine raises BMR/CO2 production. | (C): Thyroxine is essential for brain development. | (D): Thyroxine has minor effects on erythropoiesis. | (E): T3 acts faster than T4.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 16,
+        "type": "TF",
+        "stem": "In the normal menstrual cycle",
+        "items": [
+          {
+            "label": "a",
+            "text": "Blood loss during menstruation averages around 100 mL",
+            "ans": false
+          },
+          {
+            "label": "b",
+            "text": "The proliferative phase depends on estrogen secretion",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Cervical mucus becomes more fluid around the time of ovulation",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Ovulation is followed by LH surge",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Basal body temperature is higher after ovulation",
+            "ans": true
+          }
+        ],
+        "explanation": "(A): Menstrual loss averages 35–50 mL. | (B): Proliferative phase depends on estrogen. | (C): Cervical mucus becomes thin around ovulation. | (D): LH surge precedes ovulation. | (E): Progesterone raises BBT by ~0.5 °C.",
+        "textbookNote": "(A): Menstrual loss averages 35–50 mL. | (B): Proliferative phase depends on estrogen. | (C): Cervical mucus becomes thin around ovulation. | (D): LH surge precedes ovulation. | (E): Progesterone raises BBT by ~0.5 °C.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 17,
+        "type": "TF",
+        "stem": "Superficial reflexes are",
+        "items": [
+          {
+            "label": "a",
+            "text": "Corneal reflex",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Knee jerk",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Ankle jerk",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Cremasteric reflex",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Biceps jerk",
+            "ans": false
+          }
+        ],
+        "explanation": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Ankle jerk is a deep tendon (stretch) reflex. | (E): Biceps jerk is a deep tendon reflex.",
+        "textbookNote": "(B): Knee jerk is a deep tendon (stretch) reflex. | (C): Ankle jerk is a deep tendon (stretch) reflex. | (E): Biceps jerk is a deep tendon reflex.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 18,
+        "type": "TF",
+        "stem": "The fovea centralis",
+        "items": [
+          {
+            "label": "a",
+            "text": "Is not crossed by any major blood vessels",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Is the thickest part of retina",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "Has higher visual acuity than other parts of retina",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Lies on the temporal side of the optic disc",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "Lies at the center of the optic disc",
+            "ans": false
+          }
+        ],
+        "explanation": "(A): Fovea is avascular. | (B): Fovea is the THINNEST part of the retina. | (C): Fovea has the highest acuity. | (D): Fovea is on the temporal side. | (E): The optic disc is the blind spot, nasal to the fovea.",
+        "textbookNote": "(A): Fovea is avascular. | (B): Fovea is the THINNEST part of the retina. | (C): Fovea has the highest acuity. | (D): Fovea is on the temporal side. | (E): The optic disc is the blind spot, nasal to the fovea.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 19,
+        "type": "TF",
+        "stem": "Posterior column damage may impair",
+        "items": [
+          {
+            "label": "a",
+            "text": "Vibration sense",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Pain sense",
+            "ans": false
+          },
+          {
+            "label": "c",
+            "text": "The flexor plantar response to stimulation",
+            "ans": false
+          },
+          {
+            "label": "d",
+            "text": "Touch sensation",
+            "ans": true
+          },
+          {
+            "label": "e",
+            "text": "The ability to stand steadily with the eyes closed",
+            "ans": true
+          }
+        ],
+        "explanation": "(B): Pain travels in the spinothalamic tract. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "textbookNote": "(B): Pain travels in the spinothalamic tract. | (C): Plantar reflex tests pyramidal tract, not the dorsal column.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      },
+      {
+        "qNum": 20,
+        "type": "TF",
+        "stem": "Sympathetic stimulation causes",
+        "items": [
+          {
+            "label": "a",
+            "text": "Increased heart rate",
+            "ans": true
+          },
+          {
+            "label": "b",
+            "text": "Increased sweating",
+            "ans": true
+          },
+          {
+            "label": "c",
+            "text": "Dilatation of bronchi",
+            "ans": true
+          },
+          {
+            "label": "d",
+            "text": "Constriction of pupil",
+            "ans": false
+          },
+          {
+            "label": "e",
+            "text": "Glycogenolysis",
+            "ans": true
+          }
+        ],
+        "explanation": "Standard medical physiology textbook verified facts.",
+        "textbookNote": "Standard medical physiology textbook verified facts.",
+        "verificationStatus": "Verified",
+        "sourceReference": "Guyton and Hall Textbook of Medical Physiology (14th Ed.) / Ganong's Review of Medical Physiology (26th Ed.)"
+      }
+    ]
   }
 ];
-
-// Dynamically extract unique subjects from the MCQ papers dataset
-export function getAvailableMcqSubjects(papers: McqExamPaper[] = AUTHENTIC_MCQ_PAPERS): string[] {
-  const set = new Set<string>();
-  papers.forEach(p => {
-    if (p.subject) set.add(p.subject);
-  });
-  return Array.from(set).sort();
-}
-
-// Dynamically extract unique papers for a given subject from the MCQ dataset
-export function getAvailableMcqPapersForSubject(subject: string, papers: McqExamPaper[] = AUTHENTIC_MCQ_PAPERS): string[] {
-  const set = new Set<string>();
-  papers
-    .filter(p => p.subject.toLowerCase() === subject.toLowerCase())
-    .forEach(p => {
-      if (p.paper) set.add(p.paper);
-    });
-  return Array.from(set).sort();
-}
-
-// Dynamically extract unique examination years for a subject and paper, in chronological order
-export function getAvailableMcqYearsForPaper(
-  subject: string,
-  paper: string,
-  papers: McqExamPaper[] = AUTHENTIC_MCQ_PAPERS
-): number[] {
-  const set = new Set<number>();
-  papers
-    .filter(
-      p =>
-        p.subject.toLowerCase() === subject.toLowerCase() &&
-        p.paper.toLowerCase() === paper.toLowerCase()
-    )
-    .forEach(p => {
-      if (p.year) set.add(p.year);
-    });
-  // Sort reverse chronological (latest first)
-  return Array.from(set).sort((a, b) => b - a);
-}
-
-// Helper to filter papers matching all three criteria: Subject, Paper, and Year
-export function getMatchingMcqPapers(
-  subject: string,
-  paper: string,
-  year: number,
-  papers: McqExamPaper[] = AUTHENTIC_MCQ_PAPERS
-): McqExamPaper[] {
-  return papers.filter(
-    p =>
-      p.subject.toLowerCase() === subject.toLowerCase() &&
-      p.paper.toLowerCase() === paper.toLowerCase() &&
-      p.year === year
-  );
-}

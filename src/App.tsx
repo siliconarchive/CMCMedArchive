@@ -559,7 +559,7 @@ export default function App() {
               <button className={page === 'archive' ? 'on' : ''} onClick={() => navigateTo('archive')}>Written (CQ)</button>
               <button className={page === 'mcq' ? 'on' : ''} onClick={() => navigateTo('mcq')}>
                 MCQ Practice
-                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600/10 text-emerald-800 dark:text-emerald-300 border border-emerald-600/20 rounded text-[10px] font-bold">149 Verified</span>
+                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600/10 text-emerald-800 dark:text-emerald-300 border border-emerald-600/20 rounded text-[10px] font-bold">{MCQ_VERIFICATION_STATS.totalQuestions} Questions</span>
               </button>
               <button className={page === 'teacher' ? 'on' : ''} onClick={() => navigateTo('teacher')}>
                 Viva Bank
@@ -715,7 +715,7 @@ export default function App() {
                     </span>
                   </div>
                   <span className="mut text-sm">
-                    {MCQ_VERIFICATION_STATS.papersCount} authentic CMU examination papers across Anatomy ({MCQ_VERIFICATION_STATS.anatomyCount} Qs) and Biochemistry ({MCQ_VERIFICATION_STATS.biochemistryCount} Qs) with verified textbook citations.
+                    {MCQ_VERIFICATION_STATS.papersCount} authentic CMU examination papers across Anatomy ({MCQ_VERIFICATION_STATS.anatomyCount} Qs), Biochemistry ({MCQ_VERIFICATION_STATS.biochemistryCount} Qs), and Physiology ({MCQ_VERIFICATION_STATS.physiologyCount} Qs) with verified textbook citations.
                   </span>
                 </button>
 
@@ -1354,6 +1354,8 @@ export default function App() {
                           ? "Chittagong Medical University 1st Professional MBBS. Covers Gross Anatomy, Histology, Embryology, and Neuroanatomy with verified textbook solutions."
                           : sub.name === 'Biochemistry'
                           ? "Chittagong Medical University 1st Professional MBBS. Covers Biomolecules, Metabolism, Clinical Biochemistry, and Genetics with verified textbook solutions."
+                          : sub.name === 'Physiology'
+                          ? "Chittagong Medical University 1st Professional MBBS. Covers General Physiology, Nerve-Muscle, Blood, CVS, Respiration, Renal, Endocrine & Neurophysiology."
                           : "Chittagong Medical University 1st Professional MBBS Examination. Includes Paper-I and Paper-II with verified textbook solutions."}
                       </p>
 
@@ -1386,62 +1388,12 @@ export default function App() {
                       </button>
                     </div>
                   ))}
-
-                  {/* Curriculum Subjects (In Digitization) - Demonstrates graceful dynamic handling and empty states */}
-                  <div
-                    onClick={() => {
-                      setMcqSelectedSubject('Physiology');
-                      setMcqSelectedPaper(null);
-                      setMcqSelectedYear(null);
-                    }}
-                    className="card p-5 cursor-pointer hover:border-[var(--t)] hover:shadow-xs transition-all border border-dashed border-[var(--line)] bg-[var(--card)] group"
-                  >
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold">
-                        <FileText size={20} />
-                      </div>
-                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 bg-amber-500/15 text-amber-700 rounded-full">
-                        In Digitization
-                      </span>
-                    </div>
-
-                    <h4 className="text-lg font-bold group-hover:text-[var(--t)] mb-1">
-                      Physiology
-                    </h4>
-                    <p className="text-xs text-[var(--mut)] mb-3 leading-relaxed">
-                      First Professional MBBS Physiology examination papers. Official CMU examination MCQs are currently being digitized and verified.
-                    </p>
-
-                    <div className="space-y-1.5 pt-3 border-t border-[var(--line)] text-xs text-[var(--mut)]">
-                      <div className="flex items-center justify-between">
-                        <span>Status:</span>
-                        <span className="font-semibold text-amber-600">Pending Verification</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span>Exam Scope:</span>
-                        <span>Paper-I &amp; Paper-II</span>
-                      </div>
-                    </div>
-
-                    <button
-                      className="btn w-full mt-4 alt text-xs font-semibold flex items-center justify-center gap-1.5"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMcqSelectedSubject('Physiology');
-                        setMcqSelectedPaper(null);
-                        setMcqSelectedYear(null);
-                      }}
-                    >
-                      <span>Check Physiology</span>
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
                 </div>
 
                 <div className="p-4 bg-[var(--card)] border border-[var(--line)] rounded-lg text-xs text-[var(--mut)] flex items-start gap-2.5">
                   <ShieldAlert size={16} className="text-[var(--t)] shrink-0 mt-0.5" />
                   <div>
-                    <b>Authentic Chittagong Medical University Question Bank:</b> All question items are extracted verbatim from official CMU 1st Professional MBBS examination papers. Answers strictly reflect standard textbook citations (Snell, Gray's Anatomy, Moore Clinically Oriented Anatomy, Langman's Medical Embryology, BD Chaurasia, Junqueira's Histology, Harper's Illustrated Biochemistry, Lippincott Illustrated Reviews: Biochemistry, Satyanarayana, Vasudevan).
+                    <b>Authentic Chittagong Medical University Question Bank:</b> All question items are extracted verbatim from official CMU 1st Professional MBBS examination papers. Answers strictly reflect standard textbook citations (Snell, Gray's Anatomy, Moore Clinically Oriented Anatomy, Langman's Medical Embryology, BD Chaurasia, Junqueira's Histology, Harper's Illustrated Biochemistry, Lippincott Illustrated Reviews: Biochemistry, Satyanarayana, Vasudevan, Guyton and Hall Textbook of Medical Physiology, Ganong's Review of Medical Physiology).
                   </div>
                 </div>
               </div>
@@ -1531,6 +1483,10 @@ export default function App() {
                             ? paper.name === 'Paper-I'
                               ? 'Biophysics, Solutions, Acid-Base Balance, Carbohydrate, Protein & Lipid Chemistry, Enzymes, Vitamins, and Digestion & Absorption.'
                               : 'Metabolism of Carbohydrates, Lipids, Amino acids, Bioenergetics, Molecular Biology, Genetics, Endocrinology, and Organ Function Tests.'
+                            : mcqSelectedSubject?.toLowerCase() === 'physiology'
+                            ? paper.name === 'Paper-I'
+                              ? 'General Physiology, Nerve-Muscle Physiology, Blood & Immunity, Cardiovascular System (CVS), Respiratory System, and Gastrointestinal Tract (GIT).'
+                              : 'Renal Physiology & Body Fluids, Endocrine System, Reproductive Physiology, Central Nervous System (CNS), Special Senses, and Autonomic Nervous System.'
                             : paper.name === 'Paper-I'
                             ? 'General Anatomy, General Histology, Embryology, Genetics, Head & Neck, Brain, and Eyeball.'
                             : 'Abdomen, Pelvis, Thorax, Superior Extremity, and Inferior Extremity.'}
