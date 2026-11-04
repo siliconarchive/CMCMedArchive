@@ -45,7 +45,14 @@ import {
   FileQuestion,
   Eye,
   EyeOff,
-  XCircle
+  XCircle,
+  UploadCloud,
+  FileUp,
+  Loader2,
+  Trash2,
+  ShieldCheck,
+  Download,
+  ChevronDown
 } from 'lucide-react';
 
 type PageRoute = 'home' | 'archive' | 'question' | 'mcq' | 'library' | 'teacher' | 'upload' | 'about';
@@ -63,26 +70,45 @@ interface FilterState {
 
 interface UploadedItem {
   id: string;
+  fullName: string;
+  collegeName: string;
   title: string;
   subject: string;
   topic: string;
   kind: string;
-  desc: string;
-  uploader: string;
-  college?: string;
-  date: string;
-  perm: string;
-  url?: string;
+  description: string;
+  originalFileName?: string;
+  storedFileName?: string;
+  fileSize?: number;
+  mimeType?: string;
+  fileUrl?: string;
+  uploadedByUserId?: string;
+  uploadedByEmail?: string;
+  uploadTimestamp?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  moderationNote?: string;
   prog: 'MBBS' | 'BDS';
+  // Legacy compatibility fields
+  uploader?: string;
+  college?: string;
+  desc?: string;
+  date?: string;
+  perm?: string;
+  url?: string;
   demo?: boolean;
 }
 
 interface UserProfile {
-  name: string;
+  id: string;
+  fullName: string;
   email: string;
-  college: string;
+  collegeName: string;
   batch: string;
   roll?: string;
+  role: 'student' | 'admin';
+  createdAt?: string;
+  name?: string;
+  college?: string;
 }
 
 const TELEGRAM_URL = "https://t.me/Sifat_Islam_7";
@@ -92,14 +118,126 @@ const SUBJ_BDS = ["Anatomy", "Physiology", "Biochemistry", "Dental Anatomy", "Or
 const EXAM_TYPES = ["Written", "SEQ", "PBQ", "Short Note", "Professional", "Term", "Viva", "Card"];
 
 const INITIAL_DEMO_RESOURCES: UploadedItem[] = [
-  { id: "r1", title: "Brachial plexus summary & clinical lesions", subject: "Anatomy", topic: "Brachial plexus", kind: "Notes", desc: "One-page revision summary of roots, trunks, divisions, cords and branches with Erb-Duchenne and Klumpke palsy clinical correlations.", uploader: "Sifat Islam (CMC-67)", date: "2026-09-01", perm: "Student shared note", prog: "MBBS" },
-  { id: "r2", title: "Cardiac cycle Wiggers diagram & heart sounds", subject: "Physiology", topic: "Cardiac cycle", kind: "Diagram", desc: "Pressure-volume loop, synchronized jugular venous pulse (JVP) and phonocardiogram (S1-S4) reference chart.", uploader: "CMC Student", date: "2026-09-05", perm: "Student shared note", prog: "MBBS" },
-  { id: "r3", title: "Glycolysis & Gluconeogenesis reciprocal regulation", subject: "Biochemistry", topic: "Carbohydrate Metabolism", kind: "Notes", desc: "High-yield pathway chart with regulated rate-limiting enzymes, ATP yield, and insulin-glucagon phosphorylation states.", uploader: "CMC Student", date: "2026-09-09", perm: "Student shared note", prog: "MBBS" },
-  { id: "r4", title: "Renal Clearance & Countercurrent multiplier mechanism", subject: "Physiology", topic: "Renal System", kind: "Notes", desc: "Step-by-step summary of loop of Henle medullary hyperosmolarity and GFR regulation by tubuloglomerular feedback.", uploader: "CMC Student", date: "2026-09-12", perm: "Student shared note", prog: "MBBS" },
-  { id: "r5", title: "Cranial nerves exit foramina & functional modalities", subject: "Anatomy", topic: "Neuroanatomy & Cranial Cavity", kind: "Summary", desc: "Complete reference table of cranial nerves (I–XII), their skull base exit foramina, and sensory/motor/parasympathetic components.", uploader: "Sifat Islam (CMC-67)", date: "2026-09-15", perm: "Student shared note", prog: "MBBS" },
-  { id: "r6", title: "Acid-Base balance & arterial blood gas (ABG) chart", subject: "Biochemistry", topic: "Acid-Base & Renal", kind: "Summary", desc: "Systematic diagnostic algorithm for metabolic vs respiratory acidosis and alkalosis with compensation formulas.", uploader: "CMC Student", date: "2026-09-20", perm: "Student shared note", prog: "MBBS" },
-  { id: "r7", title: "Epithelium classification & histology quick guide", subject: "Anatomy", topic: "General Histology", kind: "Notes", desc: "High-yield identification guide for simple, stratified, pseudostratified and transitional epithelium with organ locations.", uploader: "CMC Student", date: "2026-09-22", perm: "Student shared note", prog: "MBBS" },
-  { id: "r8", title: "Respiratory membrane & gas diffusion capacities", subject: "Physiology", topic: "Respiratory System", kind: "Summary", desc: "Layers of the blood-air barrier, Fick's law of diffusion, and factors altering diffusion capacity (DLCO).", uploader: "CMC Student", date: "2026-09-28", perm: "Student shared note", prog: "MBBS" }
+  {
+    id: "r1",
+    fullName: "Sifat Islam",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Brachial plexus summary & clinical lesions",
+    subject: "Anatomy",
+    topic: "Brachial plexus",
+    kind: "Notes",
+    description: "One-page revision summary of roots, trunks, divisions, cords and branches with Erb-Duchenne and Klumpke palsy clinical correlations.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "Sifat Islam (CMC-67)",
+    date: "2026-09-01",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r2",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Cardiac cycle Wiggers diagram & heart sounds",
+    subject: "Physiology",
+    topic: "Cardiac cycle",
+    kind: "Diagram",
+    description: "Pressure-volume loop, synchronized jugular venous pulse (JVP) and phonocardiogram (S1-S4) reference chart.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-05",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r3",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Glycolysis & Gluconeogenesis reciprocal regulation",
+    subject: "Biochemistry",
+    topic: "Carbohydrate Metabolism",
+    kind: "Notes",
+    description: "High-yield pathway chart with regulated rate-limiting enzymes, ATP yield, and insulin-glucagon phosphorylation states.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-09",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r4",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Renal Clearance & Countercurrent multiplier mechanism",
+    subject: "Physiology",
+    topic: "Renal System",
+    kind: "Notes",
+    description: "Step-by-step summary of loop of Henle medullary hyperosmolarity and GFR regulation by tubuloglomerular feedback.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-12",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r5",
+    fullName: "Sifat Islam",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Cranial nerves exit foramina & functional modalities",
+    subject: "Anatomy",
+    topic: "Neuroanatomy & Cranial Cavity",
+    kind: "Summary",
+    description: "Complete reference table of cranial nerves (I–XII), their skull base exit foramina, and sensory/motor/parasympathetic components.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "Sifat Islam (CMC-67)",
+    date: "2026-09-15",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r6",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Acid-Base balance & arterial blood gas (ABG) chart",
+    subject: "Biochemistry",
+    topic: "Acid-Base & Renal",
+    kind: "Summary",
+    description: "Systematic diagnostic algorithm for metabolic vs respiratory acidosis and alkalosis with compensation formulas.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-20",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r7",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Epithelium classification & histology quick guide",
+    subject: "Anatomy",
+    topic: "General Histology",
+    kind: "Notes",
+    description: "High-yield identification guide for simple, stratified, pseudostratified and transitional epithelium with organ locations.",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-22",
+    perm: "Verified Academic Note"
+  },
+  {
+    id: "r8",
+    fullName: "CMC Academic Committee",
+    collegeName: "Chittagong Medical College (CMC)",
+    title: "Respiratory membrane & gas diffusion capacities",
+    subject: "Physiology",
+    topic: "Respiratory System",
+    kind: "Summary",
+    description: "Layers of the blood-air barrier, Fick's law of diffusion, and factors altering diffusion capacity (DLCO).",
+    status: "approved",
+    prog: "MBBS",
+    uploader: "CMC Academic Committee",
+    date: "2026-09-28",
+    perm: "Verified Academic Note"
+  }
 ];
 
 function TelegramIcon({ className = "w-5 h-5" }: { className?: string }) {
@@ -146,8 +284,15 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Authentication Modal State
+  // Authentication & Session State
   const [authModal, setAuthModal] = useState<'signin' | 'signup' | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('cmc_auth_token');
+    } catch (e) {
+      return null;
+    }
+  });
   const [userProfile, setUserProfile] = useState<UserProfile | null>(() => {
     try {
       const raw = localStorage.getItem('cmc_user_profile');
@@ -156,6 +301,29 @@ export default function App() {
       return null;
     }
   });
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Server-Persisted Notes and Library State
+  const [serverNotes, setServerNotes] = useState<UploadedItem[]>([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+  const [libraryTab, setLibraryTab] = useState<'all' | 'my' | 'pending'>('all');
+
+  // Dedicated Note Upload Form State
+  const [uploadFullName, setUploadFullName] = useState<string>('');
+  const [uploadCollegeName, setUploadCollegeName] = useState<string>('Chittagong Medical College (CMC)');
+  const [uploadTitle, setUploadTitle] = useState<string>('');
+  const [uploadSubject, setUploadSubject] = useState<string>('');
+  const [uploadTopic, setUploadTopic] = useState<string>('');
+  const [uploadDescription, setUploadDescription] = useState<string>('');
+  const [uploadProg, setUploadProg] = useState<'MBBS' | 'BDS'>('MBBS');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadSubmitting, setUploadSubmitting] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccessMessage, setUploadSuccessMessage] = useState<string | null>(null);
 
   // Lock body scroll and trap Escape key when auth modal is open
   useEffect(() => {
@@ -164,6 +332,8 @@ export default function App() {
       const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
           setAuthModal(null);
+          setAuthError(null);
+          setAuthSuccess(null);
         }
       };
       window.addEventListener('keydown', handleKeyDown);
@@ -176,15 +346,322 @@ export default function App() {
     }
   }, [authModal]);
 
-  // Student uploads in localStorage
-  const [userUploads, setUserUploads] = useState<UploadedItem[]>(() => {
+  // Fetch verified notes from backend
+  const fetchNotes = async (token?: string | null) => {
     try {
-      const raw = localStorage.getItem('cmc_medarchive_uploads_v1');
-      return raw ? JSON.parse(raw) : [];
+      setNotesLoading(true);
+      const headers: Record<string, string> = {};
+      const activeToken = token !== undefined ? token : authToken;
+      if (activeToken) {
+        headers['Authorization'] = `Bearer ${activeToken}`;
+      }
+      const res = await fetch('/api/notes', { headers });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.notes)) {
+          setServerNotes(data.notes);
+        }
+      }
     } catch (e) {
-      return [];
+      console.warn('Note archive server sync notice:', e);
+    } finally {
+      setNotesLoading(false);
     }
-  });
+  };
+
+  // Restore authenticated session and initial notes on mount
+  useEffect(() => {
+    const token = localStorage.getItem('cmc_auth_token');
+    if (token) {
+      setAuthToken(token);
+      fetch('/api/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('Session expired');
+          return res.json();
+        })
+        .then(data => {
+          if (data.user) {
+            setUserProfile(data.user);
+            try {
+              localStorage.setItem('cmc_user_profile', JSON.stringify(data.user));
+            } catch (e) {}
+            fetchNotes(token);
+          }
+        })
+        .catch(() => {
+          try {
+            localStorage.removeItem('cmc_auth_token');
+            localStorage.removeItem('cmc_user_profile');
+          } catch (e) {}
+          setUserProfile(null);
+          setAuthToken(null);
+          fetchNotes(null);
+        });
+    } else {
+      fetchNotes(null);
+    }
+  }, []);
+
+  // Sync authenticated user info to upload form defaults
+  useEffect(() => {
+    if (userProfile) {
+      if (!uploadFullName) {
+        setUploadFullName(userProfile.fullName || userProfile.name || '');
+      }
+      if (!uploadCollegeName || uploadCollegeName === 'Chittagong Medical College (CMC)') {
+        setUploadCollegeName(userProfile.collegeName || userProfile.college || 'Chittagong Medical College (CMC)');
+      }
+    }
+  }, [userProfile]);
+
+  // Real authentication handlers
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
+    setAuthLoading(true);
+
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Authentication failed. Please verify your credentials.');
+      }
+
+      setAuthToken(data.token);
+      setUserProfile(data.user);
+      try {
+        localStorage.setItem('cmc_auth_token', data.token);
+        localStorage.setItem('cmc_user_profile', JSON.stringify(data.user));
+      } catch (err) {}
+
+      setAuthModal(null);
+      fetchNotes(data.token);
+    } catch (err: any) {
+      setAuthError(err.message || 'An error occurred during authentication.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setAuthError(null);
+    setAuthSuccess(null);
+    setAuthLoading(true);
+
+    const form = e.currentTarget;
+    const fullName = (form.elements.namedItem('fullName') as HTMLInputElement).value.trim();
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim();
+    const collegeName = (form.elements.namedItem('collegeName') as HTMLInputElement).value.trim();
+    const batch = (form.elements.namedItem('batch') as HTMLInputElement).value.trim();
+    const roll = (form.elements.namedItem('roll') as HTMLInputElement).value.trim();
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+
+    if (!fullName || !email || !collegeName || !batch || !password) {
+      setAuthError('Please fill in all required registration fields.');
+      setAuthLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setAuthError('Password must contain at least 6 characters.');
+      setAuthLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, email, collegeName, batch, roll, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Registration failed.');
+      }
+
+      setAuthToken(data.token);
+      setUserProfile(data.user);
+      try {
+        localStorage.setItem('cmc_auth_token', data.token);
+        localStorage.setItem('cmc_user_profile', JSON.stringify(data.user));
+      } catch (err) {}
+
+      setAuthModal(null);
+      fetchNotes(data.token);
+    } catch (err: any) {
+      setAuthError(err.message || 'An error occurred during registration.');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (authToken) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+      } catch (e) {}
+    }
+    try {
+      localStorage.removeItem('cmc_auth_token');
+      localStorage.removeItem('cmc_user_profile');
+    } catch (e) {}
+    setUserProfile(null);
+    setAuthToken(null);
+    setUserMenuOpen(false);
+    fetchNotes(null);
+  };
+
+  // Note Upload submission handler
+  const handleNoteUploadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploadError(null);
+    setUploadSuccessMessage(null);
+
+    if (!authToken) {
+      setUploadError('Authentication required. Please sign in or register to submit study materials.');
+      setAuthModal('signin');
+      return;
+    }
+
+    if (!uploadFullName.trim()) {
+      setUploadError('Contributor Full Name is required.');
+      return;
+    }
+    if (!uploadCollegeName.trim()) {
+      setUploadError('Medical College Name is required as a separate field.');
+      return;
+    }
+    if (!uploadTitle.trim()) {
+      setUploadError('Note Title is required.');
+      return;
+    }
+    if (!uploadSubject.trim()) {
+      setUploadError('Please select a Medical Subject.');
+      return;
+    }
+    if (!uploadFile) {
+      setUploadError('Please select a note file (PDF or image) to upload.');
+      return;
+    }
+
+    // Size limit verification: 25 MB
+    if (uploadFile.size > 25 * 1024 * 1024) {
+      setUploadError('The selected file exceeds the 25 MB size limit. Please choose a smaller file.');
+      return;
+    }
+
+    // MIME type verification
+    const allowedMime = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!allowedMime.includes(uploadFile.type.toLowerCase())) {
+      setUploadError('Unsupported file type. Only PDF documents and image files (PNG, JPG, WEBP) are accepted.');
+      return;
+    }
+
+    try {
+      setUploadSubmitting(true);
+      setUploadProgress(25);
+
+      const formData = new FormData();
+      formData.append('fullName', uploadFullName.trim());
+      formData.append('collegeName', uploadCollegeName.trim());
+      formData.append('title', uploadTitle.trim());
+      formData.append('subject', uploadSubject.trim());
+      formData.append('topic', uploadTopic.trim() || 'General Revision');
+      formData.append('description', uploadDescription.trim());
+      formData.append('prog', uploadProg);
+      formData.append('file', uploadFile);
+
+      setUploadProgress(65);
+
+      const res = await fetch('/api/notes/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        },
+        body: formData
+      });
+
+      setUploadProgress(95);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to upload note.');
+      }
+
+      setUploadProgress(100);
+      setUploadSuccessMessage(data.message || 'Note successfully uploaded and saved to storage.');
+
+      // Clear note-specific inputs
+      setUploadTitle('');
+      setUploadTopic('');
+      setUploadDescription('');
+      setUploadFile(null);
+
+      // Re-fetch notes archive
+      fetchNotes(authToken);
+    } catch (err: any) {
+      setUploadError(err.message || 'Failed to upload study note.');
+    } finally {
+      setUploadSubmitting(false);
+      setTimeout(() => setUploadProgress(null), 1200);
+    }
+  };
+
+  // Admin note moderation action
+  const handleModerateNote = async (noteId: string, status: 'approved' | 'rejected') => {
+    if (!authToken || userProfile?.role !== 'admin') return;
+    try {
+      const res = await fetch(`/api/notes/${noteId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        fetchNotes(authToken);
+      }
+    } catch (err) {
+      console.error('Failed to moderate note:', err);
+    }
+  };
+
+  // Delete note action (for author or admin)
+  const handleDeleteUploadedNote = async (noteId: string) => {
+    if (!authToken) return;
+    if (!window.confirm('Are you sure you want to remove this study resource from the archive?')) return;
+    try {
+      const res = await fetch(`/api/notes/${noteId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        }
+      });
+      if (res.ok) {
+        fetchNotes(authToken);
+      }
+    } catch (err) {
+      console.error('Failed to delete note:', err);
+    }
+  };
 
   // MCQ 3-tier categorization state: Subject -> Paper -> Year
   const [mcqSelectedSubject, setMcqSelectedSubject] = useState<string | null>(null);
@@ -587,26 +1064,101 @@ export default function App() {
 
               {/* Sign In / User Status */}
               {userProfile ? (
-                <div className="flex items-center gap-2 ml-2 pl-2 border-l border-[var(--line)]">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--g)]">
-                    <User size={14} />
-                    <span>{userProfile.name}</span>
-                  </div>
+                <div className="relative ml-2 pl-2 border-l border-[var(--line)]">
                   <button
-                    className="text-xs text-[var(--mut)] hover:text-rose-600"
-                    title="Sign Out"
-                    onClick={() => {
-                      setUserProfile(null);
-                      try { localStorage.removeItem('cmc_user_profile'); } catch (e) {}
-                    }}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[var(--brand-sage)] text-[var(--brand-pine)] hover:bg-emerald-100 dark:hover:bg-emerald-950 transition-colors text-xs font-bold"
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    aria-expanded={userMenuOpen}
+                    title="Account Profile & Settings"
                   >
-                    <LogOut size={14} />
+                    <div className="w-5 h-5 rounded-full bg-[var(--brand-pine)] text-white flex items-center justify-center text-[10px] font-bold">
+                      {(userProfile.fullName || userProfile.name || 'U')[0].toUpperCase()}
+                    </div>
+                    <span className="max-w-[120px] truncate">{userProfile.fullName || userProfile.name}</span>
+                    <ChevronDown size={12} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {/* Profile Dropdown Card */}
+                  {userMenuOpen && (
+                    <div
+                      className="absolute right-0 top-full mt-2 w-72 bg-[var(--card)] border border-[var(--line)] rounded-xl shadow-xl z-50 p-3.5 space-y-3"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="border-b border-[var(--line)] pb-2.5">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-sm text-[var(--ink)] truncate">
+                            {userProfile.fullName || userProfile.name}
+                          </span>
+                          <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded ${userProfile.role === 'admin' ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30' : 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300'}`}>
+                            {userProfile.role === 'admin' ? 'Administrator' : 'Student'}
+                          </span>
+                        </div>
+                        <div className="text-xs text-[var(--mut)] truncate">{userProfile.email}</div>
+                        <div className="text-xs text-[var(--ink-secondary)] mt-1 font-medium">
+                          {userProfile.collegeName || userProfile.college} &bull; {userProfile.batch}
+                          {userProfile.roll ? ` (Roll: ${userProfile.roll})` : ''}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <button
+                          className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center gap-2"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            navigateTo('upload');
+                          }}
+                        >
+                          <UploadCloud size={14} className="text-[var(--brand-teal)]" />
+                          <span>Submit Study Notes</span>
+                        </button>
+
+                        <button
+                          className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center gap-2"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            setLibraryTab('my');
+                            navigateTo('library');
+                          }}
+                        >
+                          <FileText size={14} className="text-[var(--brand-pine)]" />
+                          <span>My Submissions</span>
+                        </button>
+
+                        {userProfile.role === 'admin' && (
+                          <button
+                            className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 flex items-center gap-2"
+                            onClick={() => {
+                              setUserMenuOpen(false);
+                              setLibraryTab('pending');
+                              navigateTo('library');
+                            }}
+                          >
+                            <ShieldCheck size={14} className="text-amber-600" />
+                            <span>Moderate Submissions</span>
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="pt-2 border-t border-[var(--line)]">
+                        <button
+                          className="w-full py-1.5 px-2.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center justify-center gap-1.5 transition-colors"
+                          onClick={handleLogout}
+                        >
+                          <LogOut size={13} />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <button
                   className="btn sm alt text-xs ml-2 flex items-center gap-1.5"
-                  onClick={() => setAuthModal('signin')}
+                  onClick={() => {
+                    setAuthError(null);
+                    setAuthSuccess(null);
+                    setAuthModal('signin');
+                  }}
                 >
                   <LogIn size={13} />
                   <span>Sign In</span>
@@ -2215,14 +2767,30 @@ export default function App() {
 
         {/* ===================== STUDENT LIBRARY & NOTES ===================== */}
         {page === 'library' && (() => {
-          const allLibraryItems = [...userUploads, ...INITIAL_DEMO_RESOURCES];
+          const allLibraryItems = serverNotes.length > 0 ? serverNotes : INITIAL_DEMO_RESOURCES;
           
-          const filteredLibrary = allLibraryItems.filter(item => {
+          // Tab-level filtering
+          let tabFilteredItems = allLibraryItems;
+          if (libraryTab === 'my') {
+            tabFilteredItems = allLibraryItems.filter(item => 
+              userProfile && (item.uploadedByUserId === userProfile.id || item.uploadedByEmail === userProfile.email)
+            );
+          } else if (libraryTab === 'pending') {
+            tabFilteredItems = allLibraryItems.filter(item => item.status === 'pending');
+          } else {
+            // 'all' tab shows verified approved items plus student's own items
+            tabFilteredItems = allLibraryItems.filter(item => 
+              item.status === 'approved' || 
+              (userProfile && (item.uploadedByUserId === userProfile.id || item.uploadedByEmail === userProfile.email))
+            );
+          }
+
+          const filteredLibrary = tabFilteredItems.filter(item => {
             if (librarySubject !== 'all' && item.subject.toLowerCase() !== librarySubject.toLowerCase()) return false;
             if (libraryType !== 'all' && item.kind.toLowerCase() !== libraryType.toLowerCase()) return false;
             if (librarySearch.trim()) {
               const q = librarySearch.toLowerCase().trim();
-              const fullText = `${item.title} ${item.subject} ${item.topic} ${item.desc} ${item.uploader}`.toLowerCase();
+              const fullText = `${item.title} ${item.subject} ${item.topic || ''} ${item.description || item.desc || ''} ${item.fullName || item.uploader || ''} ${item.collegeName || item.college || ''}`.toLowerCase();
               if (!fullText.includes(q)) return false;
             }
             return true;
@@ -2232,26 +2800,65 @@ export default function App() {
           const availableSubjects = ['all', 'Anatomy', 'Physiology', 'Biochemistry'];
           const availableTypes = ['all', 'Notes', 'Diagram', 'Summary'];
 
+          // Count stats
+          const myUploadsCount = userProfile ? allLibraryItems.filter(item => item.uploadedByUserId === userProfile.id || item.uploadedByEmail === userProfile.email).length : 0;
+          const pendingCount = userProfile?.role === 'admin' ? allLibraryItems.filter(item => item.status === 'pending').length : 0;
+
           return (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight text-[var(--ink)]">Student Library &amp; Academic Notes</h2>
                   <p className="mut text-sm">
-                    Verified medical notes, mnemonics, anatomical diagrams, and high-yield revision summaries contributed by Chittagong Medical College students.
+                    Verified medical notes, mnemonics, anatomical diagrams, and high-yield revision summaries contributed by medical students.
                   </p>
                 </div>
-                <button className="btn sm self-start sm:self-auto shrink-0" onClick={() => navigateTo('upload')}>
-                  Upload Study Resource
+                <button className="btn sm self-start sm:self-auto shrink-0 flex items-center gap-1.5" onClick={() => navigateTo('upload')}>
+                  <UploadCloud size={14} />
+                  <span>Submit Study Resource</span>
                 </button>
               </div>
 
-              {/* In-App Study Access Notice (No raw PDF downloads) */}
-              <div className="p-3 bg-emerald-500/5 border border-emerald-600/20 rounded-lg text-xs text-[var(--ink)] flex items-start gap-2.5">
-                <ShieldAlert size={16} className="text-[var(--brand-pine)] shrink-0 mt-0.5" />
-                <div className="leading-relaxed">
-                  <b>Academic Integrity Notice:</b> In adherence to student resource guidelines, original PDF download links have been disabled. All question banks, lecture notes, and diagrams are provided directly inside CMC MedArchive for structured, in-browser reference and self-testing.
-                </div>
+              {/* View Tabs: All Resources / My Submissions / Moderation Queue */}
+              <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] pb-2">
+                <button
+                  onClick={() => setLibraryTab('all')}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    libraryTab === 'all'
+                      ? 'bg-[var(--brand-pine)] text-white shadow-xs'
+                      : 'text-[var(--ink-secondary)] hover:bg-[var(--bg-subtle)]'
+                  }`}
+                >
+                  All Verified Notes ({allLibraryItems.filter(n => n.status === 'approved').length})
+                </button>
+
+                {userProfile && (
+                  <button
+                    onClick={() => setLibraryTab('my')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      libraryTab === 'my'
+                        ? 'bg-[var(--brand-pine)] text-white shadow-xs'
+                        : 'text-[var(--ink-secondary)] hover:bg-[var(--bg-subtle)]'
+                    }`}
+                  >
+                    <User size={13} />
+                    <span>My Submissions ({myUploadsCount})</span>
+                  </button>
+                )}
+
+                {userProfile?.role === 'admin' && (
+                  <button
+                    onClick={() => setLibraryTab('pending')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      libraryTab === 'pending'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                    }`}
+                  >
+                    <ShieldCheck size={13} />
+                    <span>Pending Moderation ({pendingCount})</span>
+                  </button>
+                )}
               </div>
 
               {/* Multi-Filter Controls Bar */}
@@ -2263,7 +2870,7 @@ export default function App() {
                     type="text"
                     value={librarySearch}
                     onChange={(e) => setLibrarySearch(e.target.value)}
-                    placeholder="Search notes by topic, title, keyword, or contributor..."
+                    placeholder="Search notes by topic, title, contributor name, or medical college..."
                     className="!pl-10 !pr-10 !py-2.5 text-sm"
                   />
                   {librarySearch && (
@@ -2334,7 +2941,7 @@ export default function App() {
                 {/* Results Count Banner */}
                 <div className="flex items-center justify-between text-xs text-[var(--mut)] pt-2 border-t border-[var(--line)]">
                   <span>
-                    Showing <b>{filteredLibrary.length}</b> of <b>{allLibraryItems.length}</b> learning resources
+                    Showing <b>{filteredLibrary.length}</b> of <b>{tabFilteredItems.length}</b> learning resources
                   </span>
                   {hasActiveFilters && (
                     <span className="font-semibold text-[var(--brand-pine)]">Filtered Results Active</span>
@@ -2346,161 +2953,497 @@ export default function App() {
               {filteredLibrary.length === 0 ? (
                 <div className="card text-center p-10 border-dashed border-2 border-[var(--line)] bg-[var(--card-subtle)]">
                   <BookOpen size={48} className="mx-auto text-[var(--mut)] mb-3 opacity-50" />
-                  <h3 className="text-lg font-bold text-[var(--ink)]">No study materials match your filters</h3>
+                  <h3 className="text-lg font-bold text-[var(--ink)]">
+                    {libraryTab === 'my' 
+                      ? "You haven't submitted any study notes yet" 
+                      : libraryTab === 'pending'
+                        ? "No pending notes currently awaiting moderation"
+                        : "No study materials match your filters"}
+                  </h3>
                   <p className="mut text-sm max-w-md mx-auto mt-1 mb-5">
-                    Try adjusting your search terms or clearing one of the subject/type filters to view all available notes and summaries.
+                    {libraryTab === 'my'
+                      ? "Share your medical revision notes, summaries, or anatomical diagrams to build your academic profile."
+                      : "Try adjusting your search terms or clearing one of the filters to view all available resources."}
                   </p>
-                  <button
-                    className="btn sm"
-                    onClick={() => {
-                      setLibrarySearch('');
-                      setLibrarySubject('all');
-                      setLibraryType('all');
-                    }}
-                  >
-                    Clear All Filters
-                  </button>
+                  {libraryTab === 'my' ? (
+                    <button className="btn sm" onClick={() => navigateTo('upload')}>
+                      Submit Your First Note &rarr;
+                    </button>
+                  ) : (
+                    <button
+                      className="btn sm"
+                      onClick={() => {
+                        setLibrarySearch('');
+                        setLibrarySubject('all');
+                        setLibraryType('all');
+                      }}
+                    >
+                      Clear All Filters
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {filteredLibrary.map(res => (
-                    <div key={res.id} className="item flex flex-col justify-between hover:border-[var(--brand-pine)] transition-all shadow-xs">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20">
-                            {res.kind}
-                          </span>
-                          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--t2)] text-[var(--t)] border border-[var(--t)]/20">
-                            {res.subject}
-                          </span>
-                          <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[var(--ink-secondary)]">
-                            {res.topic}
-                          </span>
-                          {res.prog && (
-                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 ml-auto">
-                              {res.prog}
+                  {filteredLibrary.map(res => {
+                    const isOwner = userProfile && (res.uploadedByUserId === userProfile.id || res.uploadedByEmail === userProfile.email);
+                    const isAdmin = userProfile?.role === 'admin';
+                    const displayContributor = res.fullName || res.uploader || 'CMC Student';
+                    const displayCollege = res.collegeName || res.college || 'Chittagong Medical College (CMC)';
+                    const displayDesc = res.description || res.desc;
+
+                    return (
+                      <div key={res.id} className="item flex flex-col justify-between hover:border-[var(--brand-pine)] transition-all shadow-xs">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20">
+                              {res.kind || 'Notes'}
                             </span>
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--t2)] text-[var(--t)] border border-[var(--t)]/20">
+                              {res.subject}
+                            </span>
+                            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[var(--ink-secondary)]">
+                              {res.topic}
+                            </span>
+                            {res.prog && (
+                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 ml-auto">
+                                {res.prog}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-bold text-base text-[var(--ink)] mb-1 leading-snug">
+                            {res.title}
+                          </h3>
+
+                          {displayDesc && (
+                            <p className="text-sm text-[var(--mut)] mb-3 leading-relaxed">
+                              {displayDesc}
+                            </p>
                           )}
+
+                          {/* Dedicated Contributor & College Details */}
+                          <div className="p-2.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] mb-3 text-xs space-y-1">
+                            <div className="flex items-center gap-1.5 text-[var(--ink)] font-semibold">
+                              <User size={13} className="text-[var(--brand-pine)] shrink-0" />
+                              <span className="text-[var(--mut)] font-normal">Contributor:</span>
+                              <span>{displayContributor}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[var(--ink-secondary)]">
+                              <GraduationCap size={13} className="text-[var(--brand-teal)] shrink-0" />
+                              <span className="text-[var(--mut)]">College:</span>
+                              <span className="font-medium">{displayCollege}</span>
+                            </div>
+                          </div>
                         </div>
 
-                        <h3 className="font-bold text-base text-[var(--ink)] mb-2 leading-snug">
-                          {res.title}
-                        </h3>
-                        <p className="text-sm text-[var(--mut)] mb-4 leading-relaxed">
-                          {res.desc}
-                        </p>
-                      </div>
+                        <div>
+                          {/* Status and Action Ribbon */}
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--line)] text-xs">
+                            <div className="flex items-center gap-2">
+                              {/* Status Badge */}
+                              {res.status === 'approved' ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 px-2 py-0.5 rounded">
+                                  <CheckCircle2 size={12} className="text-emerald-600" />
+                                  <span>Verified Resource</span>
+                                </span>
+                              ) : res.status === 'rejected' ? (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-300 px-2 py-0.5 rounded">
+                                  <AlertCircle size={12} className="text-rose-600" />
+                                  <span>Revision Requested</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 px-2 py-0.5 rounded">
+                                  <Clock size={12} className="text-amber-600" />
+                                  <span>Pending Review</span>
+                                </span>
+                              )}
 
-                      <div className="flex flex-wrap items-center justify-between text-xs text-[var(--mut)] pt-3 border-t border-[var(--line)]">
-                        <div className="flex items-center gap-1">
-                          <User size={12} className="text-[var(--mut)]" />
-                          <span>{res.uploader}</span>
-                          <span>&bull;</span>
-                          <span className="text-[11px]">{res.date}</span>
+                              {res.fileSize ? (
+                                <span className="text-[11px] text-[var(--mut)]">
+                                  ({(res.fileSize / 1024 / 1024).toFixed(1)} MB)
+                                </span>
+                              ) : null}
+                            </div>
+
+                            <div className="flex items-center gap-1.5">
+                              {/* Document Viewer Link */}
+                              {res.fileUrl && (
+                                <a
+                                  href={res.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="btn sm alt !px-2.5 !py-1 text-xs flex items-center gap-1 no-underline text-[var(--brand-pine)] hover:bg-[var(--brand-sage)]"
+                                  title="Open note in browser"
+                                >
+                                  <ExternalLink size={12} />
+                                  <span>Open File</span>
+                                </a>
+                              )}
+
+                              {/* Admin Moderation Actions */}
+                              {isAdmin && res.status === 'pending' && (
+                                <>
+                                  <button
+                                    onClick={() => handleModerateNote(res.id, 'approved')}
+                                    className="btn sm good !px-2 !py-0.5 text-[11px]"
+                                    title="Approve note for public library"
+                                  >
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleModerateNote(res.id, 'rejected')}
+                                    className="btn sm alt !px-2 !py-0.5 text-[11px] text-rose-600"
+                                    title="Reject note"
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              )}
+
+                              {/* Delete button (owner or admin) */}
+                              {(isOwner || isAdmin) && (
+                                <button
+                                  onClick={() => handleDeleteUploadedNote(res.id)}
+                                  className="p-1 rounded text-[var(--mut)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
+                                  title="Delete note"
+                                  aria-label="Delete note"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <span className="text-[11px] font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
-                          {res.perm}
-                        </span>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
           );
         })()}
 
-        {/* ===================== UPLOAD PAGE ===================== */}
+        {/* ===================== NOTE UPLOAD PAGE ===================== */}
         {page === 'upload' && (
-          <div>
-            <h2>Share a Study Resource</h2>
-            <div className="card mb-6">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <UploadCloud size={24} className="text-[var(--brand-pine)]" />
+                <h2 className="text-2xl font-bold tracking-tight text-[var(--ink)] m-0">Submit Study Notes</h2>
+              </div>
               <p className="mut text-sm">
-                Share your lecture notes, summaries, or past questions to help your fellow CMC classmates. Materials are verified before public archiving.
+                Share revision notes, summary sheets, and anatomical diagrams with medical students. Submissions are verified against standard curriculum guidelines.
               </p>
             </div>
 
-            <form
-              className="card max-w-xl space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const form = e.currentTarget;
-                const title = (form.elements.namedItem('title') as HTMLInputElement).value;
-                const subject = (form.elements.namedItem('subject') as HTMLSelectElement).value;
-                const topic = (form.elements.namedItem('topic') as HTMLInputElement).value;
-                const desc = (form.elements.namedItem('desc') as HTMLTextAreaElement).value;
-                const uploader = (form.elements.namedItem('uploader') as HTMLInputElement).value;
+            {/* Authentication Gateway Check */}
+            {!userProfile ? (
+              <div className="card p-6 border-amber-500/30 bg-amber-500/5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <ShieldAlert size={22} className="text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-base text-[var(--ink)] m-0">
+                      Sign In Required to Submit Study Notes
+                    </h3>
+                    <p className="text-xs text-[var(--ink-secondary)] leading-relaxed">
+                      To ensure academic accountability and prevent incorrect medical notes from entering the library, all contributors must be signed in with a student or faculty account. Your Full Name and Medical College Name will be stored and credited with your contribution.
+                    </p>
+                  </div>
+                </div>
 
-                if (!title || !subject || !topic) {
-                  alert('Please fill in title, subject and topic');
-                  return;
-                }
-
-                const newItem: UploadedItem = {
-                  id: 'u_' + Date.now(),
-                  title,
-                  subject,
-                  topic,
-                  kind: 'Student Note',
-                  desc,
-                  uploader: uploader || (userProfile?.name ? userProfile.name : 'CMC Student'),
-                  date: new Date().toISOString().slice(0, 10),
-                  perm: 'Shared locally in browser',
-                  prog
-                };
-
-                const updated = [newItem, ...userUploads];
-                setUserUploads(updated);
-                try {
-                  localStorage.setItem('cmc_medarchive_uploads_v1', JSON.stringify(updated));
-                } catch (err) {}
-
-                navigateTo('library');
-              }}
-            >
-              <div>
-                <label className="font-semibold text-sm">Your Name / Batch</label>
-                <input
-                  name="uploader"
-                  defaultValue={userProfile ? `${userProfile.name} (${userProfile.batch})` : ''}
-                  placeholder="e.g. Sifat Islam (CMC-67)"
-                />
+                <div className="pt-2 flex flex-wrap gap-2.5">
+                  <button
+                    className="btn sm flex items-center gap-1.5"
+                    onClick={() => {
+                      setAuthError(null);
+                      setAuthSuccess(null);
+                      setAuthModal('signin');
+                    }}
+                  >
+                    <LogIn size={14} />
+                    <span>Sign In to Continue</span>
+                  </button>
+                  <button
+                    className="btn sm alt flex items-center gap-1.5"
+                    onClick={() => {
+                      setAuthError(null);
+                      setAuthSuccess(null);
+                      setAuthModal('signup');
+                    }}
+                  >
+                    <UserPlus size={14} />
+                    <span>Register New Account</span>
+                  </button>
+                </div>
               </div>
+            ) : (
+              <form
+                className="card p-6 space-y-5 bg-[var(--card)] border-[var(--line)] shadow-sm"
+                onSubmit={handleNoteUploadSubmit}
+              >
+                {/* Contributor Profile Banner */}
+                <div className="p-3.5 rounded-lg bg-[var(--brand-sage)] border border-[var(--brand-pine)]/20 text-xs space-y-1">
+                  <div className="font-bold text-[var(--brand-pine)] flex items-center gap-1.5">
+                    <ShieldCheck size={14} />
+                    <span>Authenticated Contributor Profile</span>
+                  </div>
+                  <div className="text-[var(--ink-secondary)]">
+                    Logged in as <b>{userProfile.email}</b> ({userProfile.role === 'admin' ? 'Administrator' : 'Verified Student'}). You can review or customize your displayed contributor credentials below.
+                  </div>
+                </div>
 
-              <div>
-                <label className="font-semibold text-sm">Resource Title</label>
-                <input name="title" placeholder="e.g. Complete Autonomic Pharmacology Revision Sheet" required />
-              </div>
+                {/* Success Notification */}
+                {uploadSuccessMessage && (
+                  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 text-xs space-y-2">
+                    <div className="flex items-center gap-2 font-bold text-sm text-emerald-800 dark:text-emerald-300">
+                      <CheckCircle2 size={16} />
+                      <span>{uploadSuccessMessage}</span>
+                    </div>
+                    <p className="leading-relaxed">
+                      Your note has been saved to disk storage. You can view it under the "My Submissions" tab in the Student Library.
+                    </p>
+                    <button
+                      type="button"
+                      className="btn sm good mt-1"
+                      onClick={() => {
+                        setLibraryTab('my');
+                        navigateTo('library');
+                      }}
+                    >
+                      View in Student Library &rarr;
+                    </button>
+                  </div>
+                )}
 
-              <div>
-                <label className="font-semibold text-sm">Subject</label>
-                <select name="subject" required>
-                  <option value="">Select Medical Subject</option>
-                  {availableSubjects.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
+                {/* Error Notification */}
+                {uploadError && (
+                  <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2.5">
+                    <AlertCircle size={16} className="text-rose-600 shrink-0 mt-0.5" />
+                    <div>{uploadError}</div>
+                  </div>
+                )}
 
-              <div>
-                <label className="font-semibold text-sm">Topic</label>
-                <input name="topic" placeholder="e.g. Brachial Plexus / Renal Clearance" required />
-              </div>
+                {/* Field 1 & 2: Dedicated Full Name and Medical College Name */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="fullName"
+                      value={uploadFullName}
+                      onChange={(e) => setUploadFullName(e.target.value)}
+                      placeholder="e.g. Sifat Islam"
+                      required
+                      className="w-full text-sm"
+                    />
+                    <span className="text-[11px] text-[var(--mut)]">Contributor name credited on the note.</span>
+                  </div>
 
-              <div>
-                <label className="font-semibold text-sm">Description &amp; Key Takeaways</label>
-                <textarea name="desc" rows={3} placeholder="Brief summary of what this document covers..." />
-              </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Medical College Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="collegeName"
+                      value={uploadCollegeName}
+                      onChange={(e) => setUploadCollegeName(e.target.value)}
+                      placeholder="e.g. Chittagong Medical College (CMC)"
+                      required
+                      className="w-full text-sm"
+                    />
+                    <span className="text-[11px] text-[var(--mut)]">Independent institution field.</span>
+                  </div>
+                </div>
 
-              <div>
-                <label className="font-semibold text-sm">Google Drive / Public Link (Optional)</label>
-                <input name="url" type="url" placeholder="https://drive.google.com/..." />
-              </div>
+                {/* Field 3: Note Title */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Note Title <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    name="title"
+                    value={uploadTitle}
+                    onChange={(e) => setUploadTitle(e.target.value)}
+                    placeholder="e.g. Autonomic Pharmacology &amp; Receptor Classification Sheet"
+                    required
+                    className="w-full text-sm"
+                  />
+                </div>
 
-              <div className="pt-2">
-                <button type="submit" className="btn w-full">
-                  Save to Local Archive
-                </button>
-              </div>
-            </form>
+                {/* Field 4 & 5: Subject and Curriculum Stream */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Medical Subject <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      name="subject"
+                      value={uploadSubject}
+                      onChange={(e) => setUploadSubject(e.target.value)}
+                      required
+                      className="w-full text-sm"
+                    >
+                      <option value="">Select Medical Subject</option>
+                      {availableSubjects.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Curriculum
+                    </label>
+                    <select
+                      name="prog"
+                      value={uploadProg}
+                      onChange={(e) => setUploadProg(e.target.value as 'MBBS' | 'BDS')}
+                      className="w-full text-sm"
+                    >
+                      <option value="MBBS">MBBS</option>
+                      <option value="BDS">BDS</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Topic / System */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Topic / Anatomical Region / System
+                  </label>
+                  <input
+                    name="topic"
+                    value={uploadTopic}
+                    onChange={(e) => setUploadTopic(e.target.value)}
+                    placeholder="e.g. Brachial Plexus / Renal Physiology / Carbohydrate Metabolism"
+                    className="w-full text-sm"
+                  />
+                </div>
+
+                {/* Field 6: Note Description */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Note Description &amp; Key Takeaways <span className="text-[var(--mut)] font-normal">(Optional)</span>
+                  </label>
+                  <textarea
+                    name="description"
+                    value={uploadDescription}
+                    onChange={(e) => setUploadDescription(e.target.value)}
+                    rows={3}
+                    placeholder="Brief summary of what this document covers, high-yield mnemonics, or exam tips..."
+                    className="w-full text-sm"
+                  />
+                </div>
+
+                {/* Field 7: File Upload Area */}
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Select Note File <span className="text-rose-500">*</span>
+                  </label>
+                  
+                  <div className="border-2 border-dashed border-[var(--line)] hover:border-[var(--brand-pine)] rounded-xl p-5 text-center transition-colors bg-[var(--bg-subtle)]">
+                    <input
+                      type="file"
+                      id="file-input"
+                      accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        if (file) {
+                          if (file.size > 25 * 1024 * 1024) {
+                            setUploadError('File exceeds 25 MB size limit.');
+                            setUploadFile(null);
+                            return;
+                          }
+                          setUploadError(null);
+                          setUploadFile(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+
+                    {!uploadFile ? (
+                      <label htmlFor="file-input" className="cursor-pointer block space-y-2">
+                        <FileUp size={36} className="mx-auto text-[var(--brand-pine)] opacity-80" />
+                        <div className="text-sm font-bold text-[var(--ink)]">
+                          Click to select a PDF document or image file
+                        </div>
+                        <div className="text-xs text-[var(--mut)]">
+                          Supported formats: PDF, PNG, JPG, WEBP (Maximum size: 25 MB)
+                        </div>
+                      </label>
+                    ) : (
+                      <div className="flex items-center justify-between p-3 bg-[var(--card)] rounded-lg border border-[var(--line)]">
+                        <div className="flex items-center gap-2.5 text-left truncate">
+                          <FileText size={20} className="text-[var(--brand-pine)] shrink-0" />
+                          <div className="truncate">
+                            <div className="text-xs font-bold text-[var(--ink)] truncate">
+                              {uploadFile.name}
+                            </div>
+                            <div className="text-[11px] text-[var(--mut)]">
+                              {(uploadFile.size / 1024 / 1024).toFixed(2)} MB &bull; {uploadFile.type || 'Document'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setUploadFile(null)}
+                          className="p-1 rounded text-[var(--mut)] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Change file"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                {uploadProgress !== null && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs text-[var(--mut)]">
+                      <span>Uploading to server storage...</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-[var(--line)] h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[var(--brand-pine)] h-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Submission Action */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={uploadSubmitting}
+                    className="btn w-full flex items-center justify-center gap-2 text-sm font-bold"
+                  >
+                    {uploadSubmitting ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Storing Note &amp; Metadata...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud size={16} />
+                        <span>
+                          {userProfile.role === 'admin' ? 'Publish to Student Library' : 'Submit Note for Academic Verification'}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[11px] text-center text-[var(--mut)] mt-2">
+                    {userProfile.role === 'admin'
+                      ? 'Administrator submission: your document will be published immediately.'
+                      : 'Submitted notes are archived securely and reviewed for academic accuracy before public display.'}
+                  </p>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
@@ -2697,7 +3640,11 @@ export default function App() {
       {authModal && (
         <div
           className="modal-overlay"
-          onClick={() => setAuthModal(null)}
+          onClick={() => {
+            setAuthModal(null);
+            setAuthError(null);
+            setAuthSuccess(null);
+          }}
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
@@ -2707,19 +3654,23 @@ export default function App() {
               <div className="flex items-center gap-2.5">
                 <CmcLogo variant="icon" size="sm" />
                 <h3 id="auth-modal-title" className="text-base font-bold m-0 text-slate-900 dark:text-white">
-                  {authModal === 'signin' ? 'Sign In to CMC MedArchive' : 'Student Registration'}
+                  {authModal === 'signin' ? 'Sign In to CMC MedArchive' : 'Student Account Registration'}
                 </h3>
               </div>
               <button
                 className="btn sm alt !px-2.5 !py-1 text-xs"
-                onClick={() => setAuthModal(null)}
+                onClick={() => {
+                  setAuthModal(null);
+                  setAuthError(null);
+                  setAuthSuccess(null);
+                }}
                 aria-label="Close modal"
               >
                 <X size={16} />
               </button>
             </div>
 
-            {/* Modal Tabs */}
+            {/* Modal Navigation Tabs */}
             <div className="grid grid-cols-2 border-b border-[var(--line)] bg-[var(--bg-subtle)] text-xs font-bold">
               <button
                 type="button"
@@ -2728,7 +3679,11 @@ export default function App() {
                     ? 'bg-[var(--card)] text-[var(--brand-pine)] border-b-2 border-[var(--brand-pine)]'
                     : 'text-[var(--mut)] hover:text-[var(--ink)]'
                 }`}
-                onClick={() => setAuthModal('signin')}
+                onClick={() => {
+                  setAuthError(null);
+                  setAuthSuccess(null);
+                  setAuthModal('signin');
+                }}
               >
                 Sign In
               </button>
@@ -2739,126 +3694,215 @@ export default function App() {
                     ? 'bg-[var(--card)] text-[var(--brand-pine)] border-b-2 border-[var(--brand-pine)]'
                     : 'text-[var(--mut)] hover:text-[var(--ink)]'
                 }`}
-                onClick={() => setAuthModal('signup')}
+                onClick={() => {
+                  setAuthError(null);
+                  setAuthSuccess(null);
+                  setAuthModal('signup');
+                }}
               >
                 Register Account
               </button>
             </div>
 
-            <div className="p-5 overflow-y-auto max-h-[75vh] bg-[var(--card)]">
-              {/* Honest Backend Setup Notice */}
-              <div className="p-3 mb-4 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-[var(--ink)]">
-                <div className="flex items-start gap-2">
-                  <ShieldAlert size={16} className="text-amber-700 flex-shrink-0 mt-0.5" />
-                  <div className="leading-relaxed">
-                    <b>Account Setup Notice:</b> Cloud authentication with Chittagong Medical College roll/batch verification is currently in development. You can sign in or register below to activate your browser session and submit study resources to the library.
+            <div className="p-5 overflow-y-auto max-h-[75vh] bg-[var(--card)] space-y-4">
+              {/* Error Message Box */}
+              {authError && (
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs flex items-start gap-2">
+                  <AlertCircle size={15} className="text-rose-600 shrink-0 mt-0.5" />
+                  <div>{authError}</div>
+                </div>
+              )}
+
+              {/* Success Message Box */}
+              {authSuccess && (
+                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs flex items-start gap-2">
+                  <CheckCircle2 size={15} className="text-emerald-600 shrink-0 mt-0.5" />
+                  <div>{authSuccess}</div>
+                </div>
+              )}
+
+              {/* Academic Account Notice & Test Credentials Helper */}
+              <div className="p-3 rounded-lg bg-[var(--brand-sage)] border border-[var(--brand-pine)]/20 text-xs text-[var(--ink)] space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-[var(--brand-pine)]">
+                  <ShieldCheck size={14} />
+                  <span>Curriculum Verification Access</span>
+                </div>
+                <div className="leading-relaxed text-[var(--ink-secondary)] text-[11px]">
+                  Sign in with your medical student credentials.
+                  <div className="mt-1 pt-1 border-t border-[var(--brand-pine)]/15 text-[11px] font-mono">
+                    <b>Admin:</b> sifatislam.cmc67@gmail.com / cmc67student<br />
+                    <b>Demo Student:</b> student@cmc.edu.bd / studentdemo
                   </div>
                 </div>
               </div>
 
               {authModal === 'signin' ? (
-                <form
-                  className="space-y-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                    const user: UserProfile = {
-                      name: email.split('@')[0],
-                      email,
-                      college: 'Chittagong Medical College (CMC)',
-                      batch: 'CMC-67'
-                    };
-                    setUserProfile(user);
-                    try { localStorage.setItem('cmc_user_profile', JSON.stringify(user)); } catch (err) {}
-                    setAuthModal(null);
-                  }}
-                >
+                <form className="space-y-3.5" onSubmit={handleLogin}>
                   <div>
-                    <label className="text-xs font-semibold">Student Email</label>
-                    <input name="email" type="email" placeholder="student@cmc.edu.bd" required />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold">Password / Access Code</label>
-                    <input name="password" type="password" placeholder="••••••••" required />
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Email Address
+                    </label>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="student@cmc.edu.bd"
+                      required
+                      className="w-full text-sm"
+                      autoComplete="username"
+                    />
                   </div>
 
-                  <button type="submit" className="btn w-full mt-3">
-                    Sign In
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Password
+                    </label>
+                    <input
+                      name="password"
+                      type="password"
+                      placeholder="••••••••"
+                      required
+                      className="w-full text-sm"
+                      autoComplete="current-password"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="btn w-full mt-2 flex items-center justify-center gap-2 text-sm font-bold"
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" />
+                        <span>Verifying Credentials...</span>
+                      </>
+                    ) : (
+                      <>
+                        <LogIn size={15} />
+                        <span>Sign In</span>
+                      </>
+                    )}
                   </button>
 
-                  <div className="text-center text-xs text-[var(--mut)] pt-3">
-                    Don't have an account?{' '}
+                  <div className="text-center text-xs text-[var(--mut)] pt-2">
+                    Don't have an account yet?{' '}
                     <button
                       type="button"
-                      className="underline text-[var(--t)] font-semibold"
-                      onClick={() => setAuthModal('signup')}
+                      className="underline text-[var(--t)] font-bold hover:text-[var(--brand-pine)]"
+                      onClick={() => {
+                        setAuthError(null);
+                        setAuthModal('signup');
+                      }}
                     >
                       Register here
                     </button>
                   </div>
                 </form>
               ) : (
-                <form
-                  className="space-y-3"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-                    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                    const college = (form.elements.namedItem('college') as HTMLInputElement).value;
-                    const batch = (form.elements.namedItem('batch') as HTMLInputElement).value;
-                    const roll = (form.elements.namedItem('roll') as HTMLInputElement).value;
-
-                    const user: UserProfile = {
-                      name,
-                      email,
-                      college: college || 'Chittagong Medical College',
-                      batch: batch || 'CMC-67',
-                      roll
-                    };
-                    setUserProfile(user);
-                    try { localStorage.setItem('cmc_user_profile', JSON.stringify(user)); } catch (err) {}
-                    setAuthModal(null);
-                  }}
-                >
+                <form className="space-y-3.5" onSubmit={handleRegister}>
                   <div>
-                    <label className="text-xs font-semibold">Full Name</label>
-                    <input name="name" placeholder="e.g. Sifat Islam" required />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold">Email Address</label>
-                    <input name="email" type="email" placeholder="student@example.com" required />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold">Medical College</label>
-                    <input name="college" defaultValue="Chittagong Medical College (CMC)" required />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-xs font-semibold">Batch / Session</label>
-                      <input name="batch" placeholder="e.g. CMC-67" required />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold">Roll Number</label>
-                      <input name="roll" placeholder="e.g. 102" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold">Password</label>
-                    <input name="password" type="password" placeholder="••••••••" required />
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="fullName"
+                      placeholder="e.g. Sifat Islam"
+                      required
+                      className="w-full text-sm"
+                    />
                   </div>
 
-                  <button type="submit" className="btn w-full mt-3">
-                    Complete Registration
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Medical College Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="collegeName"
+                      defaultValue="Chittagong Medical College (CMC)"
+                      required
+                      className="w-full text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Email Address <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="student@example.com"
+                      required
+                      className="w-full text-sm"
+                      autoComplete="email"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                        Batch / Session <span className="text-rose-500">*</span>
+                      </label>
+                      <input
+                        name="batch"
+                        placeholder="e.g. CMC-67"
+                        required
+                        className="w-full text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                        Roll Number
+                      </label>
+                      <input
+                        name="roll"
+                        placeholder="e.g. 102"
+                        className="w-full text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Create Password <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      name="password"
+                      type="password"
+                      placeholder="Minimum 6 characters"
+                      required
+                      className="w-full text-sm"
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="btn w-full mt-2 flex items-center justify-center gap-2 text-sm font-bold"
+                  >
+                    {authLoading ? (
+                      <>
+                        <Loader2 size={15} className="animate-spin" />
+                        <span>Creating Account...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus size={15} />
+                        <span>Complete Registration</span>
+                      </>
+                    )}
                   </button>
 
-                  <div className="text-center text-xs text-[var(--mut)] pt-3">
+                  <div className="text-center text-xs text-[var(--mut)] pt-2">
                     Already registered?{' '}
                     <button
                       type="button"
-                      className="underline text-[var(--t)] font-semibold"
-                      onClick={() => setAuthModal('signin')}
+                      className="underline text-[var(--t)] font-bold hover:text-[var(--brand-pine)]"
+                      onClick={() => {
+                        setAuthError(null);
+                        setAuthModal('signin');
+                      }}
                     >
                       Sign in instead
                     </button>
