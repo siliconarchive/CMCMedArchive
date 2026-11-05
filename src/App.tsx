@@ -977,51 +977,101 @@ export default function App() {
       )}
 
       {/* Top Banner Notice */}
-      <div className="notice">
-        <div className="wrap flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            <span><b>CMC MedArchive</b> — Chittagong Medical College Student Resource Bank</span>
+      {/* Top Utility Ribbon (Cyan / Educational Blue bar as in reference screenshot) */}
+      <div className="ed-topbar">
+        <div className="wrap flex flex-wrap items-center justify-between gap-3 py-1.5">
+          {/* Left: Academic Portals & Audience */}
+          <div className="flex items-center gap-3 text-xs">
+            <span className="font-bold tracking-tight">CMC MedArchive</span>
+            <span className="opacity-40">|</span>
+            <span className="hidden sm:inline opacity-90">Chittagong Medical College</span>
+            <span className="opacity-40 hidden sm:inline">|</span>
+            <span className="opacity-90">{prog} Medical Curriculum</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Right: Curriculum Switcher, Telegram Icon & Action Triggers */}
+          <div className="flex items-center gap-2.5">
+            {/* Curriculum Switcher: MBBS | BDS */}
+            <div className="inline-flex items-center rounded bg-white/20 p-0.5 text-xs font-bold">
+              <button
+                className={`px-2 py-0.5 rounded transition-all ${prog === 'MBBS' ? 'bg-white text-[#0082c9] shadow-xs' : 'text-white hover:bg-white/10'}`}
+                onClick={() => handleProgramSwitch('MBBS')}
+                title="Switch to MBBS Curriculum"
+              >
+                MBBS
+              </button>
+              <button
+                className={`px-2 py-0.5 rounded transition-all ${prog === 'BDS' ? 'bg-white text-[#0082c9] shadow-xs' : 'text-white hover:bg-white/10'}`}
+                onClick={() => handleProgramSwitch('BDS')}
+                title="Switch to BDS Curriculum"
+              >
+                BDS
+              </button>
+            </div>
+
+            {/* Recognisable Clickable Telegram Icon (NO visible text URL!) */}
             <a
               href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-teal)] hover:text-[var(--brand-pine)] font-semibold"
-              title="Join CMC MedArchive Telegram"
+              className="telegram-icon-btn"
+              title="Join us on Telegram"
+              aria-label="Join us on Telegram"
             >
-              <TelegramIcon className="w-4 h-4 text-sky-600" />
-              <span>@Sifat_Islam_7</span>
+              <TelegramIcon className="w-4 h-4 text-white" />
             </a>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--mut)] hidden sm:inline">
-              Academic Archive
-            </span>
+
+            {/* Quick Updates Pill (similar to News Subscription in screenshot) */}
+            <button
+              onClick={() => navigateTo('mcq')}
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold bg-[#00a651] hover:bg-[#009146] text-white transition-colors"
+            >
+              <span>60 MCQ Papers</span>
+            </button>
+
+            {/* Sign In / User Status (similar to Login/Register in screenshot) */}
+            {userProfile ? (
+              <div className="relative">
+                <button
+                  className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#005b94] hover:bg-[#004d7c] text-white text-xs font-bold transition-colors"
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  aria-expanded={userMenuOpen}
+                  title="Account Profile & Settings"
+                >
+                  <div className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center text-[10px] font-bold">
+                    {(userProfile.fullName || userProfile.name || 'U')[0].toUpperCase()}
+                  </div>
+                  <span className="max-w-[100px] truncate">{userProfile.fullName || userProfile.name}</span>
+                  <ChevronDown size={11} className={`transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </div>
+            ) : (
+              <button
+                className="px-3 py-1 rounded bg-[#005b94] hover:bg-[#004d7c] text-white text-xs font-bold transition-colors flex items-center gap-1"
+                onClick={() => {
+                  setAuthError(null);
+                  setAuthSuccess(null);
+                  setAuthModal('signin');
+                }}
+              >
+                <LogIn size={12} />
+                <span>Sign In</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Main Header */}
-      <header>
-        <div className="wrap bar">
+      {/* Main Header — Clean White Bar with Prominent Unchanged Logo */}
+      <header className="ed-header">
+        <div className="wrap ed-bar">
+          {/* Logo Prominently Positioned on Left — Original Logo Unchanged */}
           <button className="brand group" onClick={() => navigateTo('home')} aria-label="CMC MedArchive Home">
             <CmcLogo variant="full" size="md" />
           </button>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Telegram Header Quick Link */}
-            <a
-              href={TELEGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-lg bg-[var(--brand-sage)] text-sky-700 hover:bg-sky-100 transition-colors inline-flex items-center justify-center"
-              aria-label="Telegram Community"
-              title="Join Telegram Community"
-            >
-              <TelegramIcon className="w-5 h-5 text-sky-600" />
-            </a>
-
+          {/* Navigation Links Arranged Neatly Across Header + Search Icon on Right */}
+          <div className="flex items-center gap-3">
             <button
               id="menu"
               aria-expanded={mobileMenuOpen}
@@ -1031,36 +1081,44 @@ export default function App() {
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
 
-            <nav className={mobileMenuOpen ? "open" : ""}>
-              <button className={page === 'home' ? 'on' : ''} onClick={() => navigateTo('home')}>Home</button>
-              <button className={page === 'archive' ? 'on' : ''} onClick={() => navigateTo('archive')}>Written (CQ)</button>
+            <nav className={`ed-nav ${mobileMenuOpen ? "open" : ""}`}>
+              <button className={page === 'home' ? 'on' : ''} onClick={() => navigateTo('home')}>
+                Homepage
+              </button>
+              <button className={page === 'archive' ? 'on' : ''} onClick={() => navigateTo('archive')}>
+                Written (CQ)
+              </button>
               <button className={page === 'mcq' ? 'on' : ''} onClick={() => navigateTo('mcq')}>
                 MCQ Practice
-                <span className="ml-1 px-1.5 py-0.5 bg-emerald-600/10 text-emerald-800 dark:text-emerald-300 border border-emerald-600/20 rounded text-[10px] font-bold">{MCQ_VERIFICATION_STATS.totalQuestions} Questions</span>
               </button>
               <button className={page === 'teacher' ? 'on' : ''} onClick={() => navigateTo('teacher')}>
                 Viva Bank
-                <span className="ml-1 px-1.5 py-0.5 bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/20 rounded text-[10px] font-bold">Dev</span>
               </button>
-              <button className={page === 'library' ? 'on' : ''} onClick={() => navigateTo('library')}>Library</button>
-              <button className={page === 'upload' ? 'on' : ''} onClick={() => navigateTo('upload')}>Upload</button>
-              <button className={page === 'about' ? 'on' : ''} onClick={() => navigateTo('about')}>About</button>
+              <button className={page === 'library' ? 'on' : ''} onClick={() => navigateTo('library')}>
+                Student Library
+              </button>
+              <button className={page === 'upload' ? 'on' : ''} onClick={() => navigateTo('upload')}>
+                Upload Notes
+              </button>
+              <button className={page === 'about' ? 'on' : ''} onClick={() => navigateTo('about')}>
+                About
+              </button>
 
-              {/* Program Switcher */}
-              <div className="ml-2 inline-flex rounded-lg p-1 bg-[var(--g2)] border border-[var(--line)]">
-                <button
-                  className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all ${prog === 'MBBS' ? 'bg-[var(--card)] text-[var(--g)] shadow-sm' : 'text-[var(--mut)]'}`}
-                  onClick={() => handleProgramSwitch('MBBS')}
-                >
-                  MBBS
-                </button>
-                <button
-                  className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all ${prog === 'BDS' ? 'bg-[var(--card)] text-[var(--g)] shadow-sm' : 'text-[var(--mut)]'}`}
-                  onClick={() => handleProgramSwitch('BDS')}
-                >
-                  BDS
-                </button>
-              </div>
+              {/* Magnifying Glass Search Button on Right of Nav */}
+              <button
+                onClick={() => {
+                  if (page !== 'home') navigateTo('home');
+                  setTimeout(() => {
+                    document.getElementById('home-search-input')?.focus();
+                  }, 100);
+                }}
+                className="p-2 rounded-full text-slate-600 hover:text-sky-600 hover:bg-sky-50 dark:text-slate-300 transition-colors ml-1 hidden lg:inline-flex"
+                title="Search Archive"
+                aria-label="Search Archive"
+              >
+                <Search size={19} />
+              </button>
+            </nav>
 
               {/* Sign In / User Status */}
               {userProfile ? (
@@ -1164,7 +1222,6 @@ export default function App() {
                   <span>Sign In</span>
                 </button>
               )}
-            </nav>
           </div>
         </div>
       </header>
@@ -1173,56 +1230,104 @@ export default function App() {
       <main className="wrap flex-1 my-6" id="app">
         {/* ===================== HOME PAGE ===================== */}
         {page === 'home' && (
-          <div>
-            {/* Hero Section */}
-            <div className="hero">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 mb-3 tracking-wide uppercase font-sans">
-                <span className="text-emerald-800 dark:text-emerald-300 font-bold">{prog} Medical Curriculum</span>
-                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
-                <span>{ALL_QUESTIONS.filter(q => q.prog === prog).length} Written Past Questions</span>
-                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
-                <span>14 Authentic MCQ Papers</span>
-                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
-                <span className="text-teal-700 dark:text-teal-400">118 Verified References</span>
+          <div className="space-y-10">
+            {/* Spacious Main Hero Section — Inspired by Reference Screenshot */}
+            <section className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-6 sm:p-10 lg:p-14 shadow-sm">
+              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 lg:gap-12">
+                {/* Left Column: Prominent Institutional Emblem (Original CmcLogo Unchanged) */}
+                <div className="shrink-0 flex items-center justify-center p-6 sm:p-8 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+                  <CmcLogo variant="icon" size="xl" />
+                </div>
+
+                {/* Right Column: Hero Heading, Sub-heading, Intro, and Outlined Action Buttons */}
+                <div className="flex-1 text-center lg:text-left">
+                  {/* Exact Main Heading Required */}
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-2 leading-tight">
+                    Welcome to CMC MedArchive
+                  </h1>
+
+                  {/* Sub-heading in Sky Blue */}
+                  <div className="text-lg sm:text-xl font-bold text-[#0082c9] dark:text-sky-400 mb-4 tracking-normal">
+                    Chittagong Medical College (CMC)
+                  </div>
+
+                  {/* Concise, Elegant, Professional Introduction */}
+                  <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl mb-8">
+                    CMC MedArchive is the centralized academic repository and examination resource platform for students of Chittagong Medical College. Access authentic 1st Professional written questions (CQ) organized paper-wise by subject, practice 1,200 verified university MCQs with standard textbook citations, and collaborate through peer-reviewed study notes and viva checklists.
+                  </p>
+
+                  {/* Outlined Action Buttons (matching [ Website ] [ Brochure ] [ Enquiry ] in the screenshot) */}
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                    <button
+                      onClick={() => navigateTo('archive')}
+                      className="ed-btn-outline"
+                    >
+                      Written Questions (CQ)
+                    </button>
+                    <button
+                      onClick={() => navigateTo('mcq')}
+                      className="ed-btn-outline"
+                    >
+                      MCQ Examination Practice
+                    </button>
+                    <button
+                      onClick={() => navigateTo('library')}
+                      className="ed-btn-outline"
+                    >
+                      Student Library
+                    </button>
+                    <button
+                      onClick={() => navigateTo('upload')}
+                      className="ed-btn-outline"
+                    >
+                      Submit Resource
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Repository Quick Search Bar */}
+            <div className="bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  Quick Repository Search
+                </span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  {ALL_QUESTIONS.filter(q => q.prog === prog).length} Written Questions &bull; {MCQ_VERIFICATION_STATS.totalQuestions} Verified MCQs
+                </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 text-slate-900 dark:text-white">
-                CMC MedArchive
-              </h1>
-              <p className="tag">Questions. Notes. Knowledge. Together.</p>
-              <p className="text-[var(--mut)] max-w-2xl mb-6 text-sm sm:text-base leading-relaxed">
-                Chittagong Medical College official student question archive. Search past written examination questions organized paper-wise by subject, practice authentic university MCQs with verified answer scripts, and study with peer-contributed medical summaries.
-              </p>
-
               <form
-                className="sb max-w-2xl"
+                className="sb max-w-3xl"
                 onSubmit={(e) => {
                   e.preventDefault();
                   navigateTo('archive');
                 }}
               >
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
                   <input
+                    id="home-search-input"
                     aria-label="Search questions"
-                    placeholder="Search past questions, topics (e.g. brachial plexus, GFR, glycolysis, cardiac cycle)..."
+                    placeholder="Search past questions, topics, or physiological mechanisms (e.g. brachial plexus, GFR, glycolysis)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-11 pr-4 py-3 text-sm rounded-lg"
                   />
                 </div>
-                <button type="submit" className="btn">
-                  Search Questions
+                <button type="submit" className="btn font-semibold">
+                  Search Archive
                 </button>
               </form>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-[var(--mut)]">
-                <span className="font-medium text-slate-500">Popular topics:</span>
-                {["Brachial plexus", "GFR", "Cardiac cycle", "Erb's palsy", "Glycolysis", "Pleural effusion", "Somatomedin"].map(t => (
+              <div className="mt-3.5 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">High-Yield Topics:</span>
+                {["Brachial plexus", "GFR & filtration fraction", "Cardiac cycle", "Erb's palsy", "Glycolysis", "Pleural effusion", "Somatomedin"].map(t => (
                   <button
                     key={t}
                     type="button"
-                    className="underline text-[var(--brand-teal)] hover:text-[var(--brand-pine)] cursor-pointer transition-colors"
+                    className="text-sky-600 hover:text-sky-800 dark:text-sky-400 hover:underline cursor-pointer transition-colors"
                     onClick={() => {
                       setSearchQuery(t);
                       navigateTo('archive');
@@ -1234,114 +1339,348 @@ export default function App() {
               </div>
             </div>
 
-            {/* Core Features Dashboard */}
-            <section>
-              <div className="flex items-center justify-between mb-4">
-                <h2>Academic Sections</h2>
-                <span className="text-xs font-semibold text-[var(--mut)] uppercase tracking-wider">
-                  Chittagong Medical College
-                </span>
+            {/* Curricular Subjects & Question Banks (Anatomy, Physiology, Biochemistry) */}
+            <div className="space-y-4">
+              <div className="border-b border-slate-200 dark:border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white m-0">
+                    1st Professional Curricular Subjects
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Complete curriculum structured paper-wise for Chittagong Medical University (CMU) and University of Chittagong (CU)
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                  <span>Paper-I &bull; Paper-II</span>
+                </div>
               </div>
-              
-              <div className="grid">
-                <button className="card group cursor-pointer" onClick={() => navigateTo('archive')}>
-                  <div className="ic">
-                    <BookOpen size={20} />
-                  </div>
-                  <h3 className="group-hover:text-[var(--brand-teal)] transition-colors">Written Questions (CQ)</h3>
-                  <span className="mut text-sm">
-                    Paper-wise past questions with answers, mark distributions &amp; examination tags.
-                  </span>
-                </button>
 
-                <button className="card group cursor-pointer border-teal-500/30 bg-teal-500/5 hover:border-teal-500/60" onClick={() => navigateTo('mcq')}>
-                  <div className="ic !bg-teal-500/15 !text-teal-700 dark:!text-teal-300">
-                    <FileCheck2 size={20} />
-                  </div>
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h3 className="text-teal-800 dark:text-teal-300 font-bold m-0 group-hover:text-[var(--brand-pine)] transition-colors">
-                      MCQ Examination Practice
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* Anatomy Card */}
+                <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs hover:border-sky-400 dark:hover:border-sky-500 transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                        Subject 01
+                      </span>
+                      <span className="badge ok text-[10px]">
+                        145 Verified MCQs
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      Anatomy
                     </h3>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-600/10 text-emerald-800 dark:text-emerald-300 border border-emerald-600/20">
-                      {MCQ_VERIFICATION_STATS.papersCount} Papers
-                    </span>
-                  </div>
-                  <span className="mut text-sm">
-                    {MCQ_VERIFICATION_STATS.papersCount} authentic CMU examination papers across Anatomy ({MCQ_VERIFICATION_STATS.anatomyCount} Qs), Biochemistry ({MCQ_VERIFICATION_STATS.biochemistryCount} Qs), and Physiology ({MCQ_VERIFICATION_STATS.physiologyCount} Qs) with verified textbook citations.
-                  </span>
-                </button>
 
-                <button className="card group cursor-pointer" onClick={() => navigateTo('teacher')}>
-                  <div className="ic !bg-amber-500/15 !text-amber-700 dark:!text-amber-300">
-                    <GraduationCap size={20} />
-                  </div>
-                  <div className="flex items-center justify-between gap-2 mb-1">
-                    <h3 className="group-hover:text-[var(--brand-teal)] transition-colors m-0">Viva Bank</h3>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold rounded border border-amber-500/20">
-                      In Dev
-                    </span>
-                  </div>
-                  <span className="mut text-sm">
-                    Teacher-wise viva questions, card-wise table checklists &amp; high-yield examiner favorites.
-                  </span>
-                </button>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Gross Anatomy, General Histology, Medical Embryology, Neuroanatomy, Head &amp; Neck, Thorax, Abdomen, Pelvis, and Limbs.
+                    </p>
 
-                <button className="card group cursor-pointer" onClick={() => navigateTo('library')}>
-                  <div className="ic">
-                    <FileText size={20} />
+                    <div className="text-xs font-semibold text-slate-500 mb-4">
+                      {ALL_QUESTIONS.filter(q => q.prog === prog && q.subject === 'Anatomy').length} Written Questions archived
+                    </div>
                   </div>
-                  <h3 className="group-hover:text-[var(--brand-teal)] transition-colors">Student Library</h3>
-                  <span className="mut text-sm">
-                    Community study guides, mnemonics &amp; diagram summaries shared by classmates.
-                  </span>
-                </button>
 
-                <button className="card group cursor-pointer" onClick={() => navigateTo('upload')}>
-                  <div className="ic">
-                    <ExternalLink size={20} />
-                  </div>
-                  <h3 className="group-hover:text-[var(--brand-teal)] transition-colors">Upload Resource</h3>
-                  <span className="mut text-sm">
-                    Submit lecture notes, summaries or Google Drive links for academic review.
-                  </span>
-                </button>
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Anatomy', paper: 'Paper-I', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-I (CQ)
+                      </button>
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Anatomy', paper: 'Paper-II', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-II (CQ)
+                      </button>
+                    </div>
 
-                <button className="card group cursor-pointer" onClick={() => navigateTo('about')}>
-                  <div className="ic">
-                    <Info size={20} />
-                  </div>
-                  <h3 className="group-hover:text-[var(--brand-teal)] transition-colors">About CMC MedArchive</h3>
-                  <span className="mut text-sm">
-                    Student-run mission, developer profile of Sifat Islam &amp; Telegram community.
-                  </span>
-                </button>
-              </div>
-            </section>
-
-            {/* Medical Subjects Selection Area */}
-            <section>
-              <h2>Medical Subjects</h2>
-              <p className="mut text-sm mb-3">
-                Select a medical subject to view its structured past questions organized paper-wise:
-              </p>
-              <div className="chips">
-                {availableSubjects.map(subj => {
-                  const count = ALL_QUESTIONS.filter(q => q.prog === prog && q.subject === subj).length;
-                  return (
                     <button
-                      key={subj}
-                      className="chip"
+                      className="w-full text-center py-2 text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:underline flex items-center justify-center gap-1"
                       onClick={() => {
-                        setFilters(prev => ({ ...prev, subject: subj, section: '' }));
-                        navigateTo('archive');
+                        setMcqSelectedSubject('Anatomy');
+                        setMcqSelectedPaper(null);
+                        setMcqSelectedYear(null);
+                        navigateTo('mcq');
                       }}
                     >
-                      {subj} ({count})
+                      <span>Practice Anatomy MCQs &rarr;</span>
                     </button>
-                  );
-                })}
+                  </div>
+                </div>
+
+                {/* Physiology Card */}
+                <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs hover:border-sky-400 dark:hover:border-sky-500 transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                        Subject 02
+                      </span>
+                      <span className="badge ok text-[10px]">
+                        678 Verified MCQs
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      Physiology
+                    </h3>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      General Physiology, Nerve-Muscle, Blood &amp; Immunity, Cardiovascular, Respiration, Renal &amp; Body Fluids, Endocrine, and CNS.
+                    </p>
+
+                    <div className="text-xs font-semibold text-slate-500 mb-4">
+                      {ALL_QUESTIONS.filter(q => q.prog === prog && q.subject === 'Physiology').length} Written Questions archived
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Physiology', paper: 'Paper-I', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-I (CQ)
+                      </button>
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Physiology', paper: 'Paper-II', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-II (CQ)
+                      </button>
+                    </div>
+
+                    <button
+                      className="w-full text-center py-2 text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:underline flex items-center justify-center gap-1"
+                      onClick={() => {
+                        setMcqSelectedSubject('Physiology');
+                        setMcqSelectedPaper(null);
+                        setMcqSelectedYear(null);
+                        navigateTo('mcq');
+                      }}
+                    >
+                      <span>Practice Physiology MCQs &rarr;</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Biochemistry Card */}
+                <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs hover:border-sky-400 dark:hover:border-sky-500 transition-colors">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                        Subject 03
+                      </span>
+                      <span className="badge ok text-[10px]">
+                        377 Verified MCQs
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                      Biochemistry
+                    </h3>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Biomolecules &amp; Solutions, Enzymes &amp; Vitamins, Intermediary Metabolism, Bioenergetics, Molecular Biology, and Clinical Chemistry.
+                    </p>
+
+                    <div className="text-xs font-semibold text-slate-500 mb-4">
+                      {ALL_QUESTIONS.filter(q => q.prog === prog && q.subject === 'Biochemistry').length} Written Questions archived
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Biochemistry', paper: 'Paper-I', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-I (CQ)
+                      </button>
+                      <button
+                        className="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 transition-colors text-center"
+                        onClick={() => {
+                          setFilters(prev => ({ ...prev, subject: 'Biochemistry', paper: 'Paper-II', section: '' }));
+                          navigateTo('archive');
+                        }}
+                      >
+                        Paper-II (CQ)
+                      </button>
+                    </div>
+
+                    <button
+                      className="w-full text-center py-2 text-xs font-bold text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:underline flex items-center justify-center gap-1"
+                      onClick={() => {
+                        setMcqSelectedSubject('Biochemistry');
+                        setMcqSelectedPaper(null);
+                        setMcqSelectedYear(null);
+                        navigateTo('mcq');
+                      }}
+                    >
+                      <span>Practice Biochemistry MCQs &rarr;</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </section>
+            </div>
+
+            {/* Examination Suites & Student Knowledge Hub */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              {/* Official University MCQ Practice Suite */}
+              <div className="p-6 rounded-xl border border-sky-200 dark:border-sky-900 bg-sky-50/40 dark:bg-sky-950/20 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">
+                    Official Board Practice
+                  </span>
+                  <span className="badge ok text-[10px]">
+                    {MCQ_VERIFICATION_STATS.papersCount} Authentic Papers
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1.5">
+                    MCQ Examination Practice
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed m-0">
+                    1,200 authentic questions extracted from official Chittagong Medical University (CMU) examination scripts. Includes both True/False (MFT) and Single Best Answer (SBA) items with verified medical references (Snell, Gray&rsquo;s, Guyton &amp; Hall, Harper&rsquo;s).
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span>Total Authentic MCQs:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{MCQ_VERIFICATION_STATS.totalQuestions} Questions</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Commercial Errors:</span>
+                    <span className="font-semibold text-amber-700 dark:text-amber-400">Explicitly Flagged</span>
+                  </div>
+                </div>
+
+                <button
+                  className="btn w-full text-xs font-semibold py-2.5"
+                  onClick={() => navigateTo('mcq')}
+                >
+                  Launch MCQ Examination Practice &rarr;
+                </button>
+              </div>
+
+              {/* Student Peer Knowledge Base */}
+              <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                    Peer Knowledge Base
+                  </span>
+                  <span className="text-xs text-slate-500 font-semibold">
+                    Student Notes
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1.5">
+                    Student Study Library
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed m-0">
+                    High-yield revision notes, metabolic pathway summaries, and anatomical diagrams submitted by medical students with full college and batch attribution.
+                  </p>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    className="btn alt flex-1 text-xs py-2"
+                    onClick={() => navigateTo('library')}
+                  >
+                    Browse Library
+                  </button>
+                  <button
+                    className="btn flex-1 text-xs py-2"
+                    onClick={() => navigateTo('upload')}
+                  >
+                    Submit Notes &rarr;
+                  </button>
+                </div>
+              </div>
+
+              {/* Oral Viva & Card-Table Preparation */}
+              <div className="p-6 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                    Oral Examination
+                  </span>
+                  <span className="badge demo text-[10px]">In Dev</span>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1.5">
+                    Oral Viva Bank
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed m-0">
+                    Teacher-wise viva questions, table card checklists, and examiner favorites for 1st Professional examinations.
+                  </p>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    className="btn alt w-full text-xs py-2"
+                    onClick={() => navigateTo('teacher')}
+                  >
+                    View Viva Bank Status &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Academic Colophon & Founder Mission */}
+            <div className="p-6 sm:p-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+                    Academic Colophon
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white m-0">
+                    About CMC MedArchive
+                  </h3>
+                </div>
+                <button
+                  className="text-xs font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 hover:underline self-start sm:self-auto"
+                  onClick={() => navigateTo('about')}
+                >
+                  Read Full Mission Statement &rarr;
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                <div>
+                  <b className="text-slate-900 dark:text-white block mb-1">Student-Run Academic Initiative</b>
+                  Created by Sifat Islam (CMC-67) to ensure every student at Chittagong Medical College has structured, permanent, and free access to curriculum examination records.
+                </div>
+                <div>
+                  <b className="text-slate-900 dark:text-white block mb-1">Verified Medical Textbooks</b>
+                  All question items and answers are systematically audited against standard medical authorities including Snell, Gray&rsquo;s Anatomy, Guyton &amp; Hall, and Harper&rsquo;s Biochemistry.
+                </div>
+                <div>
+                  <b className="text-slate-900 dark:text-white block mb-1">Continuous Curricular Expansion</b>
+                  The archive continues to integrate new CMU examination sessions, student-contributed summaries, and structured viva resources as they are verified.
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1563,16 +1902,45 @@ export default function App() {
 
                       <div className="list">
                         {qList.map(q => (
-                          <div key={q.id} className="item qa hover:border-[var(--t)] transition-all">
-                            <div className="flex flex-wrap items-center gap-1.5 mb-2">
-                              <span className={`badge ${q.status === 'verified' ? 'ok' : 'demo'}`}>
-                                {q.status === 'verified' ? 'Verified' : 'Needs Review'}
+                          <div key={q.id} className="item qa hover:border-[var(--brand-pine)] transition-all">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs">
+                              <div className="flex flex-wrap items-center gap-1.5 text-[var(--mut)]">
+                                <span className="font-bold text-[var(--ink)]">{q.subject}</span>
+                                <span aria-hidden="true">&bull;</span>
+                                <span>{q.paper}</span>
+                                {q.group && (
+                                  <>
+                                    <span aria-hidden="true">&bull;</span>
+                                    <span>{q.group}</span>
+                                  </>
+                                )}
+                                {q.section && (
+                                  <>
+                                    <span aria-hidden="true">&bull;</span>
+                                    <span>{q.section}</span>
+                                  </>
+                                )}
+                                {q.year && (
+                                  <>
+                                    <span aria-hidden="true">&bull;</span>
+                                    <span>{q.year}</span>
+                                  </>
+                                )}
+                                {q.board && (
+                                  <>
+                                    <span aria-hidden="true">&bull;</span>
+                                    <span>{q.board}</span>
+                                  </>
+                                )}
+                              </div>
+
+                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                                q.status === 'verified'
+                                  ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300'
+                                  : 'bg-amber-500/10 text-amber-800 dark:text-amber-300'
+                              }`}>
+                                {q.status === 'verified' ? '✓ Verified' : 'Needs Review'}
                               </span>
-                              <span className="badge">{q.subject}</span>
-                              {q.section && <span className="badge ok">{q.section}</span>}
-                              {q.board && <span className="badge">{q.board}</span>}
-                              {q.type && q.type !== 'Written' && <span className="badge">{q.type}</span>}
-                              {q.year && <span className="badge ok">{q.year}</span>}
                             </div>
 
                             <h3
@@ -2994,19 +3362,17 @@ export default function App() {
                     return (
                       <div key={res.id} className="item flex flex-col justify-between hover:border-[var(--brand-pine)] transition-all shadow-xs">
                         <div>
-                          <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border border-emerald-500/20">
-                              {res.kind || 'Notes'}
-                            </span>
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[var(--t2)] text-[var(--t)] border border-[var(--t)]/20">
-                              {res.subject}
-                            </span>
-                            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[var(--ink-secondary)]">
-                              {res.topic}
-                            </span>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mb-2 text-xs">
+                            <div className="flex items-center gap-1.5 text-[var(--mut)]">
+                              <span className="font-bold text-[var(--brand-pine)]">{res.subject}</span>
+                              <span aria-hidden="true">&bull;</span>
+                              <span className="font-semibold text-[var(--ink)]">{res.kind || 'Notes'}</span>
+                              <span aria-hidden="true">&bull;</span>
+                              <span>{res.topic}</span>
+                            </div>
                             {res.prog && (
-                              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 ml-auto">
-                                {res.prog}
+                              <span className="text-[11px] font-semibold text-[var(--mut)]">
+                                {res.prog} Curriculum
                               </span>
                             )}
                           </div>
@@ -3564,12 +3930,12 @@ export default function App() {
                   </div>
 
                   <div className="text-[var(--ink)] text-sm sm:text-base leading-relaxed space-y-4">
-                    <p className="p-4 bg-[var(--bg-subtle)] rounded-lg border-l-4 border-[var(--brand-pine)] italic">
-                      “I am Sifat Islam, a medical student at Chittagong Medical College. I created CMC MedArchive with a simple goal: to make academic resources easier for medical students to find, access, and organize in one place.”
-                    </p>
+                    <blockquote className="editorial-quote">
+                      &ldquo;I am Sifat Islam, a medical student at Chittagong Medical College. I created CMC MedArchive with a simple goal: to make academic resources easier for medical students to find, access, and organize in one place.&rdquo;
+                    </blockquote>
 
                     <p>
-                      “Medical students often need to search through scattered question papers, study materials, and revision resources while preparing for professional examinations. CMC MedArchive aims to reduce that difficulty by bringing these resources together in a structured, searchable, and student-friendly platform.”
+                      &ldquo;Medical students often need to search through scattered question papers, study materials, and revision resources while preparing for professional examinations. CMC MedArchive aims to reduce that difficulty by bringing these resources together in a structured, searchable, and student-friendly platform.&rdquo;
                     </p>
                   </div>
                 </div>
@@ -3600,28 +3966,30 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Contact and Community Links */}
+                {/* Connect and Contact Area */}
                 <div className="card bg-[var(--card)] shadow-xs">
-                  <h3 className="text-base font-bold text-[var(--ink)] mb-3">Connect &amp; Student Feedback</h3>
+                  <h3 className="text-base font-bold text-[var(--ink)] mb-3">Academic Correspondence &amp; Community</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <a
-                      href={TELEGRAM_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3.5 rounded-xl border border-[var(--line)] hover:border-sky-500 bg-[var(--card-subtle)] hover:bg-sky-50 dark:hover:bg-sky-950/30 transition-all flex items-center gap-3 no-underline group"
-                    >
-                      <div className="p-2.5 rounded-lg bg-sky-500/10 text-sky-600 group-hover:scale-105 transition-transform">
-                        <TelegramIcon className="w-5 h-5 text-sky-600" />
-                      </div>
+                    <div className="p-3.5 rounded-lg border border-[var(--line)] bg-[var(--card-subtle)] flex items-center justify-between gap-3">
                       <div>
-                        <div className="text-xs font-bold text-[var(--ink)]">Telegram Channel &amp; Direct Contact</div>
-                        <div className="text-xs text-sky-600 font-semibold">@Sifat_Islam_7</div>
+                        <div className="text-xs font-bold text-[var(--ink)]">Student Discussion Community</div>
+                        <div className="text-xs text-[var(--mut)]">Connect on Telegram</div>
                       </div>
-                    </a>
+                      <a
+                        href={TELEGRAM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="telegram-icon-btn shrink-0"
+                        title="Join us on Telegram"
+                        aria-label="Join us on Telegram"
+                      >
+                        <TelegramIcon className="w-4 h-4 text-[#229ED9]" />
+                      </a>
+                    </div>
 
-                    <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--card-subtle)] flex items-center gap-3">
-                      <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600">
-                        <User size={20} />
+                    <div className="p-3.5 rounded-lg border border-[var(--line)] bg-[var(--card-subtle)] flex items-center gap-3">
+                      <div className="p-2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                        <User size={18} />
                       </div>
                       <div>
                         <div className="text-xs font-bold text-[var(--ink)]">Student Inquiries &amp; Contributions</div>
@@ -3930,21 +4298,22 @@ export default function App() {
               </div>
             </div>
 
-            <div className="text-center sm:text-right text-xs text-[var(--mut)]">
-              <div className="flex items-center justify-center sm:justify-end gap-2">
-                <span>Telegram Community:</span>
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-[var(--mut)]">
+              <div className="flex items-center gap-2">
+                <span>Community:</span>
                 <a
                   href={TELEGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-semibold text-sky-600 hover:text-sky-700"
+                  className="telegram-icon-btn"
+                  title="Join us on Telegram"
+                  aria-label="Join us on Telegram"
                 >
-                  <TelegramIcon className="w-3.5 h-3.5" />
-                  <span>@Sifat_Islam_7</span>
+                  <TelegramIcon className="w-4 h-4 text-[#229ED9]" />
                 </a>
               </div>
-              <div className="mt-1 text-[11px]">
-                Built for medical students · Preserving curriculum excellence
+              <div className="text-[11px] text-[var(--mut)]">
+                Built for medical students &bull; Chittagong Medical College
               </div>
             </div>
           </div>
