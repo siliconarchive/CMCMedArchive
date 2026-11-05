@@ -13,6 +13,7 @@ import {
   VerificationStatus
 } from './data/mcqData';
 import { CmcLogo } from './components/CmcLogo';
+import { FloatingMedicalElements } from './components/FloatingMedicalElements';
 import {
   Search,
   BookOpen,
@@ -27,6 +28,7 @@ import {
   Sparkles,
   ArrowLeft,
   User,
+  CircleUser,
   LogIn,
   LogOut,
   UserPlus,
@@ -38,9 +40,13 @@ import {
   FileCheck2,
   HelpCircle,
   GraduationCap,
+  Users,
   Calendar,
   RotateCcw,
   FileText,
+  ListChecks,
+  Mic,
+  MessageCircle,
   Check,
   FileQuestion,
   Eye,
@@ -673,6 +679,8 @@ export default function App() {
   const [showAnswerKeys, setShowAnswerKeys] = useState<boolean>(false);
   const [mcqStudyMode, setMcqStudyMode] = useState<boolean>(false);
   const [mcqStatusFilter, setMcqStatusFilter] = useState<'all' | 'Verified' | 'Needs Review' | 'Provisional'>('all');
+  const [mcqSearchQuery, setMcqSearchQuery] = useState<string>('');
+  const [mcqShowAllQuestions, setMcqShowAllQuestions] = useState<boolean>(false);
 
   // Student Library Filter State
   const [librarySearch, setLibrarySearch] = useState<string>('');
@@ -962,6 +970,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--ink)] relative">
+      {/* Subtle Floating Medical Background Elements (Stethoscope, Heart, Lungs, Brain, DNA, Microscope) */}
+      <FloatingMedicalElements page={page} />
+
       {/* Initial Loading Screen */}
       {isLoadingScreen && (
         <div
@@ -1336,6 +1347,313 @@ export default function App() {
                     {t}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Academic Categories / Segments Hub (Requirement 3: 6 consistent categories) */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white m-0">
+                    Academic Categories &amp; Services
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Structured portals for Chittagong Medical College 1st Professional preparation
+                  </p>
+                </div>
+                <span className="text-xs font-semibold text-teal-700 dark:text-teal-400">
+                  6 Curricular Portals
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4.5">
+                {/* 1. MCQ Archive */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('mcq')}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-teal-200/60 dark:border-teal-800/60">
+                      <ListChecks size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
+                        MCQ Archive
+                      </h3>
+                      <span className="text-[11px] font-bold text-teal-700 dark:text-teal-400">1,200 MCQs</span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Official CMU examination question bank with Single Best Answer (SBA) and True/False items verified against standard medical textbooks.
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-teal-700 dark:text-teal-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Explore Question Bank</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+
+                {/* 2. CQ Archive */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('archive')}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-[#173B55]/10 dark:bg-[#173B55]/40 text-[#173B55] dark:text-sky-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-[#173B55]/20 dark:border-sky-800/60">
+                      <FileText size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-[#173B55] dark:group-hover:text-sky-300 transition-colors">
+                        Written (CQ) Archive
+                      </h3>
+                      <span className="text-[11px] font-bold text-sky-700 dark:text-sky-400">821 Questions</span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Past written examination questions organized paper-wise across Anatomy, Physiology, and Biochemistry with group breakdowns.
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-[#173B55] dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Browse Written Archive</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+
+                {/* 3. Teachers / Question Development */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('teacher')}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-indigo-200/60 dark:border-indigo-800/60">
+                      <GraduationCap size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-700 dark:group-hover:text-indigo-300 transition-colors">
+                        Teachers &amp; Curriculum
+                      </h3>
+                      <span className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400">Faculty Guide</span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Departmental trends, faculty question patterns, table topics, and high-yield emphasis areas for 1st Professional examinations.
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>View Faculty Trends</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+
+                {/* 4. Viva — Under Development */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('teacher')}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-amber-200/60 dark:border-amber-800/60">
+                      <Mic size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
+                        Oral Viva Bank
+                      </h3>
+                      <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
+                        Under Development
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Comprehensive card table questions, specimen identification checklists, and examiner favorites currently being curated.
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Check Viva Status</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+
+                {/* 5. Note Upload */}
+                <button
+                  type="button"
+                  onClick={() => navigateTo('upload')}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-emerald-200/60 dark:border-emerald-800/60">
+                      <FileUp size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+                        Note Upload &amp; Library
+                      </h3>
+                      <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400">Share Notes</span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Submit and access peer-reviewed revision summaries, metabolic pathway flowcharts, and anatomical dissection diagrams.
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>Submit Academic Notes</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+
+                {/* 6. User Profile / Sign In */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (userProfile) {
+                      setLibraryTab('my');
+                      navigateTo('library');
+                    } else {
+                      setAuthError(null);
+                      setAuthSuccess(null);
+                      setAuthModal('signin');
+                    }
+                  }}
+                  className="cat-segment-card text-left group"
+                >
+                  <div>
+                    <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center mb-3.5 group-hover:scale-105 transition-transform border border-slate-200/80 dark:border-slate-700">
+                      <CircleUser size={22} />
+                    </div>
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
+                        {userProfile ? 'Student Profile' : 'Student Account'}
+                      </h3>
+                      <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                        {userProfile ? userProfile.role === 'admin' ? 'Administrator' : 'Verified' : 'Sign In'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      {userProfile
+                        ? `Logged in as ${userProfile.fullName || userProfile.name}. Track your contributed notes and verified submissions.`
+                        : 'Sign in with your verified medical college account to submit revision notes and participate in peer moderation.'}
+                    </p>
+                  </div>
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    <span>{userProfile ? 'Manage Submissions' : 'Sign In / Register'}</span>
+                    <ChevronRight size={14} />
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Recently Added Academic Resources Section (Requirement 2 & 8) */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white m-0">
+                    Recently Added Resources
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    Newly indexed authentic past papers, verified answer scripts, and peer revision materials
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigateTo('library')}
+                  className="text-xs font-bold text-teal-700 dark:text-teal-400 hover:underline flex items-center gap-1 self-start sm:self-auto"
+                >
+                  <span>View All Library Resources</span>
+                  <ChevronRight size={13} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4.5">
+                {/* Resource 1 */}
+                <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
+                        CMU Exam Paper
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">May 2024 Session</span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">
+                      Physiology Paper-I &amp; Paper-II
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      Complete written and MCQ examination questions with Guyton &amp; Hall references and filtration fraction solutions.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500 font-medium">24 Written &bull; 678 MCQs</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilters(prev => ({ ...prev, subject: 'Physiology' }));
+                        navigateTo('archive');
+                      }}
+                      className="text-xs font-bold text-teal-700 hover:text-teal-800 dark:text-teal-400 hover:underline flex items-center gap-1"
+                    >
+                      <span>Open Paper</span>
+                      <ChevronRight size={12} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Resource 2 */}
+                <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[#173B55] dark:text-sky-400">
+                        Verified MCQ Key
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">Harper's Biochemistry</span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">
+                      Intermediary Metabolism &amp; Enzymes
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      377 verified biochemistry questions with commercial question bank discrepancies flagged and resolved.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500 font-medium">377 Verified MCQs</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMcqSelectedSubject('Biochemistry');
+                        navigateTo('mcq');
+                      }}
+                      className="text-xs font-bold text-[#173B55] hover:text-sky-800 dark:text-sky-400 hover:underline flex items-center gap-1"
+                    >
+                      <span>Practice MCQs</span>
+                      <ChevronRight size={12} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Resource 3 */}
+                <div className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col justify-between shadow-xs">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                        Student Note
+                      </span>
+                      <span className="text-[11px] text-slate-500 font-medium">Sifat Islam &bull; CMC-67</span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">
+                      Brachial Plexus &amp; Upper Limb Nerve Lesions
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                      High-yield clinical summary detailing roots, trunks, cords, branches, Erb's palsy, and Klumpke's paralysis.
+                    </p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-[11px] text-slate-500 font-medium">Peer Reviewed</span>
+                    <button
+                      type="button"
+                      onClick={() => navigateTo('library')}
+                      className="text-xs font-bold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                    >
+                      <span>Read Note</span>
+                      <ChevronRight size={12} />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -2724,16 +3042,35 @@ export default function App() {
                 ) : (
                   <div className="space-y-8 mb-8">
                     {activeDisplayMcqPapers.map(paper => {
-                      // Filter questions in this paper if type or status filter is chosen
+                      // Filter questions in this paper if type or status or search filter is chosen
                       const displayQuestions = paper.questions.filter(q => {
                         if (mcqTypeFilter !== 'all' && q.type !== mcqTypeFilter) return false;
-                        if (mcqStatusFilter === 'all') return true;
-                        const qKey = `${paper.id}-q${q.qNum}`;
-                        const meta = getMcqAnswerMetadata(qKey, q.stem, q.type);
-                        return meta.verificationStatus === mcqStatusFilter;
+                        if (mcqStatusFilter !== 'all') {
+                          const qKey = `${paper.id}-q${q.qNum}`;
+                          const meta = getMcqAnswerMetadata(qKey, q.stem, q.type);
+                          if (meta.verificationStatus !== mcqStatusFilter) return false;
+                        }
+                        if (mcqSearchQuery.trim()) {
+                          const query = mcqSearchQuery.toLowerCase();
+                          const matchesStem = q.stem.toLowerCase().includes(query);
+                          const matchesItems = q.items ? q.items.some(it => it.text.toLowerCase().includes(query)) : false;
+                          const matchesOptions = q.opts ? q.opts.some(op => op.toLowerCase().includes(query)) : false;
+                          if (!matchesStem && !matchesItems && !matchesOptions) return false;
+                        }
+                        return true;
                       });
 
                       if (displayQuestions.length === 0) return null;
+
+                      // Distinct Question Organization: SBA and True/False in distinct sections (Requirement 4)
+                      const sortedQuestions = [...displayQuestions].sort((a, b) => {
+                        if (mcqTypeFilter === 'all' && a.type !== b.type) {
+                          return a.type === 'SBA' ? -1 : 1;
+                        }
+                        return a.qNum - b.qNum;
+                      });
+
+                      const questionsToRender = mcqShowAllQuestions ? sortedQuestions : sortedQuestions.slice(0, 10);
 
                       return (
                         <div key={paper.id} className="paper">
@@ -2749,21 +3086,46 @@ export default function App() {
                             </div>
 
                             <span className="badge ok text-xs font-semibold">
-                              {displayQuestions.length} Questions Shown &bull; Page {paper.page}
+                              {sortedQuestions.length} Questions Available &bull; Page {paper.page}
                             </span>
                           </div>
 
                           {/* Standard Textbook Methodology Notice */}
                           <div className="p-3 my-2 bg-emerald-500/5 border border-emerald-600/20 rounded-md text-xs text-[var(--ink)] flex items-start gap-2">
-                            <ShieldAlert size={15} className="text-[var(--g)] shrink-0 mt-0.5" />
+                            <ShieldAlert size={15} className="text-teal-700 dark:text-teal-400 shrink-0 mt-0.5" />
                             <div>
-                              <b>Verification Integrity &amp; Standard References:</b> Answers are verified against established medical textbooks (Snell, Gray's Anatomy, Moore, BD Chaurasia, Langman, Junqueira). Questions with commercial question bank ambiguities or discrepancies are clearly marked with warning badges.
+                              <b>Verification Integrity &amp; Standard References:</b> Answers are verified against established medical textbooks (Snell, Gray's Anatomy, Moore, Guyton &amp; Hall, Harper's Biochemistry). Questions with commercial question bank discrepancies are explicitly flagged.
                             </div>
                           </div>
 
-                          {/* Questions List */}
+                          {/* Search Questions Inside This Paper */}
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 my-3 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <div className="relative flex-1">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+                              <input
+                                type="text"
+                                value={mcqSearchQuery}
+                                onChange={(e) => setMcqSearchQuery(e.target.value)}
+                                placeholder="Search questions in this paper (e.g. brachial, inulin, GFR, cortisol)..."
+                                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 focus:outline-none focus:border-teal-500"
+                              />
+                            </div>
+                            {mcqSearchQuery && (
+                              <button
+                                onClick={() => setMcqSearchQuery('')}
+                                className="text-xs px-2.5 py-1 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 font-semibold"
+                              >
+                                Clear Search
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Questions List with Distinct SBA and True/False Section Separators */}
                           <div className="divide-y divide-[var(--line)] mt-4">
-                            {displayQuestions.map((q) => {
+                            {questionsToRender.map((q, qIndex) => {
+                              const showSectionHeader =
+                                mcqTypeFilter === 'all' &&
+                                (qIndex === 0 || questionsToRender[qIndex - 1].type !== q.type);
                               const qKey = `${paper.id}-q${q.qNum}`;
                               const meta = getMcqAnswerMetadata(qKey, q.stem, q.type);
                               const currentAnswer = mcqAnswers[qKey];
@@ -2774,6 +3136,19 @@ export default function App() {
 
                                 return (
                                   <div key={q.qNum} className="py-5">
+                                    {showSectionHeader && (
+                                      <div className="pb-3 mb-4 border-b-2 border-sky-600/40 pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="w-2.5 h-2.5 rounded-full bg-sky-600" />
+                                          <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-900 dark:text-white m-0">
+                                            Multiple True / False (TF) Questions
+                                          </h4>
+                                        </div>
+                                        <span className="text-xs text-slate-500 font-semibold">
+                                          Mark True or False for each statement
+                                        </span>
+                                      </div>
+                                    )}
                                     <div className="flex flex-wrap items-baseline justify-between gap-2 mb-2 font-semibold">
                                       <div className="flex items-baseline gap-2">
                                         <span className="text-[var(--g)] font-bold text-base">{q.qNum}.</span>

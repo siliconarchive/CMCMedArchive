@@ -6,55 +6,58 @@
    ========================================================================== */
 
 :root {
-  /* Surfaces & Canvas */
-  --bg: #f8fafc;
-  --bg-subtle: #f1f5f9;
-  --card: #ffffff;
-  --card-subtle: #f8fafc;
-  --card-hover: #ffffff;
+  /* Surfaces & Canvas — Soft Off-white #F7F9FB & Pure White #FFFFFF */
+  --bg: #F7F9FB;
+  --bg-subtle: #EEF2F6;
+  --card: #FFFFFF;
+  --card-subtle: #F8FAFC;
+  --card-hover: #FFFFFF;
 
-  /* Primary Educational & Institutional Accent: Deep Oxford Navy & Clinical Sky Blue */
-  --brand-navy: #0f172a;
-  --brand-navy-light: #1e293b;
-  --brand-blue: #0284c7;
-  --brand-blue-hover: #0369a1;
-  --brand-blue-light: #e0f2fe;
-  --brand-cyan: #0082c9;
+  /* Primary Educational & Medical Accents: Deep Navy #173B55 & Elegant Teal #34766F */
+  --brand-navy: #173B55;
+  --brand-navy-light: #244D6C;
+  --brand-teal: #34766F;
+  --brand-teal-hover: #265954;
+  --brand-teal-light: #EBF3F2;
+  --brand-blue: #173B55;
+  --brand-blue-hover: #244D6C;
+  --brand-blue-light: #E8F0F5;
+  --brand-cyan: #2A9D8F;
 
-  /* Accent Green & Teal */
-  --brand-pine: #0284c7;
-  --brand-pine-hover: #0369a1;
-  --brand-pine-light: #e0f2fe;
-  --brand-sage: #f0f9ff;
+  /* Clinical Pine & Sage */
+  --brand-pine: #34766F;
+  --brand-pine-hover: #265954;
+  --brand-pine-light: #EBF3F2;
+  --brand-sage: #F0F6F5;
   --accent-green: #059669;
 
-  /* Inks & Contrast */
-  --ink: #0f172a;
-  --ink-secondary: #334155;
-  --mut: #64748b;
-  --ink-faint: #94a3b8;
+  /* Primary Text #202B36 & Secondary Text #64748B */
+  --ink: #202B36;
+  --ink-secondary: #475569;
+  --mut: #64748B;
+  --ink-faint: #94A3B8;
 
   /* Clean Hairline Dividers */
-  --line: #e2e8f0;
-  --line-light: #f1f5f9;
-  --line-strong: #cbd5e1;
+  --line: #E2E8F0;
+  --line-light: #F1F5F9;
+  --line-strong: #CBD5E1;
 
   /* Evidence & Verification Statuses */
-  --success-bg: #ecfdf5;
-  --success-line: #a7f3d0;
-  --success-text: #065f46;
+  --success-bg: #ECFDF5;
+  --success-line: #A7F3D0;
+  --success-text: #065F46;
 
-  --warn-bg: #fffbeb;
-  --warn-line: #fde68a;
-  --warn-text: #92400e;
+  --warn-bg: #FFFBEB;
+  --warn-line: #FDE68A;
+  --warn-text: #92400E;
 
-  --info-bg: #f0f9ff;
-  --info-line: #bae6fd;
-  --info-text: #0369a1;
+  --info-bg: #F0F7FF;
+  --info-line: #BAE6FD;
+  --info-text: #0369A1;
 
-  --danger-bg: #fef2f2;
-  --danger-line: #fecaca;
-  --danger-text: #991b1b;
+  --danger-bg: #FEF2F2;
+  --danger-line: #FECACA;
+  --danger-text: #991B1B;
 
   /* Legacy mappings */
   --g: var(--brand-blue);
@@ -802,3 +805,93 @@ footer {
   background: var(--bg-subtle);
   flex-shrink: 0;
 }
+
+/* Floating Medical Background Elements Animations */
+@keyframes medFloat1 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(2deg);
+  }
+}
+
+@keyframes medFloat2 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(-2.5deg);
+  }
+}
+
+@keyframes medFloat3 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.5deg);
+  }
+}
+
+@keyframes medFloat4 {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(-1.5deg);
+  }
+}
+
+.med-float-1 {
+  animation: medFloat1 10s ease-in-out infinite;
+}
+
+.med-float-2 {
+  animation: medFloat2 14s ease-in-out infinite;
+}
+
+.med-float-3 {
+  animation: medFloat3 17s ease-in-out infinite;
+}
+
+.med-float-4 {
+  animation: medFloat4 20s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .med-float-1,
+  .med-float-2,
+  .med-float-3,
+  .med-float-4 {
+    animation: none !important;
+  }
+}
+
+/* Academic Category Segments & Cards */
+.cat-segment-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(23, 59, 85, 0.04);
+}
+
+.cat-segment-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand-teal);
+  box-shadow: 0 12px 28px -6px rgba(23, 59, 85, 0.1);
+}
+
+.cat-segment-card:focus-visible {
+  outline: 2px solid var(--brand-teal);
+  outline-offset: 2px;
+}
+
