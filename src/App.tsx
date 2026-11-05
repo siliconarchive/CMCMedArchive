@@ -3993,7 +3993,7 @@ export default function App() {
                       </div>
                       <div>
                         <div className="text-xs font-bold text-[var(--ink)]">Student Inquiries &amp; Contributions</div>
-                        <div className="text-xs text-[var(--mut)] font-mono">sifatislam.cmc67@gmail.com</div>
+                        <div className="text-xs text-[var(--mut)]">Editorial &amp; Academic Desk &bull; CMC-67</div>
                       </div>
                     </div>
                   </div>
@@ -4089,18 +4089,14 @@ export default function App() {
                 </div>
               )}
 
-              {/* Academic Account Notice & Test Credentials Helper */}
-              <div className="p-3 rounded-lg bg-[var(--brand-sage)] border border-[var(--brand-pine)]/20 text-xs text-[var(--ink)] space-y-1">
-                <div className="flex items-center gap-1.5 font-bold text-[var(--brand-pine)]">
+              {/* Academic Account Notice */}
+              <div className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs text-[var(--ink)] space-y-1">
+                <div className="flex items-center gap-1.5 font-bold text-sky-600 dark:text-sky-400">
                   <ShieldCheck size={14} />
                   <span>Curriculum Verification Access</span>
                 </div>
                 <div className="leading-relaxed text-[var(--ink-secondary)] text-[11px]">
-                  Sign in with your medical student credentials.
-                  <div className="mt-1 pt-1 border-t border-[var(--brand-pine)]/15 text-[11px] font-mono">
-                    <b>Admin:</b> sifatislam.cmc67@gmail.com / cmc67student<br />
-                    <b>Demo Student:</b> student@cmc.edu.bd / studentdemo
-                  </div>
+                  Sign in with your verified medical student account to submit study notes and access peer-reviewed revision resources.
                 </div>
               </div>
 
@@ -4113,7 +4109,7 @@ export default function App() {
                     <input
                       name="email"
                       type="email"
-                      placeholder="student@cmc.edu.bd"
+                      placeholder="Enter your email address"
                       required
                       className="w-full text-sm"
                       autoComplete="username"
@@ -4199,7 +4195,7 @@ export default function App() {
                     <input
                       name="email"
                       type="email"
-                      placeholder="student@example.com"
+                      placeholder="Enter your email address"
                       required
                       className="w-full text-sm"
                       autoComplete="email"
