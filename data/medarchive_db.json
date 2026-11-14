@@ -61,6 +61,12 @@
       "userId": "usr_1793813484332_a5efd6aa",
       "createdAt": "2026-11-04T17:31:24.333Z",
       "expiresAt": 1796405484333
+    },
+    {
+      "token": "28688ffc5e8adb883ecbc209553001db72e17a4b1425a98727be2b2eba3962fe",
+      "userId": "usr_student_demo",
+      "createdAt": "2026-11-14T18:15:38.120Z",
+      "expiresAt": 1797272138120
     }
   ],
   "notes": [
@@ -274,5 +280,48 @@
       "status": "approved",
       "prog": "MBBS"
     }
-  ]
+  ],
+  "submissions": [],
+  "publishedPapers": [],
+  "publishedQuestions": [],
+  "contributors": [
+    {
+      "id": "contrib_sadman_sami",
+      "name": "MD Sadman Sami",
+      "batch": "CMC 67",
+      "college": "Chittagong Medical College (CMC)",
+      "contribution": "Question Paper Archiving & Academic Data Contribution",
+      "verified": true,
+      "addedAt": "2026-09-01T00:00:00.000Z"
+    }
+  ],
+  "announcements": [
+    {
+      "id": "campaign_question_collection_2026",
+      "badgeText": "📢 SPECIAL ANNOUNCEMENT",
+      "title": "LET’S BUILD A MEDICAL QUESTION ARCHIVE TOGETHER!",
+      "subtitle": "We Are Collecting Questions From Different Medical Colleges.",
+      "bodyParagraphs": [
+        "We are collecting Card Examination Questions and Term Examination Questions from medical colleges across Bangladesh.",
+        "You can contribute by submitting:"
+      ],
+      "highlightText": "YOUR CONTRIBUTION MATTERS!",
+      "ctaText": "SUBMIT YOUR QUESTION PAPERS",
+      "enabled": true,
+      "autoDismissSeconds": 7,
+      "updatedAt": "2026-11-14T18:11:36.814Z",
+      "bulletItems": [
+        "PDF question papers",
+        "Images of question papers",
+        "Google Drive links"
+      ],
+      "ctaTarget": "submit"
+    }
+  ],
+  "questionOverrides": {},
+  "customTaxonomy": {
+    "subjects": [],
+    "chaptersBySubjectPaper": {},
+    "years": []
+  }
 }

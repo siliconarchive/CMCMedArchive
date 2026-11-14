@@ -2,18 +2,18 @@ import React from 'react';
 
 interface FloatingMedicalElementsProps {
   page: string;
+  dimmed?: boolean;
 }
 
-export const FloatingMedicalElements: React.FC<FloatingMedicalElementsProps> = ({ page }) => {
-  // On reading-heavy question archives, keep elements ultra-subtle or restrained to margins
-  const isReadingPage = page === 'mcq' || page === 'archive' || page === 'question';
+export const FloatingMedicalElements: React.FC<FloatingMedicalElementsProps> = ({ page, dimmed = false }) => {
+  const isReadingPage = page === 'mcq' || page === 'archive' || page === 'question' || page === 'admin';
   const isHomePage = page === 'home';
 
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-700 ${
-        isHomePage ? 'opacity-90' : isReadingPage ? 'opacity-25' : 'opacity-40'
+      className={`fixed inset-0 pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-500 ${
+        dimmed ? 'opacity-0' : isHomePage ? 'opacity-70' : isReadingPage ? 'opacity-15' : 'opacity-25'
       }`}
     >
       {/* 1. Stethoscope — Top Right Ambient Float */}
