@@ -1578,6 +1578,7 @@ async function startServer() {
   });
 
   app.get('/api/announcements/active', (_req: Request, res: Response) => {
+    res.set('Cache-Control', 'no-store');
     const active = db.announcements.find(a => a.enabled) || db.announcements[0] || DEFAULT_ANNOUNCEMENT;
     return res.status(200).json({
       success: true,
@@ -2033,6 +2034,7 @@ CRITICAL INTEGRITY RULES:
 
   // Announcements Public & Admin
   app.get('/api/announcements', (_req: Request, res: Response) => {
+    res.set('Cache-Control', 'no-store');
     return res.status(200).json({ success: true, announcements: db.announcements });
   });
 

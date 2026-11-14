@@ -46,7 +46,7 @@ import {
 
 const TELEGRAM_URL = 'https://t.me/Sifat_Islam_7';
 const AUTH_TOKEN_KEY = 'cmc_auth_token';
-const ANNOUNCEMENT_SEEN_KEY = 'cmc_announcement_seen';
+const ANNOUNCEMENT_SEEN_KEY = 'cmc_announcement_dismissed';
 
 const FALLBACK_ANNOUNCEMENT: AnnouncementRecord = {
   id: 'campaign_question_collection_2026',
@@ -146,6 +146,49 @@ export default function App() {
     navigateTo(dest);
   }, [announcement.ctaTarget, navigateTo]);
 
+  // Independent immediate startup popup check (never blocked by auth or heavy archive fetches)
+  useEffect(() => {
+    let cancelled = false;
+    try {
+      sessionStorage.removeItem('cmc_announcement_seen');
+    } catch {}
+
+    const checkStartupAnnouncement = async () => {
+      let dismissedThisSession = false;
+      try {
+        dismissedThisSession = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
+      } catch {}
+
+      try {
+        const res = await fetch('/api/announcements/active', { cache: 'no-store' });
+        if (cancelled) return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.announcement) {
+            setAnnouncement(data.announcement);
+            if (data.announcement.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
+              initialPopupTriggeredRef.current = true;
+              setPopupOpen(true);
+            }
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch active announcement, checking fallback:', err);
+      }
+
+      if (!cancelled && FALLBACK_ANNOUNCEMENT.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
+        initialPopupTriggeredRef.current = true;
+        setPopupOpen(true);
+      }
+    };
+
+    checkStartupAnnouncement();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Load user session & all dynamic platform data
   const loadPlatformData = async (tokenOverride?: string | null) => {
     const tok = tokenOverride !== undefined ? tokenOverride : authToken;
@@ -157,8 +200,8 @@ export default function App() {
         fetch('/api/notes', { headers }),
         fetch('/api/archive/published'),
         fetch('/api/contributors'),
-        fetch('/api/announcements/active'),
-        fetch('/api/announcements')
+        fetch('/api/announcements/active', { cache: 'no-store' }),
+        fetch('/api/announcements', { cache: 'no-store' })
       ]);
 
       if (notesRes.ok) {
@@ -188,11 +231,11 @@ export default function App() {
         const and = await annRes.json();
         if (and.announcement) {
           setAnnouncement(and.announcement);
-          let alreadySeen = false;
+          let dismissedThisSession = false;
           try {
-            alreadySeen = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
+            dismissedThisSession = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
           } catch {}
-          if (and.announcement.enabled && !alreadySeen && !initialPopupTriggeredRef.current) {
+          if (and.announcement.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
             initialPopupTriggeredRef.current = true;
             setPopupOpen(true);
           }
@@ -499,7 +542,7 @@ export default function App() {
               href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="telegram-icon-btn dark"
+              className="telegram-icon-btn dark header-tg"
               title="Join Telegram Community"
               aria-label="Join Telegram Community"
             >
@@ -597,6 +640,15 @@ export default function App() {
                 <ShieldCheck size={16} /> Admin Panel
               </button>
             )}
+            <a
+              href={TELEGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] flex items-center gap-2 text-[#229ED9] hover:bg-[var(--bg-subtle)] no-underline"
+            >
+              <TelegramIcon className="w-4 h-4" />
+              <span>Join Telegram Community</span>
+            </a>
           </div>
         )}
       </header>

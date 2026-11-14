@@ -173,21 +173,21 @@ h1, h2, h3, h4 {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
+  from { opacity: 0.85; }
   to { opacity: 1; }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.97) translateY(8px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0.92; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.16s ease-out forwards;
 }
 
 .animate-scaleIn {
-  animation: scaleIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -241,8 +241,14 @@ button {
 .wrap {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 12px;
   width: 100%;
+}
+
+@media (min-width: 380px) {
+  .wrap {
+    padding: 0 16px;
+  }
 }
 
 @media (min-width: 640px) {
@@ -281,8 +287,15 @@ header.ed-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  min-height: 62px;
+  gap: 6px;
+  min-height: 60px;
+}
+
+@media (min-width: 380px) {
+  .ed-bar {
+    gap: 10px;
+    min-height: 62px;
+  }
 }
 
 @media (min-width: 640px) {
@@ -323,6 +336,12 @@ header.ed-header {
   transition: all 0.15s ease;
   text-decoration: none;
   flex-shrink: 0;
+}
+
+@media (max-width: 359px) {
+  .telegram-icon-btn.header-tg {
+    display: none;
+  }
 }
 
 .telegram-icon-btn:hover {
