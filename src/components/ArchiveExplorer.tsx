@@ -1,30 +1,31 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Search,
   X,
   RotateCcw,
   BookOpen,
-  FileText,
   CheckCircle2,
   AlertTriangle,
-  ExternalLink,
   ChevronLeft,
   ChevronRight,
   Layers,
-  Building2,
   ListChecks,
   HelpCircle,
   Eye,
   EyeOff,
   FileUp,
-  Sparkles
+  Sparkles,
+  Bookmark
 } from 'lucide-react';
 import {
+  BookmarkRecord,
   CustomTaxonomy,
   PageRoute,
-  PublishedPaper,
+  ProfessionalExamId,
   PublishedMcqQuestion,
-  QuestionOverride
+  QuestionOverride,
+  RecentlyViewedRecord,
+  StudyState
 } from '../types';
 import {
   buildUnifiedCqQuestions,
@@ -34,16 +35,37 @@ import {
   UnifiedCqQuestion,
   UnifiedMcqQuestion
 } from '../data/archiveHelpers';
+import {
+  getAlliedDisciplinesForSubject,
+  getPapersForSubjectInProf,
+  getProfConfig,
+  getSubjectsForProf,
+  subjectMatchesCanonical
+} from '../data/curriculumConfig';
 import { PDF_CATALOG } from '../data/pdfCatalog';
 
 interface ArchiveExplorerProps {
-  initialTab?: 'cq' | 'mcq' | 'papers';
+  selectedProf: ProfessionalExamId;
+  initialTab?: 'cq' | 'mcq';
   initialSearch?: string;
   initialSubject?: string;
-  publishedPapers: PublishedPaper[];
   publishedQuestions: PublishedMcqQuestion[];
   questionOverrides: Record<string, QuestionOverride>;
   customTaxonomy: CustomTaxonomy;
+  studyState?: StudyState;
+  onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
+  onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
+  onPracticeOutcome?: (payload: {
+    id: string;
+    professionalExam: ProfessionalExamId;
+    subject: string;
+    paper: string;
+    chapter: string;
+    type: 'SBA' | 'TF';
+    stem: string;
+    explanation?: string;
+    isCorrect: boolean;
+  }) => void;
   onNavigate: (page: PageRoute) => void;
   onStartQuickExam?: (preset: { subject?: string; paper?: string; chapter?: string }) => void;
 }
@@ -51,27 +73,59 @@ interface ArchiveExplorerProps {
 const PAGE_SIZE = 20;
 
 export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
+  selectedProf,
   initialTab = 'cq',
   initialSearch = '',
   initialSubject = 'all',
-  publishedPapers,
   publishedQuestions,
   questionOverrides,
   customTaxonomy,
+  studyState,
+  onToggleBookmark,
+  onRecordRecentView,
+  onPracticeOutcome,
   onNavigate,
   onStartQuickExam
 }) => {
-  const [activeTab, setActiveTab] = useState<'cq' | 'mcq' | 'papers'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'cq' | 'mcq'>(initialTab);
   const [mcqSubSection, setMcqSubSection] = useState<'all' | 'SBA' | 'TF'>('all');
-  const [progFilter, setProgFilter] = useState<'all' | 'MBBS' | 'BDS'>('all');
   const [search, setSearch] = useState(initialSearch);
   const [subject, setSubject] = useState(initialSubject);
   const [paper, setPaper] = useState('all');
   const [chapter, setChapter] = useState('all');
   const [year, setYear] = useState('all');
   const [college, setCollege] = useState('all');
-  const [paperCategory, setPaperCategory] = useState<'all' | 'Card' | 'Term' | 'MCQ'>('all');
   const [pageIdx, setPageIdx] = useState(1);
+
+  const prevProfRef = useRef<ProfessionalExamId>(selectedProf);
+  useEffect(() => {
+    setActiveTab(initialTab);
+    setPageIdx(1);
+  }, [initialTab]);
+
+  useEffect(() => {
+    setSearch(initialSearch);
+    setPageIdx(1);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    setSubject(initialSubject);
+    setPaper('all');
+    setChapter('all');
+    setPageIdx(1);
+  }, [initialSubject]);
+
+  useEffect(() => {
+    if (prevProfRef.current !== selectedProf) {
+      prevProfRef.current = selectedProf;
+      setSubject('all');
+      setPaper('all');
+      setChapter('all');
+      setYear('all');
+      setCollege('all');
+      setPageIdx(1);
+    }
+  }, [selectedProf]);
 
   // Interactive CQ & MCQ states
   const [revealedCqAnswers, setRevealedCqAnswers] = useState<Record<string, boolean>>({});
@@ -80,65 +134,97 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
   const [tfResponses, setTfResponses] = useState<Record<string, Record<string, boolean>>>({});
   const [revealedMcqExplanations, setRevealedMcqExplanations] = useState<Record<string, boolean>>({});
 
-  const allCqs = useMemo(() => buildUnifiedCqQuestions(questionOverrides), [questionOverrides]);
-  const allMcqs = useMemo(
-    () => buildUnifiedMcqQuestions(publishedQuestions, questionOverrides),
-    [publishedQuestions, questionOverrides]
+  const profConfig = getProfConfig(selectedProf, customTaxonomy);
+
+  // Scoped strictly to selectedProf + Main Professional Examination Subjects by default
+  const allCqs = useMemo(
+    () =>
+      buildUnifiedCqQuestions(questionOverrides).filter(
+        q =>
+          q.professionalExam === selectedProf &&
+          q.classificationRole !== 'Phase Teaching / Formative Subject'
+      ),
+    [questionOverrides, selectedProf]
   );
 
-  // Dynamic taxonomy lists
+  const allMcqs = useMemo(
+    () =>
+      buildUnifiedMcqQuestions(publishedQuestions, questionOverrides).filter(
+        q =>
+          q.professionalExam === selectedProf &&
+          q.classificationRole !== 'Phase Teaching / Formative Subject'
+      ),
+    [publishedQuestions, questionOverrides, selectedProf]
+  );
+
+  const bookmarkedKeys = useMemo(() => {
+    const set = new Set<string>();
+    (studyState?.bookmarks || []).forEach(b => set.add(`${b.itemType}_${b.id}`));
+    return set;
+  }, [studyState?.bookmarks]);
+
+  // Dynamic taxonomy lists strictly derived from centralized Prof subjects
   const availableSubjects = useMemo(() => {
-    const set = new Set<string>(customTaxonomy.subjects || []);
-    if (activeTab === 'cq') {
-      allCqs.forEach(q => set.add(q.subject));
-    } else if (activeTab === 'mcq') {
-      allMcqs.forEach(q => set.add(q.subject));
-    } else {
-      publishedPapers.forEach(p => set.add(p.subject));
-    }
+    const set = new Set<string>(getSubjectsForProf(selectedProf, customTaxonomy));
+    const source = activeTab === 'cq' ? allCqs : allMcqs;
+    source.forEach(q => {
+      if (q.subject) set.add(q.subject);
+    });
     return Array.from(set).sort();
-  }, [activeTab, allCqs, allMcqs, publishedPapers, customTaxonomy]);
+  }, [activeTab, allCqs, allMcqs, selectedProf, customTaxonomy]);
 
   const availablePapers = useMemo(() => {
     const set = new Set<string>();
-    const source = activeTab === 'cq' ? allCqs : activeTab === 'mcq' ? allMcqs : publishedPapers;
-    source.forEach((item: any) => {
-      if (subject === 'all' || item.subject === subject) {
-        if (item.paper) set.add(item.paper);
+    if (subject !== 'all') {
+      getPapersForSubjectInProf(selectedProf, subject, customTaxonomy).forEach(p => set.add(p));
+    }
+    const source = activeTab === 'cq' ? allCqs : allMcqs;
+    source.forEach(item => {
+      if (subjectMatchesCanonical(item.subject, subject) && item.paper) {
+        set.add(item.paper);
       }
     });
     return Array.from(set).sort();
-  }, [activeTab, allCqs, allMcqs, publishedPapers, subject]);
+  }, [activeTab, allCqs, allMcqs, subject, selectedProf, customTaxonomy]);
 
   const availableChapters = useMemo(() => {
-    const source = activeTab === 'cq' ? allCqs : activeTab === 'mcq' ? allMcqs : publishedPapers;
-    return getCanonicalChaptersFor(subject, paper, source as any[], customTaxonomy);
-  }, [activeTab, allCqs, allMcqs, publishedPapers, subject, paper, customTaxonomy]);
+    const source = activeTab === 'cq' ? allCqs : allMcqs;
+    const filteredSource =
+      subject === 'all'
+        ? source
+        : source.filter(q => subjectMatchesCanonical(q.subject, subject));
+    return getCanonicalChaptersFor('all', paper, filteredSource as any[], customTaxonomy);
+  }, [activeTab, allCqs, allMcqs, subject, paper, customTaxonomy]);
 
   const availableYears = useMemo(() => {
     const set = new Set<number>(customTaxonomy.years || []);
-    const source = activeTab === 'cq' ? allCqs : activeTab === 'mcq' ? allMcqs : publishedPapers;
-    source.forEach((item: any) => {
+    const source = activeTab === 'cq' ? allCqs : allMcqs;
+    source.forEach(item => {
       if (item.year && Number.isFinite(Number(item.year))) {
         set.add(Number(item.year));
       }
     });
     return Array.from(set).sort((a, b) => b - a);
-  }, [activeTab, allCqs, allMcqs, publishedPapers, customTaxonomy]);
+  }, [activeTab, allCqs, allMcqs, customTaxonomy]);
 
   const availableColleges = useMemo(() => {
     const set = new Set<string>(['Chittagong Medical College (CMC)']);
-    allMcqs.forEach(m => set.add(m.collegeName));
-    publishedPapers.forEach(p => set.add(p.collegeName));
+    const source = activeTab === 'cq' ? allCqs : allMcqs;
+    source.forEach(m => {
+      if (m.collegeName) set.add(m.collegeName);
+    });
     return Array.from(set).sort();
-  }, [allMcqs, publishedPapers]);
+  }, [activeTab, allCqs, allMcqs]);
 
-  // Filtered CQ
+  const alliedDisciplines = useMemo(() => {
+    if (subject === 'all') return [];
+    return getAlliedDisciplinesForSubject(selectedProf, subject, customTaxonomy);
+  }, [selectedProf, subject, customTaxonomy]);
+
   const filteredCqs = useMemo(() => {
     const q = search.trim().toLowerCase();
     return allCqs.filter(item => {
-      if (progFilter !== 'all' && item.prog !== progFilter) return false;
-      if (subject !== 'all' && item.subject !== subject) return false;
+      if (!subjectMatchesCanonical(item.subject, subject)) return false;
       if (paper !== 'all' && item.paper !== paper) return false;
       if (chapter !== 'all' && item.chapter !== chapter) return false;
       if (year !== 'all' && String(item.year || '') !== year) return false;
@@ -149,14 +235,13 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       }
       return true;
     });
-  }, [allCqs, progFilter, subject, paper, chapter, year, college, search]);
+  }, [allCqs, subject, paper, chapter, year, college, search]);
 
-  // Filtered MCQ
   const filteredMcqs = useMemo(() => {
     const q = search.trim().toLowerCase();
     return allMcqs.filter(item => {
       if (mcqSubSection !== 'all' && item.type !== mcqSubSection) return false;
-      if (subject !== 'all' && item.subject !== subject) return false;
+      if (!subjectMatchesCanonical(item.subject, subject)) return false;
       if (paper !== 'all' && item.paper !== paper) return false;
       if (chapter !== 'all' && item.chapter !== chapter) return false;
       if (year !== 'all' && String(item.year) !== year) return false;
@@ -171,25 +256,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
     });
   }, [allMcqs, mcqSubSection, subject, paper, chapter, year, college, search]);
 
-  // Filtered Published Papers
-  const filteredPapers = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return publishedPapers.filter(item => {
-      if (paperCategory !== 'all' && item.category !== paperCategory) return false;
-      if (subject !== 'all' && item.subject !== subject) return false;
-      if (paper !== 'all' && item.paper !== paper) return false;
-      if (chapter !== 'all' && item.chapter !== chapter) return false;
-      if (year !== 'all' && String(item.year || '') !== year) return false;
-      if (college !== 'all' && item.collegeName !== college) return false;
-      if (q) {
-        const hay = `${item.examName} ${item.collegeName} ${item.subject} ${item.chapter} ${item.description} ${item.contributorName}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [publishedPapers, paperCategory, subject, paper, chapter, year, college, search]);
-
-  const activeList = activeTab === 'cq' ? filteredCqs : activeTab === 'mcq' ? filteredMcqs : filteredPapers;
+  const activeList = activeTab === 'cq' ? filteredCqs : filteredMcqs;
   const totalPages = Math.max(1, Math.ceil(activeList.length / PAGE_SIZE));
   const safePage = Math.min(pageIdx, totalPages);
   const pagedItems = activeList.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
@@ -201,9 +268,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
     setChapter('all');
     setYear('all');
     setCollege('all');
-    setProgFilter('all');
     setMcqSubSection('all');
-    setPaperCategory('all');
     setPageIdx(1);
   };
 
@@ -212,7 +277,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       allMcqs.filter(
         m =>
           m.type === 'SBA' &&
-          (subject === 'all' || m.subject === subject) &&
+          subjectMatchesCanonical(m.subject, subject) &&
           (paper === 'all' || m.paper === paper) &&
           (chapter === 'all' || m.chapter === chapter) &&
           (year === 'all' || String(m.year) === year)
@@ -225,7 +290,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       allMcqs.filter(
         m =>
           m.type === 'TF' &&
-          (subject === 'all' || m.subject === subject) &&
+          subjectMatchesCanonical(m.subject, subject) &&
           (paper === 'all' || m.paper === paper) &&
           (chapter === 'all' || m.chapter === chapter) &&
           (year === 'all' || String(m.year) === year)
@@ -233,10 +298,23 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
     [allMcqs, subject, paper, chapter, year]
   );
 
+  const openCqDetail = (q: UnifiedCqQuestion) => {
+    setSelectedCq(q);
+    onRecordRecentView?.({
+      id: q.id,
+      itemType: 'cq',
+      professionalExam: q.professionalExam,
+      subject: q.subject,
+      title: q.text.slice(0, 120),
+      subtitle: `${q.paper} · ${q.chapter}${q.year ? ` · ${q.year}` : ''}`
+    });
+  };
+
   const renderMcqCard = (q: UnifiedMcqQuestion, idx: number) => {
     const sbaChoice = sbaResponses[q.id];
     const tfChoice = tfResponses[q.id] || {};
     const showExp = Boolean(revealedMcqExplanations[q.id]);
+    const isBookmarked = bookmarkedKeys.has(`mcq_${q.id}`);
 
     return (
       <div
@@ -248,9 +326,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
           <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 min-w-0">
             <span
               className={`font-extrabold uppercase tracking-wide text-[11px] ${
-                q.type === 'SBA'
-                  ? 'text-sky-700 dark:text-sky-300'
-                  : 'text-[#0D9488]'
+                q.type === 'SBA' ? 'text-sky-700 dark:text-sky-300' : 'text-[#0D9488]'
               }`}
             >
               {q.type === 'SBA' ? 'SBA' : 'True / False'}
@@ -271,12 +347,36 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-[var(--mut)] font-mono tabular-nums">
-            <span>{q.session}</span>
-            {q.isCommunityPublished && (
-              <span className="font-sans text-emerald-700 dark:text-emerald-300 font-semibold">
-                &middot; {q.collegeName}
-              </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11px] text-[var(--mut)] font-mono tabular-nums">
+              {q.session}
+              {q.isCommunityPublished ? ` · ${q.collegeName}` : ''}
+            </span>
+            {onToggleBookmark && (
+              <button
+                type="button"
+                onClick={() =>
+                  onToggleBookmark({
+                    id: q.id,
+                    itemType: 'mcq',
+                    professionalExam: q.professionalExam,
+                    subject: q.subject,
+                    paper: q.paper,
+                    chapter: q.chapter,
+                    title: q.stem,
+                    subtitle: `${q.type} · ${q.session}`
+                  })
+                }
+                className={`p-1.5 rounded-lg border min-h-[32px] min-w-[32px] flex items-center justify-center transition-colors ${
+                  isBookmarked
+                    ? 'border-[#0D9488] bg-teal-500/10 text-[#0D9488]'
+                    : 'border-[var(--line)] text-[var(--mut)] hover:text-[#0D9488]'
+                }`}
+                aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark MCQ'}
+                title={isBookmarked ? 'Saved in Bookmarks' : 'Save to Bookmarks'}
+              >
+                <Bookmark size={14} fill={isBookmarked ? 'currentColor' : 'none'} />
+              </button>
             )}
           </div>
         </div>
@@ -314,6 +414,27 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                   onClick={() => {
                     setSbaResponses(prev => ({ ...prev, [q.id]: optIdx }));
                     setRevealedMcqExplanations(prev => ({ ...prev, [q.id]: true }));
+                    onRecordRecentView?.({
+                      id: q.id,
+                      itemType: 'mcq',
+                      professionalExam: q.professionalExam,
+                      subject: q.subject,
+                      title: q.stem.slice(0, 120),
+                      subtitle: `SBA · ${q.paper} · ${q.chapter}`
+                    });
+                    if (typeof q.correctIndex === 'number') {
+                      onPracticeOutcome?.({
+                        id: q.id,
+                        professionalExam: q.professionalExam,
+                        subject: q.subject,
+                        paper: q.paper,
+                        chapter: q.chapter,
+                        type: 'SBA',
+                        stem: q.stem,
+                        explanation: q.explanation,
+                        isCorrect: optIdx === q.correctIndex
+                      });
+                    }
                   }}
                   className={`w-full text-left px-3.5 py-2.5 rounded-lg border text-xs sm:text-sm flex items-start gap-2.5 transition-colors min-h-[44px] ${btnClass}`}
                 >
@@ -355,19 +476,40 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                           cls =
                             'border-emerald-500 bg-emerald-500/15 text-emerald-800 dark:text-emerald-200 font-bold';
                         } else if (active && !isCorrect) {
-                          cls = 'border-rose-500 bg-rose-500/15 text-rose-800 dark:text-rose-200 font-bold';
+                          cls =
+                            'border-rose-500 bg-rose-500/15 text-rose-800 dark:text-rose-200 font-bold';
                         }
                       }
                       return (
                         <button
                           key={String(val)}
                           type="button"
-                          onClick={() =>
-                            setTfResponses(prev => ({
-                              ...prev,
-                              [q.id]: { ...(prev[q.id] || {}), [item.label]: val }
-                            }))
-                          }
+                          onClick={() => {
+                            const nextMap = { ...(tfResponses[q.id] || {}), [item.label]: val };
+                            setTfResponses(prev => ({ ...prev, [q.id]: nextMap }));
+                            onRecordRecentView?.({
+                              id: q.id,
+                              itemType: 'mcq',
+                              professionalExam: q.professionalExam,
+                              subject: q.subject,
+                              title: q.stem.slice(0, 120),
+                              subtitle: `TF · ${q.paper} · ${q.chapter}`
+                            });
+                            if (q.items && q.items.every(it => nextMap[it.label] !== undefined)) {
+                              const allCorrect = q.items.every(it => nextMap[it.label] === it.ans);
+                              onPracticeOutcome?.({
+                                id: q.id,
+                                professionalExam: q.professionalExam,
+                                subject: q.subject,
+                                paper: q.paper,
+                                chapter: q.chapter,
+                                type: 'TF',
+                                stem: q.stem,
+                                explanation: q.explanation,
+                                isCorrect: allCorrect
+                              });
+                            }
+                          }}
                           className={`px-3.5 py-2 rounded-lg border text-xs font-bold min-h-[42px] min-w-[50px] transition-colors ${cls}`}
                         >
                           {val ? 'T' : 'F'}
@@ -381,7 +523,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
           </div>
         )}
 
-        {/* Warnings & Explanation Footer */}
+        {/* Discrepancy Note */}
         {q.officialOrbitDiscrepancy && (
           <div className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-900 dark:text-amber-200 flex items-start gap-2">
             <AlertTriangle size={14} className="text-amber-600 shrink-0 mt-0.5" />
@@ -404,7 +546,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
           </button>
 
           <span className="text-[11px] text-[var(--mut)]">
-            {q.verificationStatus} {q.sourceReference ? `• ${q.sourceReference}` : ''}
+            {q.verificationStatus} {q.sourceReference ? `· ${q.sourceReference}` : ''}
           </span>
         </div>
 
@@ -434,19 +576,30 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[var(--line)] pb-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
-            <Layers size={14} />
-            <span>Subject &rarr; Paper &rarr; Chapter &rarr; Year</span>
+            {activeTab === 'cq' ? <BookOpen size={14} /> : <ListChecks size={14} />}
+            <span>
+              {profConfig.shortLabel} &middot;{' '}
+              {activeTab === 'cq' ? 'Study · Written Questions' : 'Practice · MCQ Practice'}
+            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--ink)] m-0">
-            Question Archive
+            {activeTab === 'cq' ? 'Written Questions Archive' : 'MCQ Practice Bank'}
           </h1>
           <p className="text-sm text-[var(--mut)] m-0">
-            Browse verified Written (CQ), SBA &amp; True/False MCQs, and community-submitted Card &amp; Term papers.
+            {activeTab === 'cq' ? (
+              <>
+                MBBS Written (CQ) archive for <strong className="text-[var(--ink)]">{profConfig.shortLabel}</strong> ({profConfig.subtitle}).
+              </>
+            ) : (
+              <>
+                Separated SBA &amp; True/False practice bank for <strong className="text-[var(--ink)]">{profConfig.shortLabel}</strong> ({profConfig.subtitle}).
+              </>
+            )}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {onStartQuickExam && (
+          {activeTab === 'mcq' && onStartQuickExam && (
             <button
               type="button"
               onClick={() =>
@@ -459,65 +612,14 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
               className="btn min-h-[44px]"
             >
               <Sparkles size={15} />
-              <span>Practice Selected in Exam</span>
+              <span>Run Timed Exam</span>
             </button>
           )}
           <button type="button" onClick={() => onNavigate('submit')} className="btn alt min-h-[44px]">
             <FileUp size={15} />
-            <span>Submit Paper</span>
+            <span>Question Papers</span>
           </button>
         </div>
-      </div>
-
-      {/* Main Archive Mode Tabs — scrollable cleanly on 320px phones */}
-      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab('cq');
-            setPageIdx(1);
-          }}
-          className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors min-h-[44px] shrink-0 ${
-            activeTab === 'cq'
-              ? 'bg-[#0F2942] text-white'
-              : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)] hover:border-[#0F2942]'
-          }`}
-        >
-          <BookOpen size={16} />
-          <span>Written (CQ) ({allCqs.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab('mcq');
-            setPageIdx(1);
-          }}
-          className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors min-h-[44px] shrink-0 ${
-            activeTab === 'mcq'
-              ? 'bg-[#0F2942] text-white'
-              : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)] hover:border-[#0F2942]'
-          }`}
-        >
-          <ListChecks size={16} />
-          <span>MCQs — SBA &amp; TF ({allMcqs.length})</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setActiveTab('papers');
-            setPageIdx(1);
-          }}
-          className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors min-h-[44px] shrink-0 ${
-            activeTab === 'papers'
-              ? 'bg-[#0F2942] text-white'
-              : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)] hover:border-[#0F2942]'
-          }`}
-        >
-          <FileText size={16} />
-          <span>Card &amp; Term Papers ({publishedPapers.length})</span>
-        </button>
       </div>
 
       {/* Hierarchy Filter Panel */}
@@ -531,7 +633,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
               setSearch(e.target.value);
               setPageIdx(1);
             }}
-            placeholder="Search by medical keyword, anatomical structure, exam session, or chapter..."
+            placeholder={`Search ${profConfig.shortLabel} questions, chapters, or exam sessions...`}
             className="!pl-10 !pr-10 text-sm min-h-[44px]"
           />
           {search && (
@@ -565,7 +667,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
               }}
               className="text-sm min-h-[44px]"
             >
-              <option value="all">All Subjects</option>
+              <option value="all">All Subjects ({availableSubjects.length})</option>
               {availableSubjects.map(s => (
                 <option key={s} value={s}>
                   {s}
@@ -660,9 +762,17 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
           </div>
         </div>
 
+        {/* Fourth Prof Allied Disciplines Callout */}
+        {alliedDisciplines.length > 0 && (
+          <div className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs text-[var(--ink-secondary)]">
+            <strong className="text-[var(--ink)]">{subject} Allied Disciplines:</strong>{' '}
+            {alliedDisciplines.join(' · ')}
+          </div>
+        )}
+
         {/* Sub-filters per tab */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[var(--line-light)]">
-          {activeTab === 'mcq' && (
+          {activeTab === 'mcq' ? (
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-bold text-[var(--mut)]">Format:</span>
               <button
@@ -691,7 +801,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                     : 'bg-[var(--bg-subtle)] text-[var(--ink-secondary)]'
                 }`}
               >
-                SBA Section ({sbaCountInFilter})
+                SBA ({sbaCountInFilter})
               </button>
               <button
                 type="button"
@@ -705,60 +815,21 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                     : 'bg-[var(--bg-subtle)] text-[var(--ink-secondary)]'
                 }`}
               >
-                True/False Section ({tfCountInFilter})
+                True/False ({tfCountInFilter})
               </button>
             </div>
-          )}
-
-          {activeTab === 'cq' && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[var(--mut)]">Program:</span>
-              {(['all', 'MBBS', 'BDS'] as const).map(p => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => {
-                    setProgFilter(p);
-                    setPageIdx(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold min-h-[36px] ${
-                    progFilter === p
-                      ? 'bg-[#0D9488] text-white'
-                      : 'bg-[var(--bg-subtle)] text-[var(--ink-secondary)]'
-                  }`}
-                >
-                  {p === 'all' ? 'All Programs' : p}
-                </button>
-              ))}
+          ) : (
+            <div className="text-xs font-semibold text-[var(--mut)] flex items-center gap-1.5">
+              <Layers size={13} className="text-[#0D9488]" />
+              <span>
+                {profConfig.shortLabel} Written Archive ({allCqs.length} questions)
+              </span>
             </div>
           )}
 
-          {activeTab === 'papers' && (
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[var(--mut)]">Category:</span>
-              {(['all', 'Card', 'Term', 'MCQ'] as const).map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => {
-                    setPaperCategory(cat);
-                    setPageIdx(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold min-h-[36px] ${
-                    paperCategory === cat
-                      ? 'bg-[#0D9488] text-white'
-                      : 'bg-[var(--bg-subtle)] text-[var(--ink-secondary)]'
-                  }`}
-                >
-                  {cat === 'all' ? 'All Categories' : `${cat} Papers`}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="flex items-center gap-3 ml-auto text-xs text-[var(--mut)]">
+          <div className="flex items-center gap-3 ml-auto text-xs text-[var(--mut)] tabular-nums">
             <span>
-              Showing <b>{pagedItems.length}</b> of <b>{activeList.length}</b> results
+              Showing <b>{pagedItems.length}</b> of <b>{activeList.length}</b>
             </span>
             <button type="button" onClick={resetFilters} className="btn sm alt">
               <RotateCcw size={12} /> Reset
@@ -769,23 +840,28 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
 
       {/* Results Area */}
       {activeList.length === 0 ? (
-        <div className="empty">
-          <HelpCircle size={36} className="mx-auto mb-2 opacity-50" />
+        <div className="empty space-y-2.5">
+          <HelpCircle size={36} className="mx-auto mb-1 opacity-50" />
           <div className="font-bold text-[var(--ink)]">
-            {activeTab === 'papers' && publishedPapers.length === 0
-              ? 'No community Card/Term papers published yet'
+            {activeTab === 'cq' && allCqs.length === 0
+              ? `No verified Written (CQ) questions cataloged yet for ${profConfig.title}`
+              : activeTab === 'mcq' && allMcqs.length === 0
+              ? `No verified MCQ questions cataloged yet for ${profConfig.title}`
               : 'No matching questions found'}
           </div>
           <p className="text-xs text-[var(--mut)] mt-1 max-w-md mx-auto">
-            {activeTab === 'papers' && publishedPapers.length === 0
-              ? 'Be the first to contribute a Card, Term, or MCQ question paper from your medical college.'
+            {(activeTab === 'cq' ? allCqs.length === 0 : allMcqs.length === 0)
+              ? `Questions are never fabricated. Submit ${profConfig.shortLabel} papers in Question Papers or review your Academic Preference in Profile → Settings.`
               : 'Try clearing one of your hierarchy filters or changing your search query.'}
           </p>
-          {activeTab === 'papers' && (
-            <button type="button" onClick={() => onNavigate('submit')} className="btn sm mt-3">
-              Submit Question Papers &rarr;
+          <div className="flex flex-wrap justify-center gap-2 pt-1">
+            <button type="button" onClick={() => onNavigate('submit')} className="btn sm">
+              Open Question Papers &rarr;
             </button>
-          )}
+            <button type="button" onClick={() => onNavigate('settings')} className="btn sm alt">
+              Profile &rarr; Settings
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -795,6 +871,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
               {(pagedItems as UnifiedCqQuestion[]).map(q => {
                 const isOpen = Boolean(revealedCqAnswers[q.id]);
                 const pdfInfo = q.pdfId ? PDF_CATALOG.find(p => p.id === q.pdfId) : undefined;
+                const isBookmarked = bookmarkedKeys.has(`cq_${q.id}`);
                 return (
                   <div
                     key={q.id}
@@ -822,15 +899,41 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                           </>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-[11px] text-[var(--mut)] font-mono tabular-nums">
-                        {q.year && <span className="font-bold text-[var(--ink)]">{q.year}</span>}
-                        <span>{q.type}</span>
-                        <span>({q.prog})</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[11px] text-[var(--mut)] font-mono tabular-nums">
+                          {q.year ? `${q.year} · ` : ''}
+                          {q.type}
+                        </span>
+                        {onToggleBookmark && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onToggleBookmark({
+                                id: q.id,
+                                itemType: 'cq',
+                                professionalExam: q.professionalExam,
+                                subject: q.subject,
+                                paper: q.paper,
+                                chapter: q.chapter,
+                                title: q.text.slice(0, 120),
+                                subtitle: `${q.paper} · ${q.chapter}${q.year ? ` · ${q.year}` : ''}`
+                              })
+                            }
+                            className={`p-1.5 rounded-lg border min-h-[32px] min-w-[32px] flex items-center justify-center transition-colors ${
+                              isBookmarked
+                                ? 'border-[#0D9488] bg-teal-500/10 text-[#0D9488]'
+                                : 'border-[var(--line)] text-[var(--mut)] hover:text-[#0D9488]'
+                            }`}
+                            aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark question'}
+                          >
+                            <Bookmark size={14} fill={isBookmarked ? 'currentColor' : 'none'} />
+                          </button>
+                        )}
                       </div>
                     </div>
 
                     <div
-                      onClick={() => setSelectedCq(q)}
+                      onClick={() => openCqDetail(q)}
                       className="text-sm sm:text-base font-semibold text-[var(--ink)] leading-relaxed cursor-pointer hover:text-[#0D9488] transition-colors"
                     >
                       {q.text}
@@ -847,9 +950,20 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                         {q.answer && (
                           <button
                             type="button"
-                            onClick={() =>
-                              setRevealedCqAnswers(prev => ({ ...prev, [q.id]: !prev[q.id] }))
-                            }
+                            onClick={() => {
+                              const nextVal = !isOpen;
+                              setRevealedCqAnswers(prev => ({ ...prev, [q.id]: nextVal }));
+                              if (nextVal) {
+                                onRecordRecentView?.({
+                                  id: q.id,
+                                  itemType: 'cq',
+                                  professionalExam: q.professionalExam,
+                                  subject: q.subject,
+                                  title: q.text.slice(0, 120),
+                                  subtitle: `${q.paper} · ${q.chapter}`
+                                });
+                              }
+                            }}
                             className="inline-flex items-center gap-1 font-bold text-[#0D9488] bg-transparent border-0 p-1"
                           >
                             {isOpen ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -858,10 +972,10 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
                         )}
                         <button
                           type="button"
-                          onClick={() => setSelectedCq(q)}
+                          onClick={() => openCqDetail(q)}
                           className="font-semibold text-[var(--ink-secondary)] hover:underline bg-transparent border-0 p-1"
                         >
-                          Full Paper Detail &rarr;
+                          Full Detail &rarr;
                         </button>
                       </div>
 
@@ -922,79 +1036,6 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
             </div>
           )}
 
-          {/* Published Community Papers */}
-          {activeTab === 'papers' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {(pagedItems as PublishedPaper[]).map(p => (
-                <div
-                  key={p.id}
-                  className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 flex flex-col justify-between gap-4"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <span className="px-2.5 py-0.5 rounded bg-teal-500/15 text-[#0D9488] font-bold">
-                        {p.category} Question Paper
-                      </span>
-                      <span className="text-[var(--mut)] font-semibold">
-                        {p.year || ''} {p.session ? `• ${p.session}` : ''}
-                      </span>
-                    </div>
-
-                    <h3 className="text-base font-bold text-[var(--ink)] m-0">{p.examName}</h3>
-
-                    <div className="text-xs text-[var(--ink-secondary)] flex items-center gap-1.5">
-                      <Building2 size={13} className="text-[#0D9488] shrink-0" />
-                      <span>{p.collegeName}</span>
-                    </div>
-
-                    <div className="text-xs text-[var(--mut)]">
-                      <b>{p.subject}</b>
-                      {p.paper ? ` • ${p.paper}` : ''}
-                      {p.chapter ? ` • ${p.chapter}` : ''}
-                    </div>
-
-                    {p.description && (
-                      <p className="text-xs text-[var(--mut)] m-0 leading-relaxed">{p.description}</p>
-                    )}
-                  </div>
-
-                  <div className="pt-3 border-t border-[var(--line)] space-y-2 text-xs">
-                    <div className="text-[var(--mut)]">
-                      Contributed by <b className="text-[var(--ink)]">{p.contributorName}</b>
-                      {p.contributorBatch ? ` (${p.contributorBatch})` : ''}
-                    </div>
-                    <div className="flex flex-wrap gap-2 min-w-0">
-                      {p.files.map(f => (
-                        <a
-                          key={f.id}
-                          href={f.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn sm alt no-underline max-w-full min-w-0"
-                        >
-                          <ExternalLink size={12} className="shrink-0" />
-                          <span className="truncate">{f.originalName}</span>
-                        </a>
-                      ))}
-                      {p.driveLinks.map((lnk, idx) => (
-                        <a
-                          key={idx}
-                          href={lnk}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn sm no-underline"
-                        >
-                          <ExternalLink size={12} />
-                          <span>Open Drive Link {p.driveLinks.length > 1 ? idx + 1 : ''}</span>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between gap-3 pt-4">
@@ -1031,10 +1072,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       {/* CQ Detail Modal */}
       {selectedCq && (
         <div className="modal-overlay" onClick={() => setSelectedCq(null)}>
-          <div
-            className="modal-content !max-w-2xl"
-            onClick={e => e.stopPropagation()}
-          >
+          <div className="modal-content !max-w-2xl" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div className="text-sm font-bold text-[var(--ink)]">
                 {selectedCq.subject} &bull; {selectedCq.paper}

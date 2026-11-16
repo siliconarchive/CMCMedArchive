@@ -1,5 +1,26 @@
 export type UserRole = 'student' | 'contributor' | 'admin';
 
+export type ProfessionalExamId =
+  | 'First Professional'
+  | 'Second Professional'
+  | 'Third Professional'
+  | 'Fourth Professional';
+
+export type SubjectClassificationRole =
+  | 'Main Professional Examination Subject'
+  | 'Phase Teaching / Formative Subject';
+
+export interface ProfExamConfig {
+  id: ProfessionalExamId;
+  title: string;
+  shortLabel: string;
+  subtitle: string;
+  subjects: string[];
+  papersBySubject: Record<string, string[]>;
+  alliedDisciplinesBySubject?: Record<string, string[]>;
+  phaseFormativeSubjects?: string[];
+}
+
 export interface UserProfile {
   id: string;
   fullName: string;
@@ -8,6 +29,7 @@ export interface UserProfile {
   batch: string;
   roll?: string;
   role: UserRole;
+  preferredProf?: ProfessionalExamId;
   createdAt?: string;
   name?: string;
   college?: string;
@@ -18,7 +40,11 @@ export interface UploadedItem {
   fullName: string;
   collegeName: string;
   title: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   subject: string;
+  paper?: string;
   topic: string;
   kind: string;
   description: string;
@@ -78,6 +104,9 @@ export interface QuestionSubmission {
   category: SubmissionCategory;
   method: SubmissionMethod;
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   examName: string;
   subject: string;
   paper: string;
@@ -109,6 +138,9 @@ export interface PublishedPaper {
   submissionId: string;
   category: SubmissionCategory;
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   examName: string;
   subject: string;
   paper: string;
@@ -130,6 +162,9 @@ export interface PublishedMcqQuestion {
   submissionId: string;
   paperId: string;
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   examName: string;
   subject: string;
   paper: 'Paper-I' | 'Paper-II' | string;
@@ -173,6 +208,9 @@ export interface AnnouncementRecord {
 
 export interface QuestionOverride {
   questionId: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   subject?: string;
   paper?: string;
   chapter?: string;
@@ -183,9 +221,77 @@ export interface QuestionOverride {
 }
 
 export interface CustomTaxonomy {
+  taxonomyVersion?: number;
   subjects: string[];
   chaptersBySubjectPaper: Record<string, string[]>;
   years: number[];
+  professionalExams?: ProfExamConfig[];
+}
+
+export interface BookmarkRecord {
+  id: string;
+  itemType: 'cq' | 'mcq' | 'paper' | 'note';
+  professionalExam: ProfessionalExamId;
+  subject: string;
+  paper?: string;
+  chapter?: string;
+  title: string;
+  subtitle?: string;
+  savedAt: string;
+}
+
+export interface RecentlyViewedRecord {
+  id: string;
+  itemType: 'cq' | 'mcq' | 'paper' | 'note';
+  professionalExam: ProfessionalExamId;
+  subject: string;
+  title: string;
+  subtitle?: string;
+  viewedAt: string;
+}
+
+export interface WrongAnswerRecord {
+  id: string;
+  professionalExam: ProfessionalExamId;
+  subject: string;
+  paper: string;
+  chapter: string;
+  type: 'SBA' | 'TF';
+  stem: string;
+  explanation?: string;
+  attempts: number;
+  lastWrongAt: string;
+}
+
+export interface ExamHistoryRecord {
+  id: string;
+  professionalExam: ProfessionalExamId;
+  subject: string;
+  mode: string;
+  totalQuestions: number;
+  scoreEarned: number;
+  percentage: number;
+  completedAt: string;
+}
+
+export interface StudyState {
+  bookmarks: BookmarkRecord[];
+  recentlyViewed: RecentlyViewedRecord[];
+  wrongAnswers: WrongAnswerRecord[];
+  examHistory: ExamHistoryRecord[];
+  practicedIds: Record<string, { professionalExam: ProfessionalExamId; subject: string; correct: boolean }>;
+}
+
+export interface ResourceRequestRecord {
+  id: string;
+  professionalExam: ProfessionalExamId;
+  subject: string;
+  topicOrExam: string;
+  resourceType: 'Written Questions' | 'MCQ' | 'Question Paper' | 'Notes' | 'Viva';
+  details: string;
+  requesterName: string;
+  status: 'Open' | 'Fulfilled';
+  createdAt: string;
 }
 
 export type PageRoute =
@@ -194,12 +300,18 @@ export type PageRoute =
   | 'question'
   | 'mcq'
   | 'exam'
+  | 'wrong-review'
   | 'submit'
+  | 'community'
   | 'library'
   | 'upload'
   | 'teacher'
+  | 'profile'
+  | 'settings'
   | 'contributors'
   | 'notices'
   | 'admin'
   | 'about'
   | 'developer';
+
+export type ProfileTab = 'info' | 'settings' | 'bookmarks' | 'recent' | 'progress';

@@ -16,16 +16,37 @@ import {
   Plus
 } from 'lucide-react';
 import {
+  BookmarkRecord,
+  CustomTaxonomy,
+  PageRoute,
+  ProfessionalExamId,
+  PublishedPaper,
   QuestionSubmission,
+  RecentlyViewedRecord,
+  StudyState,
   SubmissionCategory,
   SubmissionMethod,
   UserProfile
 } from '../types';
 import { MEDICAL_COLLEGES_BD } from '../data/archiveHelpers';
+import {
+  getMergedProfConfigs,
+  getPapersForSubjectInProf,
+  getSubjectsForProf
+} from '../data/curriculumConfig';
+import { CommunityUploadsView } from './CommunityUploadsView';
 
 interface SubmitQuestionPapersProps {
+  selectedProf: ProfessionalExamId;
   userProfile: UserProfile | null;
   authToken: string | null;
+  publishedPapers: PublishedPaper[];
+  customTaxonomy: CustomTaxonomy;
+  studyState?: StudyState;
+  onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
+  onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
+  initialHubTab?: 'submit' | 'community';
+  onNavigate: (page: PageRoute) => void;
 }
 
 interface LocalTrackingToken {
@@ -53,12 +74,32 @@ function saveTrackingToken(id: string, key: string) {
 }
 
 export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
+  selectedProf,
   userProfile,
-  authToken
+  authToken,
+  publishedPapers,
+  customTaxonomy,
+  studyState,
+  onToggleBookmark,
+  onRecordRecentView,
+  initialHubTab = 'submit',
+  onNavigate
 }) => {
+  const [hubTab, setHubTab] = useState<'submit' | 'community'>(initialHubTab);
   const [activeView, setActiveView] = useState<'form' | 'track'>('form');
 
+  useEffect(() => {
+    setHubTab(initialHubTab);
+  }, [initialHubTab]);
+
+  const profPaperCount = publishedPapers.filter(
+    p =>
+      p.classificationRole !== 'Phase Teaching / Formative Subject' &&
+      (p.professionalExam || 'First Professional') === selectedProf
+  ).length;
+
   // Form Metadata
+  const [formProf, setFormProf] = useState<ProfessionalExamId>(selectedProf);
   const [category, setCategory] = useState<SubmissionCategory>('Card');
   const [method, setMethod] = useState<SubmissionMethod>('pdf');
   const [collegeChoice, setCollegeChoice] = useState<string>(
@@ -68,15 +109,39 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   );
   const [customCollege, setCustomCollege] = useState<string>('');
   const [examName, setExamName] = useState<string>('');
-  const [subject, setSubject] = useState<string>('Anatomy');
+  const [subject, setSubject] = useState<string>(
+    getSubjectsForProf(selectedProf, customTaxonomy)[0] || 'Anatomy'
+  );
   const [paper, setPaper] = useState<string>('');
   const [chapter, setChapter] = useState<string>('');
   const [year, setYear] = useState<string>(String(new Date().getFullYear()));
   const [session, setSession] = useState<string>('');
-  const [collectionType, setCollectionType] = useState<string>('Scanned Question Paper');
+  const [collectionType] = useState<string>('Scanned Question Paper');
   const [description, setDescription] = useState<string>('');
   const [contributorName, setContributorName] = useState<string>(userProfile?.fullName || '');
   const [contributorBatch, setContributorBatch] = useState<string>(userProfile?.batch || '');
+
+  const profConfigs = getMergedProfConfigs(customTaxonomy);
+  const subjectsForFormProf = getSubjectsForProf(formProf, customTaxonomy);
+  const papersForFormSubject = getPapersForSubjectInProf(formProf, subject, customTaxonomy);
+
+  // Sync default formProf and subject whenever global selectedProf switches
+  useEffect(() => {
+    setFormProf(selectedProf);
+    const subs = getSubjectsForProf(selectedProf, customTaxonomy);
+    if (subs.length > 0) setSubject(subs[0]);
+    setPaper('');
+  }, [selectedProf, customTaxonomy]);
+
+  // Keep selected subject valid when user manually switches Professional Exam in form
+  const handleFormProfChange = (nextProf: ProfessionalExamId) => {
+    setFormProf(nextProf);
+    const subs = getSubjectsForProf(nextProf, customTaxonomy);
+    if (subs.length > 0 && !subs.includes(subject)) {
+      setSubject(subs[0]);
+    }
+    setPaper('');
+  };
 
   // Files & Links
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -231,6 +296,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
           body: JSON.stringify({
             category,
             method,
+            professionalExam: formProf,
             collegeName: effectiveCollege,
             examName: examName.trim(),
             subject: subject.trim(),
@@ -251,6 +317,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
         const fd = new FormData();
         fd.append('category', category);
         fd.append('method', method);
+        fd.append('professionalExam', formProf);
         fd.append('collegeName', effectiveCollege);
         fd.append('examName', examName.trim());
         fd.append('subject', subject.trim());
@@ -357,73 +424,128 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* ONE SECTION (QUESTION PAPERS) -> STRICTLY TWO ORGANIZED TABS */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[var(--line)] pb-5">
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
             <FileUp size={14} />
-            <span>Community Question Collection</span>
+            <span>{selectedProf} &middot; Question Papers</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--ink)] m-0">
-            Submit Question Papers
+            Question Papers
           </h1>
           <p className="text-sm text-[var(--mut)] m-0">
-            Share Card, Term, or MCQ papers from CMC or any medical college across Bangladesh via PDF, Images, or Google Drive links.
+            {hubTab === 'submit'
+              ? 'Submit Card, Term, or MCQ papers via PDF, Multiple Images, or Google Drive links.'
+              : 'Browse administrator-approved Card, Term, and MCQ papers for your selected Professional Examination.'}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
+        <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto shrink-0" role="tablist">
           <button
             type="button"
-            onClick={() => setActiveView('form')}
-            className={`px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
-              activeView === 'form'
-                ? 'bg-[#0F2942] text-white'
+            role="tab"
+            aria-selected={hubTab === 'submit'}
+            onClick={() => {
+              setHubTab('submit');
+              setActiveView('form');
+            }}
+            className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
+              hubTab === 'submit'
+                ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
                 : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
             }`}
           >
-            New Submission
+            Submit Question Papers
           </button>
           <button
             type="button"
-            onClick={() => {
-              setActiveView('track');
-              fetchMySubmissions();
-            }}
-            className={`px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
-              activeView === 'track'
-                ? 'bg-[#0F2942] text-white'
+            role="tab"
+            aria-selected={hubTab === 'community'}
+            onClick={() => setHubTab('community')}
+            className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
+              hubTab === 'community'
+                ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
                 : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
             }`}
           >
-            Track ({mySubmissions.length})
+            Community Uploads ({profPaperCount})
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs sm:text-sm flex items-start gap-2.5">
-          <AlertCircle size={18} className="shrink-0 mt-0.5" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {submittedRecord && activeView === 'form' && (
-        <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
-          <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-extrabold text-base">
-            <CheckCircle2 size={20} />
-            <span>Question Paper Submitted Successfully!</span>
+      {hubTab === 'community' ? (
+        <CommunityUploadsView
+          embedded
+          selectedProf={selectedProf}
+          publishedPapers={publishedPapers}
+          customTaxonomy={customTaxonomy}
+          studyState={studyState}
+          onToggleBookmark={onToggleBookmark}
+          onRecordRecentView={onRecordRecentView}
+          onSwitchToSubmitTab={() => setHubTab('submit')}
+          onNavigate={onNavigate}
+        />
+      ) : (
+        <div className="space-y-5 max-w-4xl">
+          {/* Sub-switch inside Submit Tab: Upload Form vs Track Status */}
+          <div className="flex flex-wrap items-center justify-between gap-2 bg-[var(--bg-subtle)] p-2 rounded-xl border border-[var(--line)]">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveView('form')}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] ${
+                  activeView === 'form'
+                    ? 'bg-[var(--card)] text-[var(--ink)] shadow-xs border border-[var(--line)]'
+                    : 'text-[var(--mut)]'
+                }`}
+              >
+                Submission Form
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveView('track');
+                  fetchMySubmissions();
+                }}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] ${
+                  activeView === 'track'
+                    ? 'bg-[var(--card)] text-[var(--ink)] shadow-xs border border-[var(--line)]'
+                    : 'text-[var(--mut)]'
+                }`}
+              >
+                Track My Submissions ({mySubmissions.length})
+              </button>
+            </div>
+            <span className="text-[11px] text-[var(--mut)] px-2">
+              Only admin-approved papers appear in Community Uploads
+            </span>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--ink-secondary)] m-0">
-            Tracking ID: <b className="font-mono text-[var(--ink)]">{submittedRecord.id}</b> &bull; Current Status:{' '}
-            <span className="font-bold">{submittedRecord.status}</span>. An administrator will review your file/link before publishing it to the Question Archive.
-          </p>
-          <button type="button" onClick={() => setActiveView('track')} className="btn sm good">
-            View My Submissions &rarr;
-          </button>
-        </div>
-      )}
+
+          {error && (
+            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-800 dark:text-rose-300 text-xs sm:text-sm flex items-start gap-2.5">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {submittedRecord && activeView === 'form' && (
+            <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-extrabold text-base">
+                <CheckCircle2 size={20} />
+                <span>Question Paper Submitted Successfully!</span>
+              </div>
+              <p className="text-xs sm:text-sm text-[var(--ink-secondary)] m-0">
+                Tracking ID: <b className="font-mono text-[var(--ink)]">{submittedRecord.id}</b> &bull; Status:{' '}
+                <span className="font-bold">{submittedRecord.status}</span> &bull; Examination Stage:{' '}
+                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. An administrator will verify this upload before publishing it to Community Uploads.
+              </p>
+              <button type="button" onClick={() => setActiveView('track')} className="btn sm good">
+                View My Submissions &rarr;
+              </button>
+            </div>
+          )}
 
       {/* VIEW 1: SUBMISSION FORM */}
       {activeView === 'form' && (
@@ -464,6 +586,23 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                  MBBS Professional Examination *
+                </label>
+                <select
+                  value={formProf}
+                  onChange={e => handleFormProfChange(e.target.value as ProfessionalExamId)}
+                  className="min-h-[44px] text-sm"
+                >
+                  {profConfigs.map(cfg => (
+                    <option key={cfg.id} value={cfg.id}>
+                      {cfg.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[var(--ink)] mb-1">
                   Medical College Name *
                 </label>
                 <select
@@ -495,7 +634,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
                 <input
                   value={examName}
                   onChange={e => setExamName(e.target.value)}
-                  placeholder="e.g. 1st Term Exam / Superior Extremity Card / 1st Prof"
+                  placeholder="e.g. 1st Term Exam / Superior Extremity Card"
                   required
                   className="min-h-[44px] text-sm"
                 />
@@ -505,18 +644,20 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
                 <label className="block text-xs font-bold text-[var(--ink)] mb-1">Subject *</label>
                 <select
                   value={subject}
-                  onChange={e => setSubject(e.target.value)}
+                  onChange={e => {
+                    setSubject(e.target.value);
+                    setPaper('');
+                  }}
                   className="min-h-[44px] text-sm"
                 >
-                  <option value="Anatomy">Anatomy</option>
-                  <option value="Physiology">Physiology</option>
-                  <option value="Biochemistry">Biochemistry</option>
-                  <option value="Pathology">Pathology</option>
-                  <option value="Pharmacology">Pharmacology</option>
-                  <option value="Microbiology">Microbiology</option>
-                  <option value="Forensic Medicine">Forensic Medicine</option>
-                  <option value="Community Medicine">Community Medicine</option>
-                  <option value="Medicine / Surgery / Obs-Gynae">Clinical (Final Prof)</option>
+                  {subjectsForFormProf.map(s => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                  {!subjectsForFormProf.includes(subject) && (
+                    <option value={subject}>{subject}</option>
+                  )}
                 </select>
               </div>
 
@@ -530,8 +671,11 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
                   className="min-h-[44px] text-sm"
                 >
                   <option value="">Not specified / General</option>
-                  <option value="Paper-I">Paper-I</option>
-                  <option value="Paper-II">Paper-II</option>
+                  {papersForFormSubject.map(p => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -978,6 +1122,8 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             </div>
           )}
         </div>
+      )}
+      </div>
       )}
     </div>
   );

@@ -89,7 +89,10 @@
       "uploadTimestamp": "2026-11-04T17:31:24.352Z",
       "status": "approved",
       "prog": "MBBS",
-      "kind": "Notes"
+      "kind": "Notes",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-I"
     },
     {
       "id": "note_1793812984184_da8464c5",
@@ -110,7 +113,10 @@
       "uploadTimestamp": "2026-11-04T17:23:04.184Z",
       "status": "pending",
       "prog": "MBBS",
-      "kind": "Notes"
+      "kind": "Notes",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-II"
     },
     {
       "id": "r1",
@@ -131,7 +137,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-01T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-II"
     },
     {
       "id": "r2",
@@ -152,7 +161,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-05T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-I"
     },
     {
       "id": "r3",
@@ -173,7 +185,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-09T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-II"
     },
     {
       "id": "r4",
@@ -194,7 +209,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-12T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-II"
     },
     {
       "id": "r5",
@@ -215,7 +233,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-15T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-I"
     },
     {
       "id": "r6",
@@ -236,7 +257,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-20T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-II"
     },
     {
       "id": "r7",
@@ -257,7 +281,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-22T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-I"
     },
     {
       "id": "r8",
@@ -278,7 +305,10 @@
       "uploadedByEmail": "sifatislam.cmc67@gmail.com",
       "uploadTimestamp": "2026-09-28T10:00:00Z",
       "status": "approved",
-      "prog": "MBBS"
+      "prog": "MBBS",
+      "professionalExam": "First Professional",
+      "profNeedsReview": false,
+      "paper": "Paper-I"
     }
   ],
   "submissions": [],
@@ -320,8 +350,134 @@
   ],
   "questionOverrides": {},
   "customTaxonomy": {
+    "taxonomyVersion": 2,
     "subjects": [],
     "chaptersBySubjectPaper": {},
-    "years": []
-  }
+    "years": [],
+    "professionalExams": [
+      {
+        "id": "First Professional",
+        "title": "First Professional Examination",
+        "shortLabel": "First Professional",
+        "subtitle": "Anatomy, Physiology & Biochemistry",
+        "subjects": [
+          "Anatomy",
+          "Physiology",
+          "Biochemistry"
+        ],
+        "papersBySubject": {
+          "Anatomy": [
+            "Paper-I",
+            "Paper-II"
+          ],
+          "Physiology": [
+            "Paper-I",
+            "Paper-II"
+          ],
+          "Biochemistry": [
+            "Paper-I",
+            "Paper-II"
+          ]
+        }
+      },
+      {
+        "id": "Second Professional",
+        "title": "Second Professional Examination",
+        "shortLabel": "Second Professional",
+        "subtitle": "Pharmacology & Therapeutics · Forensic Medicine & Toxicology",
+        "subjects": [
+          "Pharmacology & Therapeutics",
+          "Forensic Medicine & Toxicology"
+        ],
+        "papersBySubject": {
+          "Pharmacology & Therapeutics": [
+            "Paper-I",
+            "Paper-II",
+            "General"
+          ],
+          "Forensic Medicine & Toxicology": [
+            "Paper-I",
+            "Paper-II",
+            "General"
+          ]
+        },
+        "phaseFormativeSubjects": [
+          "Pathology (Phase Teaching / Formative)",
+          "Microbiology (Phase Teaching / Formative)",
+          "Community Medicine (Phase Teaching / Formative)"
+        ]
+      },
+      {
+        "id": "Third Professional",
+        "title": "Third Professional Examination",
+        "shortLabel": "Third Professional",
+        "subtitle": "Community Medicine & Public Health, Pathology & Microbiology",
+        "subjects": [
+          "Community Medicine & Public Health",
+          "Pathology",
+          "Microbiology"
+        ],
+        "papersBySubject": {
+          "Community Medicine & Public Health": [
+            "Paper-I",
+            "Paper-II",
+            "General"
+          ],
+          "Pathology": [
+            "Paper-I",
+            "Paper-II",
+            "General"
+          ],
+          "Microbiology": [
+            "Paper-I",
+            "Paper-II",
+            "General"
+          ]
+        }
+      },
+      {
+        "id": "Fourth Professional",
+        "title": "Fourth Professional (Final) Examination",
+        "shortLabel": "Fourth Professional (Final)",
+        "subtitle": "Medicine & Allied, Surgery & Allied & Obstetrics & Gynaecology",
+        "subjects": [
+          "Medicine & Allied Subjects",
+          "Surgery & Allied Subjects",
+          "Obstetrics & Gynaecology"
+        ],
+        "papersBySubject": {
+          "Medicine & Allied Subjects": [
+            "Paper-I",
+            "Paper-II"
+          ],
+          "Surgery & Allied Subjects": [
+            "Paper-I",
+            "Paper-II"
+          ],
+          "Obstetrics & Gynaecology": [
+            "Paper-I",
+            "Paper-II"
+          ]
+        },
+        "alliedDisciplinesBySubject": {
+          "Medicine & Allied Subjects": [
+            "Internal Medicine",
+            "Paediatrics",
+            "Psychiatry",
+            "Dermatology & Venereology",
+            "Physical Medicine & Rehabilitation"
+          ],
+          "Surgery & Allied Subjects": [
+            "General Surgery",
+            "Orthopaedic Surgery",
+            "Ophthalmology (Eye)",
+            "Otolaryngology (ENT)",
+            "Anaesthesiology",
+            "Radiology & Imaging"
+          ]
+        }
+      }
+    ]
+  },
+  "resourceRequests": []
 }

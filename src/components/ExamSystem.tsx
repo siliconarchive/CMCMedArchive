@@ -16,20 +16,52 @@ import {
   Check,
   Sparkles
 } from 'lucide-react';
-import { CustomTaxonomy, PageRoute, PublishedMcqQuestion, QuestionOverride } from '../types';
+import {
+  CustomTaxonomy,
+  PageRoute,
+  ProfessionalExamId,
+  PublishedMcqQuestion,
+  QuestionOverride
+} from '../types';
 import {
   buildUnifiedMcqQuestions,
   getCanonicalChaptersFor,
   PENDING_CHAPTER_LABEL,
   UnifiedMcqQuestion
 } from '../data/archiveHelpers';
+import {
+  getPapersForSubjectInProf,
+  getProfConfig,
+  getSubjectsForProf,
+  subjectMatchesCanonical
+} from '../data/curriculumConfig';
 
 interface ExamSystemProps {
+  selectedProf: ProfessionalExamId;
   publishedQuestions: PublishedMcqQuestion[];
   questionOverrides: Record<string, QuestionOverride>;
   customTaxonomy: CustomTaxonomy;
   preset?: { subject?: string; paper?: string; chapter?: string } | null;
   onExamActiveChange?: (active: boolean) => void;
+  onExamComplete?: (summary: {
+    professionalExam: ProfessionalExamId;
+    subject: string;
+    mode: string;
+    totalQuestions: number;
+    scoreEarned: number;
+    percentage: number;
+  }) => void;
+  onPracticeOutcome?: (payload: {
+    id: string;
+    professionalExam: ProfessionalExamId;
+    subject: string;
+    paper: string;
+    chapter: string;
+    type: 'SBA' | 'TF';
+    stem: string;
+    explanation?: string;
+    isCorrect: boolean;
+  }) => void;
   onNavigate: (page: PageRoute) => void;
 }
 
@@ -53,22 +85,26 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 
 export const ExamSystem: React.FC<ExamSystemProps> = ({
+  selectedProf,
   publishedQuestions,
   questionOverrides,
   customTaxonomy,
   preset,
   onExamActiveChange,
+  onExamComplete,
+  onPracticeOutcome,
   onNavigate
 }) => {
-  const allMcqs = useMemo(
+  const allMcqsRaw = useMemo(
     () => buildUnifiedMcqQuestions(publishedQuestions, questionOverrides),
     [publishedQuestions, questionOverrides]
   );
 
-  // Setup State
+  // Setup State — strictly governed by global selectedProf
   const [stage, setStage] = useState<ExamStage>('setup');
   const [mode, setMode] = useState<ExamMode>(preset?.chapter ? 'chapter' : preset?.paper ? 'paper' : 'subject');
-  const [subject, setSubject] = useState<string>(preset?.subject || 'Anatomy');
+  const profSubjects = getSubjectsForProf(selectedProf, customTaxonomy);
+  const [subject, setSubject] = useState<string>(preset?.subject || profSubjects[0] || '');
   const [paper, setPaper] = useState<string>(preset?.paper || 'Paper-I');
   const [chapter, setChapter] = useState<string>(preset?.chapter || '');
   const [qType, setQType] = useState<QuestionTypeFilter>('Both');
@@ -77,6 +113,27 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   const [customDurationTouched, setCustomDurationTouched] = useState<boolean>(false);
   const [shuffleOrder, setShuffleOrder] = useState<boolean>(true);
   const [collegeFilter, setCollegeFilter] = useState<string>('all');
+  const [recordedRunId, setRecordedRunId] = useState<number>(0);
+
+  const profConfig = getProfConfig(selectedProf, customTaxonomy);
+
+  // Reset subject/paper/chapter cleanly when selectedProf changes
+  useEffect(() => {
+    const nextSubs = getSubjectsForProf(selectedProf, customTaxonomy);
+    if (!preset?.subject) {
+      setSubject(nextSubs[0] || '');
+      setPaper('Paper-I');
+      setChapter('');
+    }
+  }, [selectedProf, customTaxonomy, preset?.subject]);
+
+  const allMcqs = useMemo(() => {
+    return allMcqsRaw.filter(
+      q =>
+        q.professionalExam === selectedProf &&
+        q.classificationRole !== 'Phase Teaching / Formative Subject'
+    );
+  }, [allMcqsRaw, selectedProf]);
 
   // Active Exam State
   const [examQuestions, setExamQuestions] = useState<UnifiedMcqQuestion[]>([]);
@@ -89,19 +146,29 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   const [confirmSubmitOpen, setConfirmSubmitOpen] = useState<boolean>(false);
 
   const subjects = useMemo(() => {
-    const set = new Set<string>(customTaxonomy.subjects || []);
-    allMcqs.forEach(q => set.add(q.subject));
+    const base = getSubjectsForProf(selectedProf, customTaxonomy);
+    const set = new Set<string>(base);
+    allMcqs.forEach(q => {
+      if (q.subject) set.add(q.subject);
+    });
     return Array.from(set).sort();
-  }, [allMcqs, customTaxonomy]);
+  }, [allMcqs, selectedProf, customTaxonomy]);
+
+  useEffect(() => {
+    if (subjects.length > 0 && !subjects.includes(subject)) {
+      setSubject(subjects[0]);
+    }
+  }, [subjects, subject]);
 
   const papersForSubject = useMemo(() => {
-    const set = new Set<string>();
-    allMcqs.filter(q => q.subject === subject).forEach(q => set.add(q.paper));
+    const set = new Set<string>(getPapersForSubjectInProf(selectedProf, subject, customTaxonomy));
+    allMcqs.filter(q => subjectMatchesCanonical(q.subject, subject)).forEach(q => set.add(q.paper));
     return Array.from(set).sort();
-  }, [allMcqs, subject]);
+  }, [allMcqs, subject, selectedProf, customTaxonomy]);
 
   const chaptersForSelection = useMemo(() => {
-    return getCanonicalChaptersFor(subject, paper, allMcqs, customTaxonomy).filter(
+    const filteredForSubj = allMcqs.filter(q => subjectMatchesCanonical(q.subject, subject));
+    return getCanonicalChaptersFor('all', paper, filteredForSubj, customTaxonomy).filter(
       c => c !== PENDING_CHAPTER_LABEL
     );
   }, [allMcqs, subject, paper, customTaxonomy]);
@@ -115,6 +182,8 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   useEffect(() => {
     if (chaptersForSelection.length > 0 && !chaptersForSelection.includes(chapter)) {
       setChapter(chaptersForSelection[0]);
+    } else if (chaptersForSelection.length === 0) {
+      setChapter('');
     }
   }, [chaptersForSelection, chapter]);
 
@@ -127,7 +196,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   // Verified pool matching user configuration (never mixes in unverified or fabricated items)
   const matchingPool = useMemo(() => {
     return allMcqs.filter(q => {
-      if (q.subject !== subject) return false;
+      if (!subjectMatchesCanonical(q.subject, subject)) return false;
       if ((mode === 'paper' || mode === 'chapter') && q.paper !== paper) return false;
       if (mode === 'chapter' && chapter && q.chapter !== chapter) return false;
       if (qType !== 'Both' && q.type !== qType) return false;
@@ -190,6 +259,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
     const elapsed = forcedElapsed !== undefined ? forcedElapsed : Math.max(0, totalDurationSecs - secondsLeft);
     setTimeTakenSecs(elapsed);
     setConfirmSubmitOpen(false);
+    setRecordedRunId(Date.now());
     setStage('results');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -277,6 +347,34 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, examQuestions, answers]);
 
+      // Record completed exam result + wrong answer review items once per submission
+  useEffect(() => {
+    if (stage !== 'results' || !evaluation || recordedRunId === 0) return;
+    onExamComplete?.({
+      professionalExam: selectedProf,
+      subject,
+      mode: mode === 'chapter' ? `${paper} · ${chapter}` : mode === 'paper' ? paper : 'Full Subject',
+      totalQuestions: evaluation.total,
+      scoreEarned: evaluation.totalMarksEarned,
+      percentage: evaluation.percentage
+    });
+    evaluation.perQuestion.forEach(({ q, status }) => {
+      if (status === 'unanswered') return;
+      onPracticeOutcome?.({
+        id: q.id,
+        professionalExam: q.professionalExam,
+        subject: q.subject,
+        paper: q.paper,
+        chapter: q.chapter,
+        type: q.type,
+        stem: q.stem,
+        explanation: q.explanation,
+        isCorrect: status === 'correct'
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordedRunId]);
+
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -292,13 +390,13 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
         <div className="border-b border-[var(--line)] pb-5 space-y-1.5">
           <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#0D9488]">
             <Award size={14} />
-            <span>Timed Self-Assessment</span>
+            <span>Practice &middot; {profConfig.shortLabel}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--ink)] m-0">
-            Online Examination
+            Examination System
           </h1>
           <p className="text-sm text-[var(--mut)] m-0">
-            Configure a customized exam from verified archive questions. Questions are never fabricated; if a topic has fewer items than requested, the available verified pool is clearly shown.
+            Timed SBA &amp; True/False exams filtered strictly for <strong className="text-[var(--ink)]">{profConfig.title}</strong>. Questions are never fabricated.
           </p>
         </div>
 
@@ -887,14 +985,25 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
 
       {/* Question-by-Question Review */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-extrabold text-[var(--ink)] m-0 flex items-center gap-2">
             <BookOpen size={18} className="text-[#0D9488]" />
             <span>Detailed Question Review</span>
           </h2>
-          <button type="button" onClick={() => onNavigate('archive')} className="btn sm alt">
-            <Sparkles size={14} /> Browse Full Archive
-          </button>
+          <div className="flex flex-wrap gap-2">
+            {evaluation.incorrectQuestions > 0 && (
+              <button
+                type="button"
+                onClick={() => onNavigate('wrong-review')}
+                className="btn sm min-h-[38px]"
+              >
+                Review Wrong Answers
+              </button>
+            )}
+            <button type="button" onClick={() => onNavigate('mcq')} className="btn sm alt min-h-[38px]">
+              <Sparkles size={14} /> MCQ Practice
+            </button>
+          </div>
         </div>
 
         {evaluation.perQuestion.map(({ q, status, earned }, idx) => (

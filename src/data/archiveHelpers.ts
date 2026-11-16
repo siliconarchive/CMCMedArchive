@@ -1,6 +1,18 @@
 import { ALL_QUESTIONS, QuestionRecord } from './questionsData';
 import { AUTHENTIC_MCQ_PAPERS, getMcqAnswerMetadata, VerificationStatus } from './mcqData';
-import { CustomTaxonomy, PublishedMcqQuestion, QuestionOverride } from '../types';
+import {
+  CustomTaxonomy,
+  ProfessionalExamId,
+  PublishedMcqQuestion,
+  QuestionOverride,
+  SubjectClassificationRole
+} from '../types';
+import {
+  canonicalizeSubjectName,
+  inferProfessionalExam,
+  isDentalSubjectOrProgram,
+  isValidProfId
+} from './curriculumConfig';
 
 export const MEDICAL_COLLEGES_BD = [
   'Chittagong Medical College (CMC)',
@@ -23,6 +35,9 @@ export const MEDICAL_COLLEGES_BD = [
 ];
 
 export interface UnifiedCqQuestion extends QuestionRecord {
+  professionalExam: ProfessionalExamId;
+  profNeedsReview: boolean;
+  classificationRole: SubjectClassificationRole;
   chapter: string;
   collegeName: string;
   chapterNeedsReview: boolean;
@@ -32,6 +47,9 @@ export interface UnifiedMcqQuestion {
   id: string;
   paperId: string;
   qNum: number;
+  professionalExam: ProfessionalExamId;
+  profNeedsReview: boolean;
+  classificationRole: SubjectClassificationRole;
   subject: string;
   paper: string;
   chapter: string;
@@ -243,17 +261,30 @@ export function buildUnifiedCqQuestions(
   const result: UnifiedCqQuestion[] = [];
 
   for (const q of ALL_QUESTIONS) {
-    const norm = `${q.subject}|${q.paper}|${q.text.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+    // MBBS-only platform policy: exclude Dental/BDS from public display without deleting underlying records
+    if (isDentalSubjectOrProgram(q.prog, q.subject)) continue;
+
+    const ov = overrides[q.id];
+    const effectiveSubject = canonicalizeSubjectName(ov?.subject || q.subject);
+    if (isDentalSubjectOrProgram(q.prog, effectiveSubject)) continue;
+
+    const effectivePaper = ov?.paper || q.paper;
+    const norm = `${effectiveSubject}|${effectivePaper}|${q.text.trim().toLowerCase().replace(/\s+/g, ' ')}`;
     if (seenText.has(norm)) continue;
     seenText.add(norm);
 
-    const baseChap = canonicalizeCqChapter(q.subject, q.paper, q.section, q.topic);
-    const ov = overrides[q.id];
+    const baseChap = canonicalizeCqChapter(effectiveSubject, effectivePaper, q.section, q.topic);
+    const profMeta = isValidProfId(ov?.professionalExam)
+      ? { professionalExam: ov.professionalExam, needsReview: Boolean(ov.profNeedsReview) }
+      : inferProfessionalExam({ subject: effectiveSubject, examName: q.exam, prog: q.prog });
 
     result.push({
       ...q,
-      subject: ov?.subject || q.subject,
-      paper: ov?.paper || q.paper,
+      professionalExam: profMeta.professionalExam,
+      profNeedsReview: ov?.profNeedsReview !== undefined ? ov.profNeedsReview : profMeta.needsReview,
+      classificationRole: ov?.classificationRole || 'Main Professional Examination Subject',
+      subject: effectiveSubject,
+      paper: effectivePaper,
       year: ov?.year !== undefined ? ov.year : q.year,
       chapter: ov?.chapter || baseChap.chapter,
       chapterNeedsReview: ov?.chapterNeedsReview !== undefined ? ov.chapterNeedsReview : baseChap.needsReview,
@@ -277,26 +308,35 @@ export function buildUnifiedMcqQuestions(
         ...(q.opts || []),
         ...(q.items?.map(i => i.text) || [])
       ];
-      const normKey = `${paper.subject}|${q.type}|${q.stem.trim().toLowerCase().replace(/\s+/g, ' ')}|${subTexts.join('|').toLowerCase().replace(/\s+/g, ' ')}`;
+      const ov = overrides[qId];
+      const effectiveSubject = canonicalizeSubjectName(ov?.subject || paper.subject);
+      if (isDentalSubjectOrProgram('MBBS', effectiveSubject)) continue;
+
+      const normKey = `${effectiveSubject}|${q.type}|${q.stem.trim().toLowerCase().replace(/\s+/g, ' ')}|${subTexts.join('|').toLowerCase().replace(/\s+/g, ' ')}`;
       if (seen.has(normKey)) continue;
       seen.add(normKey);
 
       const meta = getMcqAnswerMetadata(qId, q.stem, q.type);
-      const classified = classifyMcqChapter(paper.subject, paper.paper, q.stem, subTexts);
-      const ov = overrides[qId];
+      const classified = classifyMcqChapter(effectiveSubject, ov?.paper || paper.paper, q.stem, subTexts);
+      const profMeta = isValidProfId(ov?.professionalExam)
+        ? { professionalExam: ov.professionalExam, needsReview: Boolean(ov.profNeedsReview) }
+        : inferProfessionalExam({ subject: effectiveSubject, examName: `1st Prof MBBS (${paper.curriculum})` });
 
       list.push({
         id: qId,
         paperId: paper.id,
         qNum: q.qNum,
-        subject: ov?.subject || paper.subject,
+        professionalExam: profMeta.professionalExam,
+        profNeedsReview: ov?.profNeedsReview !== undefined ? ov.profNeedsReview : profMeta.needsReview,
+        classificationRole: ov?.classificationRole || 'Main Professional Examination Subject',
+        subject: effectiveSubject,
         paper: ov?.paper || paper.paper,
         chapter: ov?.chapter || classified.chapter,
         chapterNeedsReview: ov?.chapterNeedsReview !== undefined ? ov.chapterNeedsReview : classified.needsReview,
         year: ov?.year ?? paper.year,
         session: paper.session,
         collegeName: ov?.collegeName || 'Chittagong Medical College (CMC)',
-        examName: `1st Prof MBBS (${paper.curriculum})`,
+        examName: `${profMeta.professionalExam} MBBS (${paper.curriculum})`,
         type: q.type,
         stem: q.stem,
         items: q.items,
@@ -313,17 +353,27 @@ export function buildUnifiedMcqQuestions(
   }
 
   for (const pq of publishedQuestions) {
-    const normKey = `${pq.subject}|${pq.type}|${pq.stem.trim().toLowerCase().replace(/\s+/g, ' ')}`;
+    const ov = overrides[pq.id];
+    const effectiveSubject = canonicalizeSubjectName(ov?.subject || pq.subject);
+    if (isDentalSubjectOrProgram('MBBS', effectiveSubject)) continue;
+
+    const normKey = `${effectiveSubject}|${pq.type}|${pq.stem.trim().toLowerCase().replace(/\s+/g, ' ')}`;
     if (seen.has(normKey)) continue;
     seen.add(normKey);
 
-    const ov = overrides[pq.id];
     const chap = ov?.chapter || pq.chapter || PENDING_CHAPTER_LABEL;
+    const profMeta = isValidProfId(ov?.professionalExam)
+      ? { professionalExam: ov.professionalExam, needsReview: Boolean(ov.profNeedsReview) }
+      : inferProfessionalExam({ explicitProf: pq.professionalExam, subject: effectiveSubject, examName: pq.examName });
+
     list.push({
       id: pq.id,
       paperId: pq.paperId,
       qNum: 1,
-      subject: ov?.subject || pq.subject,
+      professionalExam: profMeta.professionalExam,
+      profNeedsReview: ov?.profNeedsReview ?? pq.profNeedsReview ?? profMeta.needsReview,
+      classificationRole: ov?.classificationRole || pq.classificationRole || 'Main Professional Examination Subject',
+      subject: effectiveSubject,
       paper: ov?.paper || pq.paper || 'Paper-I',
       chapter: chap,
       chapterNeedsReview: ov?.chapterNeedsReview ?? chap === PENDING_CHAPTER_LABEL,

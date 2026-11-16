@@ -7,6 +7,21 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
+import {
+  ProfExamConfig,
+  ProfessionalExamId,
+  ResourceRequestRecord,
+  StudyState,
+  SubjectClassificationRole
+} from './src/types.ts';
+import {
+  CURRICULUM_TAXONOMY_VERSION,
+  PROFESSIONAL_EXAMS,
+  canonicalizeSubjectName,
+  inferProfessionalExam,
+  isDentalSubjectOrProgram,
+  isValidProfId
+} from './src/data/curriculumConfig.ts';
 
 dotenv.config();
 
@@ -40,6 +55,8 @@ export interface StoredUser {
   batch: string;
   roll?: string;
   role: UserRole;
+  preferredProf?: ProfessionalExamId;
+  studyState?: StudyState;
   passwordHash: string;
   salt: string;
   createdAt: string;
@@ -57,7 +74,11 @@ export interface StoredNote {
   fullName: string;
   collegeName: string;
   title: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   subject: string;
+  paper?: string;
   topic?: string;
   description: string;
   originalFileName: string;
@@ -67,7 +88,7 @@ export interface StoredNote {
   mimeType: string;
   fileUrl: string;
   uploadedByUserId: string;
-  uploadedByEmail: string;
+  uploadedByEmail?: string;
   uploadTimestamp: string;
   status: 'pending' | 'approved' | 'rejected';
   moderationNote?: string;
@@ -111,6 +132,8 @@ export interface QuestionSubmission {
   category: 'Card' | 'Term' | 'MCQ';
   method: 'pdf' | 'images' | 'drive_link';
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
   examName: string;
   subject: string;
   paper: string;
@@ -142,6 +165,8 @@ export interface PublishedPaper {
   submissionId: string;
   category: 'Card' | 'Term' | 'MCQ';
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
   examName: string;
   subject: string;
   paper: string;
@@ -163,6 +188,8 @@ export interface PublishedMcqQuestion {
   submissionId: string;
   paperId: string;
   collegeName: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
   examName: string;
   subject: string;
   paper: string;
@@ -206,6 +233,9 @@ export interface AnnouncementRecord {
 
 export interface QuestionOverride {
   questionId: string;
+  professionalExam?: ProfessionalExamId;
+  profNeedsReview?: boolean;
+  classificationRole?: SubjectClassificationRole;
   subject?: string;
   paper?: string;
   chapter?: string;
@@ -216,9 +246,11 @@ export interface QuestionOverride {
 }
 
 export interface CustomTaxonomy {
+  taxonomyVersion?: number;
   subjects: string[];
   chaptersBySubjectPaper: Record<string, string[]>;
   years: number[];
+  professionalExams?: ProfExamConfig[];
 }
 
 export interface AppDatabase {
@@ -232,6 +264,7 @@ export interface AppDatabase {
   announcements: AnnouncementRecord[];
   questionOverrides: Record<string, QuestionOverride>;
   customTaxonomy: CustomTaxonomy;
+  resourceRequests: ResourceRequestRecord[];
 }
 
 // Password Hashing Helpers
@@ -492,6 +525,36 @@ const SEED_APPROVED_NOTES: StoredNote[] = [
   }
 ];
 
+function inferNotePaper(note: StoredNote): string {
+  if (note.paper && note.paper.trim()) return note.paper.trim();
+  const hay = `${note.title} ${note.topic || ''}`.toLowerCase();
+  if (note.subject === 'Anatomy') {
+    if (hay.includes('brachial') || hay.includes('thorax') || hay.includes('abdomen') || hay.includes('lower limb') || hay.includes('upper limb')) {
+      return 'Paper-II';
+    }
+    if (hay.includes('cranial') || hay.includes('neuroanatomy') || hay.includes('histology') || hay.includes('epithelium') || hay.includes('embryology') || hay.includes('head')) {
+      return 'Paper-I';
+    }
+  }
+  if (note.subject === 'Physiology') {
+    if (hay.includes('renal') || hay.includes('endocrin') || hay.includes('nervous') || hay.includes('autonomic') || hay.includes('special sense')) {
+      return 'Paper-II';
+    }
+    if (hay.includes('cardiac') || hay.includes('respiratory') || hay.includes('blood') || hay.includes('general')) {
+      return 'Paper-I';
+    }
+  }
+  if (note.subject === 'Biochemistry') {
+    if (hay.includes('glycolysis') || hay.includes('metabolism') || hay.includes('acid-base') || hay.includes('renal') || hay.includes('genetics')) {
+      return 'Paper-II';
+    }
+    if (hay.includes('enzyme') || hay.includes('vitamin') || hay.includes('biophysics') || hay.includes('biomolecule')) {
+      return 'Paper-I';
+    }
+  }
+  return 'General';
+}
+
 function ensureDatabaseFields(raw: any): AppDatabase {
   let changed = false;
   const dbObj: AppDatabase = {
@@ -514,15 +577,31 @@ function ensureDatabaseFields(raw: any): AppDatabase {
     customTaxonomy:
       raw?.customTaxonomy && typeof raw.customTaxonomy === 'object'
         ? {
+            taxonomyVersion:
+              typeof raw.customTaxonomy.taxonomyVersion === 'number'
+                ? raw.customTaxonomy.taxonomyVersion
+                : 1,
             subjects: Array.isArray(raw.customTaxonomy.subjects) ? raw.customTaxonomy.subjects : [],
             chaptersBySubjectPaper:
               raw.customTaxonomy.chaptersBySubjectPaper &&
               typeof raw.customTaxonomy.chaptersBySubjectPaper === 'object'
                 ? raw.customTaxonomy.chaptersBySubjectPaper
                 : {},
-            years: Array.isArray(raw.customTaxonomy.years) ? raw.customTaxonomy.years : []
+            years: Array.isArray(raw.customTaxonomy.years) ? raw.customTaxonomy.years : [],
+            professionalExams:
+              Array.isArray(raw.customTaxonomy.professionalExams) &&
+              raw.customTaxonomy.professionalExams.length > 0
+                ? raw.customTaxonomy.professionalExams
+                : [...PROFESSIONAL_EXAMS]
           }
-        : { subjects: [], chaptersBySubjectPaper: {}, years: [] }
+        : {
+            taxonomyVersion: CURRICULUM_TAXONOMY_VERSION,
+            subjects: [],
+            chaptersBySubjectPaper: {},
+            years: [],
+            professionalExams: [...PROFESSIONAL_EXAMS]
+          },
+    resourceRequests: Array.isArray(raw?.resourceRequests) ? raw.resourceRequests : []
   };
 
   if (
@@ -532,9 +611,102 @@ function ensureDatabaseFields(raw: any): AppDatabase {
     !Array.isArray(raw?.contributors) ||
     !Array.isArray(raw?.announcements) ||
     !raw?.questionOverrides ||
-    !raw?.customTaxonomy
+    !raw?.customTaxonomy ||
+    !Array.isArray(raw?.customTaxonomy?.professionalExams) ||
+    !Array.isArray(raw?.resourceRequests)
   ) {
     changed = true;
+  }
+
+  // Non-destructive BM&DC MBBS Curriculum 2021 taxonomy upgrade (v1 -> v2)
+  if ((dbObj.customTaxonomy.taxonomyVersion ?? 1) < CURRICULUM_TAXONOMY_VERSION) {
+    const oldKnownDefaultSubjects = new Set([
+      'anatomy',
+      'physiology',
+      'biochemistry',
+      'community medicine',
+      'forensic medicine',
+      'pharmacology',
+      'pathology',
+      'microbiology',
+      'medicine',
+      'surgery',
+      'obstetrics & gynaecology'
+    ]);
+    const existingProfs = Array.isArray(dbObj.customTaxonomy.professionalExams)
+      ? dbObj.customTaxonomy.professionalExams
+      : [];
+
+    dbObj.customTaxonomy.professionalExams = PROFESSIONAL_EXAMS.map(canonical => {
+      const prevCfg = existingProfs.find(p => p.id === canonical.id);
+      const adminCustomExtras = prevCfg
+        ? (prevCfg.subjects || []).filter(s => !oldKnownDefaultSubjects.has(s.trim().toLowerCase()))
+        : [];
+      return {
+        ...canonical,
+        subjects: [...canonical.subjects, ...adminCustomExtras]
+      };
+    });
+    dbObj.customTaxonomy.taxonomyVersion = CURRICULUM_TAXONOMY_VERSION;
+    changed = true;
+  }
+
+  // Safe, non-destructive Professional Examination backfill for existing records
+  for (const note of dbObj.notes) {
+    if (!isValidProfId(note.professionalExam)) {
+      const inferred = inferProfessionalExam({
+        explicitProf: note.professionalExam,
+        subject: note.subject,
+        examName: note.title,
+        prog: note.prog
+      });
+      note.professionalExam = inferred.professionalExam;
+      note.profNeedsReview = inferred.needsReview;
+      changed = true;
+    }
+    if (!note.paper) {
+      note.paper = inferNotePaper(note);
+      changed = true;
+    }
+  }
+
+  for (const sub of dbObj.submissions) {
+    if (!isValidProfId(sub.professionalExam)) {
+      const inferred = inferProfessionalExam({
+        explicitProf: sub.professionalExam,
+        subject: sub.subject,
+        examName: sub.examName
+      });
+      sub.professionalExam = inferred.professionalExam;
+      sub.profNeedsReview = inferred.needsReview;
+      changed = true;
+    }
+  }
+
+  for (const paper of dbObj.publishedPapers) {
+    if (!isValidProfId(paper.professionalExam)) {
+      const inferred = inferProfessionalExam({
+        explicitProf: paper.professionalExam,
+        subject: paper.subject,
+        examName: paper.examName
+      });
+      paper.professionalExam = inferred.professionalExam;
+      paper.profNeedsReview = inferred.needsReview;
+      changed = true;
+    }
+  }
+
+  for (const pq of dbObj.publishedQuestions) {
+    if (!isValidProfId(pq.professionalExam)) {
+      const inferred = inferProfessionalExam({
+        explicitProf: pq.professionalExam,
+        subject: pq.subject,
+        examName: pq.examName
+      });
+      pq.professionalExam = inferred.professionalExam;
+      pq.profNeedsReview = inferred.needsReview;
+      changed = true;
+    }
   }
 
   // Guarantee MD Sadman Sami is present in contributors if contributors was empty
@@ -599,7 +771,8 @@ function loadDatabase(): AppDatabase {
     contributors: [...DEFAULT_CONTRIBUTORS],
     announcements: [DEFAULT_ANNOUNCEMENT],
     questionOverrides: {},
-    customTaxonomy: { subjects: [], chaptersBySubjectPaper: {}, years: [] }
+    customTaxonomy: { subjects: [], chaptersBySubjectPaper: {}, years: [] },
+    resourceRequests: []
   };
 
   saveDatabase(initialDb);
@@ -633,14 +806,24 @@ function sanitizeUser(user: StoredUser) {
     batch: user.batch,
     roll: user.roll || '',
     role: user.role,
+    preferredProf: isValidProfId(user.preferredProf) ? user.preferredProf : undefined,
     createdAt: user.createdAt
   };
+}
+
+function sanitizeNoteForResponse(note: StoredNote, includePrivate = false): StoredNote {
+  if (includePrivate) {
+    return note;
+  }
+  const { uploadedByEmail: _omitted, ...publicNote } = note;
+  return publicNote;
 }
 
 function sanitizeSubmissionForResponse(sub: QuestionSubmission, includeSecrets = false) {
   return {
     ...sub,
     trackingKey: includeSecrets ? sub.trackingKey : undefined,
+    contributorEmail: includeSecrets ? sub.contributorEmail : undefined,
     files: sub.files.map(f => ({
       id: f.id,
       originalName: f.originalName,
@@ -875,7 +1058,7 @@ async function startServer() {
 
   app.post('/api/auth/register', (req: Request, res: Response) => {
     try {
-      const { fullName, email, collegeName, batch, roll, password } = req.body;
+      const { fullName, email, collegeName, batch, roll, password, preferredProf } = req.body;
 
       if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
         return res.status(400).json({ error: 'Full Name is required.' });
@@ -914,6 +1097,7 @@ async function startServer() {
         batch: batch.trim(),
         roll: roll ? String(roll).trim() : '',
         role: isAdmin ? 'admin' : 'student',
+        preferredProf: isValidProfId(preferredProf) ? preferredProf : undefined,
         passwordHash,
         salt,
         createdAt: new Date().toISOString()
@@ -995,6 +1179,111 @@ async function startServer() {
     });
   });
 
+  app.patch('/api/user/preference', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+    const { preferredProf } = req.body || {};
+    if (!isValidProfId(preferredProf)) {
+      return res.status(400).json({
+        error: 'Invalid Professional Examination. Choose First, Second, Third, or Fourth Professional.'
+      });
+    }
+    const storedUser = db.users.find(u => u.id === req.user!.id);
+    if (!storedUser) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+    storedUser.preferredProf = preferredProf;
+    saveDatabase(db);
+    return res.status(200).json({
+      success: true,
+      user: sanitizeUser(storedUser),
+      preferredProf
+    });
+  });
+
+  app.get('/api/user/study-state', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+    const storedUser = db.users.find(u => u.id === req.user!.id);
+    if (!storedUser) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+    return res.status(200).json({
+      success: true,
+      studyState: storedUser.studyState || {
+        bookmarks: [],
+        recentlyViewed: [],
+        wrongAnswers: [],
+        examHistory: [],
+        practicedIds: {}
+      }
+    });
+  });
+
+  app.patch('/api/user/study-state', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+    const storedUser = db.users.find(u => u.id === req.user!.id);
+    if (!storedUser) {
+      return res.status(404).json({ error: 'User account not found.' });
+    }
+    const body = req.body || {};
+    storedUser.studyState = {
+      bookmarks: Array.isArray(body.bookmarks) ? body.bookmarks.slice(0, 150) : [],
+      recentlyViewed: Array.isArray(body.recentlyViewed) ? body.recentlyViewed.slice(0, 80) : [],
+      wrongAnswers: Array.isArray(body.wrongAnswers) ? body.wrongAnswers.slice(0, 200) : [],
+      examHistory: Array.isArray(body.examHistory) ? body.examHistory.slice(0, 100) : [],
+      practicedIds:
+        body.practicedIds && typeof body.practicedIds === 'object' ? body.practicedIds : {}
+    };
+    saveDatabase(db);
+    return res.status(200).json({ success: true, studyState: storedUser.studyState });
+  });
+
+  // Resource Requests (Prof-scoped missing resource / topic requests)
+  app.get('/api/resource-requests', (req: Request, res: Response) => {
+    const prof = typeof req.query.prof === 'string' ? req.query.prof : '';
+    const items = isValidProfId(prof)
+      ? db.resourceRequests.filter(r => r.professionalExam === prof)
+      : db.resourceRequests;
+    return res.status(200).json({ success: true, requests: items });
+  });
+
+  app.post('/api/resource-requests', (req: AuthenticatedRequest, res: Response) => {
+    const { professionalExam, subject, topicOrExam, resourceType, details, requesterName } =
+      req.body || {};
+    if (!isValidProfId(professionalExam) || !subject || !topicOrExam) {
+      return res.status(400).json({
+        error: 'Professional Examination, Subject, and Topic / Exam name are required.'
+      });
+    }
+    const created: ResourceRequestRecord = {
+      id: `req_${Date.now()}_${crypto.randomBytes(2).toString('hex')}`,
+      professionalExam,
+      subject: canonicalizeSubjectName(String(subject)),
+      topicOrExam: String(topicOrExam).trim().slice(0, 180),
+      resourceType: resourceType || 'Written Questions',
+      details: String(details || '').trim().slice(0, 500),
+      requesterName: String(requesterName || req.user?.fullName || 'Anonymous Student')
+        .trim()
+        .slice(0, 80),
+      status: 'Open',
+      createdAt: new Date().toISOString()
+    };
+    db.resourceRequests.unshift(created);
+    saveDatabase(db);
+    return res.status(201).json({ success: true, request: created });
+  });
+
+  app.patch(
+    '/api/admin/resource-requests/:id',
+    requireAdmin,
+    (req: AuthenticatedRequest, res: Response) => {
+      const rec = db.resourceRequests.find(r => r.id === req.params.id);
+      if (!rec) return res.status(404).json({ error: 'Resource request not found.' });
+      const { status } = req.body || {};
+      if (status === 'Open' || status === 'Fulfilled') {
+        rec.status = status;
+        saveDatabase(db);
+      }
+      return res.status(200).json({ success: true, request: rec });
+    }
+  );
+
   app.post('/api/auth/logout', (req: AuthenticatedRequest, res: Response) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -1029,7 +1318,7 @@ async function startServer() {
           });
         }
 
-        const { fullName, collegeName, title, subject, topic, description, prog } = req.body;
+        const { fullName, collegeName, title, professionalExam, subject, paper, topic, description } = req.body;
 
         if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
           if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
@@ -1052,13 +1341,21 @@ async function startServer() {
         const noteId = `note_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
         const fileUrl = `/api/notes/${noteId}/file`;
         const status = user.role === 'admin' ? 'approved' : 'pending';
+        const profInfo = inferProfessionalExam({
+          explicitProf: professionalExam,
+          subject: subject.trim(),
+          examName: title.trim()
+        });
 
         const newNote: StoredNote = {
           id: noteId,
           fullName: fullName.trim(),
           collegeName: collegeName.trim(),
           title: title.trim(),
+          professionalExam: profInfo.professionalExam,
+          profNeedsReview: profInfo.needsReview,
           subject: subject.trim(),
+          paper: paper ? String(paper).trim() : 'General',
           topic: topic ? String(topic).trim() : 'General',
           description: description ? String(description).trim() : '',
           originalFileName: file.originalname,
@@ -1071,7 +1368,7 @@ async function startServer() {
           uploadedByEmail: user.email,
           uploadTimestamp: new Date().toISOString(),
           status,
-          prog: prog === 'BDS' ? 'BDS' : 'MBBS',
+          prog: 'MBBS',
           kind: file.mimetype.startsWith('image/') ? 'Diagram' : 'Notes'
         };
 
@@ -1080,7 +1377,7 @@ async function startServer() {
 
         return res.status(201).json({
           success: true,
-          note: newNote,
+          note: sanitizeNoteForResponse(newNote, true),
           message:
             status === 'approved'
               ? 'Your resource has been published directly to the Student Library.'
@@ -1099,14 +1396,19 @@ async function startServer() {
   app.get('/api/notes', (req: AuthenticatedRequest, res: Response) => {
     try {
       const user = req.user;
+      const includeAllMbbs = db.notes.filter(n => !isDentalSubjectOrProgram(n.prog, n.subject));
       let notesToReturn: StoredNote[];
 
       if (user && user.role === 'admin') {
-        notesToReturn = db.notes;
+        notesToReturn = includeAllMbbs.map(n => sanitizeNoteForResponse(n, true));
       } else if (user) {
-        notesToReturn = db.notes.filter(n => n.status === 'approved' || n.uploadedByUserId === user.id);
+        notesToReturn = includeAllMbbs
+          .filter(n => n.status === 'approved' || n.uploadedByUserId === user.id)
+          .map(n => sanitizeNoteForResponse(n, n.uploadedByUserId === user.id));
       } else {
-        notesToReturn = db.notes.filter(n => n.status === 'approved');
+        notesToReturn = includeAllMbbs
+          .filter(n => n.status === 'approved')
+          .map(n => sanitizeNoteForResponse(n, false));
       }
 
       return res.status(200).json({ success: true, notes: notesToReturn });
@@ -1250,6 +1552,11 @@ async function startServer() {
         const contributorName = String(body.contributorName || req.user?.fullName || 'Anonymous Student').trim();
         const contributorBatch = String(body.contributorBatch || req.user?.batch || '').trim();
         const contributorEmail = String(body.contributorEmail || req.user?.email || '').trim();
+        const subProf = inferProfessionalExam({
+          explicitProf: body.professionalExam,
+          subject,
+          examName
+        });
 
         if (!['Card', 'Term', 'MCQ'].includes(category)) {
           cleanupFiles();
@@ -1345,6 +1652,8 @@ async function startServer() {
           category,
           method,
           collegeName,
+          professionalExam: subProf.professionalExam,
+          profNeedsReview: subProf.needsReview,
           examName,
           subject,
           paper,
@@ -1561,10 +1870,17 @@ async function startServer() {
   // ===================== PUBLIC ARCHIVE, CONTRIBUTORS, ANNOUNCEMENTS =====================
 
   app.get('/api/archive/published', (_req: Request, res: Response) => {
+    res.set('Cache-Control', 'no-store');
+    const mbbsPapers = db.publishedPapers.filter(
+      p => !isDentalSubjectOrProgram('MBBS', p.subject)
+    );
+    const mbbsQuestions = db.publishedQuestions.filter(
+      q => !isDentalSubjectOrProgram('MBBS', q.subject)
+    );
     return res.status(200).json({
       success: true,
-      publishedPapers: db.publishedPapers,
-      publishedQuestions: db.publishedQuestions,
+      publishedPapers: mbbsPapers,
+      publishedQuestions: mbbsQuestions,
       questionOverrides: db.questionOverrides,
       customTaxonomy: db.customTaxonomy
     });
@@ -1589,13 +1905,16 @@ async function startServer() {
   // ===================== ADMIN API (STRICT RBAC) =====================
 
   app.get('/api/admin/submissions', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
-    const { status, category, collegeName, subject } = req.query;
+    const { status, category, collegeName, subject, professionalExam } = req.query;
     let list = [...db.submissions];
     if (status && status !== 'all') {
       list = list.filter(s => s.status === status);
     }
     if (category && category !== 'all') {
       list = list.filter(s => s.category === category);
+    }
+    if (professionalExam && professionalExam !== 'all') {
+      list = list.filter(s => s.professionalExam === professionalExam);
     }
     if (collegeName && collegeName !== 'all') {
       const q = String(collegeName).toLowerCase();
@@ -1634,6 +1953,10 @@ async function startServer() {
     }
     if (body.adminComment !== undefined) sub.adminComment = String(body.adminComment).trim();
     if (body.collegeName !== undefined) sub.collegeName = String(body.collegeName).trim();
+    if (isValidProfId(body.professionalExam)) {
+      sub.professionalExam = body.professionalExam;
+      sub.profNeedsReview = false;
+    }
     if (body.examName !== undefined) sub.examName = String(body.examName).trim();
     if (body.subject !== undefined) sub.subject = String(body.subject).trim();
     if (body.paper !== undefined) sub.paper = String(body.paper).trim();
@@ -1643,6 +1966,23 @@ async function startServer() {
     if (body.collectionType !== undefined) sub.collectionType = String(body.collectionType).trim();
     if (body.description !== undefined) sub.description = String(body.description).trim();
     if (Array.isArray(body.extractedMcqs)) sub.extractedMcqs = body.extractedMcqs;
+
+    // Also sync changes if this submission is already published in Community Uploads
+    if (sub.publishedPaperId) {
+      const pubPaper = db.publishedPapers.find(p => p.id === sub.publishedPaperId);
+      if (pubPaper) {
+        pubPaper.professionalExam = sub.professionalExam;
+        pubPaper.profNeedsReview = sub.profNeedsReview;
+        pubPaper.subject = sub.subject;
+        pubPaper.paper = sub.paper || 'General';
+        pubPaper.chapter = sub.chapter || 'Pending Chapter Review';
+        const yr = parseInt(sub.year, 10);
+        if (Number.isFinite(yr)) pubPaper.year = yr;
+        pubPaper.session = sub.session;
+        pubPaper.examName = sub.examName;
+        pubPaper.collegeName = sub.collegeName;
+      }
+    }
 
     sub.updatedAt = new Date().toISOString();
     saveDatabase(db);
@@ -1827,6 +2167,9 @@ CRITICAL INTEGRITY RULES:
     const parsedYear = parseInt(sub.year, 10);
     const paperId = `pub_${sub.id}`;
     const nowIso = new Date().toISOString();
+    const profMeta = isValidProfId(sub.professionalExam)
+      ? { professionalExam: sub.professionalExam, needsReview: Boolean(sub.profNeedsReview) }
+      : inferProfessionalExam({ explicitProf: sub.professionalExam, subject: sub.subject, examName: sub.examName });
 
     const existingPaperIdx = db.publishedPapers.findIndex(p => p.submissionId === sub.id);
     const publishedPaper: PublishedPaper = {
@@ -1834,6 +2177,8 @@ CRITICAL INTEGRITY RULES:
       submissionId: sub.id,
       category: sub.category,
       collegeName: sub.collegeName,
+      professionalExam: profMeta.professionalExam,
+      profNeedsReview: profMeta.needsReview,
       examName: sub.examName,
       subject: sub.subject,
       paper: sub.paper || 'General',
@@ -1871,6 +2216,8 @@ CRITICAL INTEGRITY RULES:
             submissionId: sub.id,
             paperId,
             collegeName: sub.collegeName,
+            professionalExam: profMeta.professionalExam,
+            profNeedsReview: profMeta.needsReview,
             examName: sub.examName,
             subject: sub.subject,
             paper: sub.paper || 'Paper-I',
@@ -1895,6 +2242,8 @@ CRITICAL INTEGRITY RULES:
             submissionId: sub.id,
             paperId,
             collegeName: sub.collegeName,
+            professionalExam: profMeta.professionalExam,
+            profNeedsReview: profMeta.needsReview,
             examName: sub.examName,
             subject: sub.subject,
             paper: sub.paper || 'Paper-I',
@@ -1928,7 +2277,7 @@ CRITICAL INTEGRITY RULES:
         name: sub.contributorName,
         batch: sub.contributorBatch || sub.session || 'Medical Student',
         college: sub.collegeName,
-        contribution: `${sub.subject} — ${sub.examName} (${sub.year})`,
+        contribution: `${profMeta.professionalExam} • ${sub.subject} — ${sub.examName} (${sub.year})`,
         verified: true,
         addedAt: nowIso
       });
@@ -1948,21 +2297,107 @@ CRITICAL INTEGRITY RULES:
     });
   });
 
+  // PATCH /api/admin/published-papers/:id (Fix Prof / Subject / Paper / Chapter / Year on published papers)
+  app.patch('/api/admin/published-papers/:id', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+    const paper = db.publishedPapers.find(p => p.id === req.params.id);
+    if (!paper) return res.status(404).json({ error: 'Published paper not found.' });
+
+    const {
+      professionalExam,
+      classificationRole,
+      subject,
+      paper: paperPart,
+      chapter,
+      year,
+      session,
+      examName,
+      collegeName
+    } = req.body || {};
+    if (isValidProfId(professionalExam)) {
+      paper.professionalExam = professionalExam;
+      paper.profNeedsReview = false;
+    }
+    if (
+      classificationRole === 'Main Professional Examination Subject' ||
+      classificationRole === 'Phase Teaching / Formative Subject'
+    ) {
+      (paper as any).classificationRole = classificationRole;
+    }
+    if (subject !== undefined) paper.subject = canonicalizeSubjectName(String(subject));
+    if (paperPart !== undefined) paper.paper = String(paperPart).trim();
+    if (chapter !== undefined) paper.chapter = String(chapter).trim();
+    if (year !== undefined) {
+      const yr = parseInt(String(year), 10);
+      paper.year = Number.isFinite(yr) ? yr : null;
+    }
+    if (session !== undefined) paper.session = String(session).trim();
+    if (examName !== undefined) paper.examName = String(examName).trim();
+    if (collegeName !== undefined) paper.collegeName = String(collegeName).trim();
+
+    saveDatabase(db);
+    return res.status(200).json({ success: true, publishedPaper: paper });
+  });
+
+  // PATCH /api/admin/notes/:id (Fix Prof / Subject / Paper / Topic on notes)
+  app.patch('/api/admin/notes/:id', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+    const note = db.notes.find(n => n.id === req.params.id);
+    if (!note) return res.status(404).json({ error: 'Note not found.' });
+
+    const { professionalExam, classificationRole, subject, paper, topic, title } = req.body || {};
+    if (isValidProfId(professionalExam)) {
+      note.professionalExam = professionalExam;
+      note.profNeedsReview = false;
+    }
+    if (
+      classificationRole === 'Main Professional Examination Subject' ||
+      classificationRole === 'Phase Teaching / Formative Subject'
+    ) {
+      note.classificationRole = classificationRole;
+    }
+    if (subject !== undefined) note.subject = canonicalizeSubjectName(String(subject));
+    if (paper !== undefined) note.paper = String(paper).trim();
+    if (topic !== undefined) note.topic = String(topic).trim();
+    if (title !== undefined) note.title = String(title).trim();
+
+    saveDatabase(db);
+    return res.status(200).json({ success: true, note: sanitizeNoteForResponse(note, true) });
+  });
+
   // PUT /api/admin/question-override
   app.put('/api/admin/question-override', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
-    const { questionId, subject, paper, chapter, year, collegeName, chapterNeedsReview } = req.body || {};
+    const {
+      questionId,
+      professionalExam,
+      profNeedsReview,
+      classificationRole,
+      subject,
+      paper,
+      chapter,
+      year,
+      collegeName,
+      chapterNeedsReview
+    } = req.body || {};
     if (!questionId || typeof questionId !== 'string') {
       return res.status(400).json({ error: 'questionId is required.' });
     }
 
+    const existing = db.questionOverrides[questionId];
     db.questionOverrides[questionId] = {
       questionId,
-      subject: subject ? String(subject).trim() : undefined,
-      paper: paper ? String(paper).trim() : undefined,
-      chapter: chapter ? String(chapter).trim() : undefined,
-      year: typeof year === 'number' ? year : undefined,
-      collegeName: collegeName ? String(collegeName).trim() : undefined,
-      chapterNeedsReview: Boolean(chapterNeedsReview),
+      professionalExam: isValidProfId(professionalExam) ? professionalExam : existing?.professionalExam,
+      profNeedsReview: profNeedsReview !== undefined ? Boolean(profNeedsReview) : false,
+      classificationRole:
+        classificationRole === 'Main Professional Examination Subject' ||
+        classificationRole === 'Phase Teaching / Formative Subject'
+          ? classificationRole
+          : existing?.classificationRole,
+      subject: subject ? canonicalizeSubjectName(String(subject)) : existing?.subject,
+      paper: paper ? String(paper).trim() : existing?.paper,
+      chapter: chapter ? String(chapter).trim() : existing?.chapter,
+      year: typeof year === 'number' ? year : existing?.year,
+      collegeName: collegeName ? String(collegeName).trim() : existing?.collegeName,
+      chapterNeedsReview:
+        chapterNeedsReview !== undefined ? Boolean(chapterNeedsReview) : existing?.chapterNeedsReview ?? false,
       updatedAt: new Date().toISOString()
     };
 
@@ -1975,11 +2410,29 @@ CRITICAL INTEGRITY RULES:
 
   // POST /api/admin/taxonomy
   app.post('/api/admin/taxonomy', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
-    const { type, subject, paper, chapter, year } = req.body || {};
+    const { type, subject, paper, chapter, year, professionalExam, subtitle } = req.body || {};
+    if (!Array.isArray(db.customTaxonomy.professionalExams) || db.customTaxonomy.professionalExams.length === 0) {
+      db.customTaxonomy.professionalExams = [...PROFESSIONAL_EXAMS];
+    }
+
     if (type === 'subject' && subject) {
       const clean = String(subject).trim();
       if (clean && !db.customTaxonomy.subjects.includes(clean)) {
         db.customTaxonomy.subjects.push(clean);
+      }
+      if (isValidProfId(professionalExam)) {
+        const profCfg = db.customTaxonomy.professionalExams.find(p => p.id === professionalExam);
+        if (profCfg) {
+          if (!profCfg.subjects.includes(clean)) profCfg.subjects.push(clean);
+          if (!profCfg.papersBySubject[clean]) {
+            profCfg.papersBySubject[clean] = ['Paper-I', 'Paper-II', 'General'];
+          }
+        }
+      }
+    } else if (type === 'prof_update' && isValidProfId(professionalExam)) {
+      const profCfg = db.customTaxonomy.professionalExams.find(p => p.id === professionalExam);
+      if (profCfg && subtitle !== undefined) {
+        profCfg.subtitle = String(subtitle).trim();
       }
     } else if (type === 'chapter' && subject && paper && chapter) {
       const key = `${String(subject).trim()}::${String(paper).trim()}`;

@@ -22,8 +22,12 @@ import {
   ContributorRecord,
   CustomTaxonomy,
   ExtractedMcqDraft,
+  ProfessionalExamId,
+  PublishedPaper,
   QuestionOverride,
   QuestionSubmission,
+  ResourceRequestRecord,
+  SubjectClassificationRole,
   SubmissionStatus,
   UploadedItem,
   UserProfile,
@@ -33,6 +37,7 @@ import {
   buildUnifiedMcqQuestions,
   PENDING_CHAPTER_LABEL
 } from '../data/archiveHelpers';
+import { getMergedProfConfigs, getSubjectsForProf } from '../data/curriculumConfig';
 
 interface AdminPanelProps {
   userProfile: UserProfile | null;
@@ -42,12 +47,13 @@ interface AdminPanelProps {
   announcement: AnnouncementRecord;
   questionOverrides: Record<string, QuestionOverride>;
   customTaxonomy: CustomTaxonomy;
+  publishedPapers: PublishedPaper[];
   onRefreshAll: () => Promise<void>;
   onModerateNote: (id: string, status: 'approved' | 'rejected') => Promise<void>;
   onDeleteNote: (id: string) => Promise<void>;
 }
 
-type AdminTab = 'submissions' | 'chapters' | 'notes' | 'contributors' | 'announcements' | 'users';
+type AdminTab = 'submissions' | 'chapters' | 'notes' | 'requests' | 'contributors' | 'announcements' | 'users';
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   userProfile,
@@ -57,6 +63,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   announcement,
   questionOverrides,
   customTaxonomy,
+  publishedPapers,
   onRefreshAll,
   onModerateNote,
   onDeleteNote
@@ -64,6 +71,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tab, setTab] = useState<AdminTab>('submissions');
   const [submissions, setSubmissions] = useState<QuestionSubmission[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
+  const [resourceRequests, setResourceRequests] = useState<ResourceRequestRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
 
@@ -71,21 +79,43 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [selectedSub, setSelectedSub] = useState<QuestionSubmission | null>(null);
+  const [editProf, setEditProf] = useState<ProfessionalExamId>('First Professional');
+  const [editSubject, setEditSubject] = useState<string>('Anatomy');
   const [editComment, setEditComment] = useState<string>('');
   const [editStatus, setEditStatus] = useState<SubmissionStatus>('Pending');
   const [editChapter, setEditChapter] = useState<string>('');
   const [editPaper, setEditPaper] = useState<string>('');
+  const [editYear, setEditYear] = useState<string>('');
   const [ocrLoading, setOcrLoading] = useState<boolean>(false);
   const [draftMcqs, setDraftMcqs] = useState<ExtractedMcqDraft[]>([]);
   const [creditContrib, setCreditContrib] = useState<boolean>(true);
   const [publishWithMcqs, setPublishWithMcqs] = useState<boolean>(false);
 
-  // Chapter Override State
+  // Taxonomy & Reclassification State
+  const profConfigs = getMergedProfConfigs(customTaxonomy);
+  const [newSubjectProf, setNewSubjectProf] = useState<ProfessionalExamId>('First Professional');
+  const [newSubjectName, setNewSubjectName] = useState('');
   const [newChapterSubj, setNewChapterSubj] = useState('Anatomy');
   const [newChapterPaper, setNewChapterPaper] = useState('Paper-I');
   const [newChapterName, setNewChapterName] = useState('');
   const [newYearVal, setNewYearVal] = useState('');
   const [chapterAssignValues, setChapterAssignValues] = useState<Record<string, string>>({});
+  const [profAssignValues, setProfAssignValues] = useState<Record<string, ProfessionalExamId>>({});
+  const [roleAssignValues, setRoleAssignValues] = useState<Record<string, SubjectClassificationRole>>({});
+  const [paperProfEdits, setPaperProfEdits] = useState<
+    Record<
+      string,
+      {
+        professionalExam: ProfessionalExamId;
+        classificationRole: SubjectClassificationRole;
+        subject: string;
+        paper: string;
+        chapter: string;
+      }
+    >
+  >({});
+  const [noteProfEdits, setNoteProfEdits] = useState<Record<string, ProfessionalExamId>>({});
+  const [noteRoleEdits, setNoteRoleEdits] = useState<Record<string, SubjectClassificationRole>>({});
 
   // Contributor Form
   const [cName, setCName] = useState('');
@@ -133,14 +163,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setLoading(true);
     try {
       const headers = { Authorization: `Bearer ${authToken}` };
-      const [subRes, usrRes, annRes] = await Promise.all([
+      const [subRes, usrRes, annRes, reqRes] = await Promise.all([
         fetch('/api/admin/submissions', { headers }),
         fetch('/api/admin/users', { headers }),
-        fetch('/api/admin/announcements', { headers })
+        fetch('/api/admin/announcements', { headers }),
+        fetch('/api/resource-requests')
       ]);
       const subData = await subRes.json();
       const usrData = await usrRes.json();
       const annData = await annRes.json();
+      const reqData = reqRes.ok ? await reqRes.json() : { requests: [] };
       if (subRes.ok && Array.isArray(subData.submissions)) {
         setSubmissions(subData.submissions);
         if (selectedSub) {
@@ -156,6 +188,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       }
       if (annRes.ok && Array.isArray(annData.announcements) && annData.announcements.length > 0) {
         setAdminNotices(annData.announcements);
+      }
+      if (Array.isArray(reqData.requests)) {
+        setResourceRequests(reqData.requests);
       }
     } catch (e) {
       console.error('Failed to load admin data:', e);
@@ -193,10 +228,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const openSubInspector = (sub: QuestionSubmission) => {
     setSelectedSub(sub);
+    setEditProf(sub.professionalExam || 'First Professional');
+    setEditSubject(sub.subject || 'Anatomy');
     setEditComment(sub.adminComment || '');
     setEditStatus(sub.status);
     setEditChapter(sub.chapter || '');
     setEditPaper(sub.paper || '');
+    setEditYear(sub.year || '');
     setDraftMcqs(sub.extractedMcqs || []);
     setPublishWithMcqs((sub.extractedMcqs || []).some(m => m.verifiedByAdmin));
   };
@@ -212,9 +250,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       },
       body: JSON.stringify({
         status: editStatus,
+        professionalExam: editProf,
+        subject: editSubject,
         adminComment: editComment,
         chapter: editChapter,
         paper: editPaper,
+        year: editYear,
         extractedMcqs: draftMcqs
       })
     });
@@ -225,6 +266,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
     setFeedback({ type: 'ok', msg: `Updated submission ${selectedSub.id}.` });
     await fetchAdminData();
+    await onRefreshAll();
   };
 
   const handleRunOcr = async () => {
@@ -280,7 +322,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleAssignChapterOverride = async (questionId: string) => {
     if (!authToken) return;
     const chap = chapterAssignValues[questionId]?.trim();
-    if (!chap) return;
+    const prof = profAssignValues[questionId];
+    const role = roleAssignValues[questionId];
+    if (!chap && !prof && !role) return;
     const res = await fetch('/api/admin/question-override', {
       method: 'PUT',
       headers: {
@@ -289,13 +333,70 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       },
       body: JSON.stringify({
         questionId,
-        chapter: chap,
-        chapterNeedsReview: chap === PENDING_CHAPTER_LABEL
+        ...(prof ? { professionalExam: prof, profNeedsReview: false } : {}),
+        ...(role ? { classificationRole: role } : {}),
+        ...(chap ? { chapter: chap, chapterNeedsReview: chap === PENDING_CHAPTER_LABEL } : {})
       })
     });
     if (res.ok) {
-      setFeedback({ type: 'ok', msg: `Assigned "${chap}" to ${questionId}.` });
+      setFeedback({ type: 'ok', msg: `Updated classification for ${questionId}.` });
       await onRefreshAll();
+    }
+  };
+
+  const handleReclassifyPublishedPaper = async (paperItem: PublishedPaper) => {
+    if (!authToken) return;
+    const patch = paperProfEdits[paperItem.id];
+    if (!patch) return;
+    const res = await fetch(`/api/admin/published-papers/${paperItem.id}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(patch)
+    });
+    if (res.ok) {
+      setFeedback({ type: 'ok', msg: `Updated paper "${paperItem.examName}" (${patch.professionalExam}).` });
+      await onRefreshAll();
+    }
+  };
+
+  const handleUpdateNoteProf = async (noteId: string) => {
+    if (!authToken) return;
+    const prof = noteProfEdits[noteId];
+    const role = noteRoleEdits[noteId];
+    if (!prof && !role) return;
+    const res = await fetch(`/api/admin/notes/${noteId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        ...(prof ? { professionalExam: prof } : {}),
+        ...(role ? { classificationRole: role } : {})
+      })
+    });
+    if (res.ok) {
+      setFeedback({ type: 'ok', msg: `Updated note classification.` });
+      await onRefreshAll();
+    }
+  };
+
+  const handleToggleRequestStatus = async (reqId: string, nextStatus: 'Open' | 'Fulfilled') => {
+    if (!authToken) return;
+    const res = await fetch(`/api/admin/resource-requests/${reqId}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: nextStatus })
+    });
+    if (res.ok) {
+      setFeedback({ type: 'ok', msg: `Resource request marked ${nextStatus}.` });
+      await fetchAdminData();
     }
   };
 
@@ -310,6 +411,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       body: JSON.stringify(payload)
     });
     if (res.ok) {
+      setNewSubjectName('');
       setNewChapterName('');
       setNewYearVal('');
       setFeedback({ type: 'ok', msg: 'Curriculum taxonomy updated.' });
@@ -463,13 +565,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           { id: 'submissions' as const, label: `Submissions (${submissions.length})`, icon: FileText },
           {
             id: 'chapters' as const,
-            label: `Chapter Review (${pendingChapterQuestions.length})`,
+            label: `Taxonomy & Review (${pendingChapterQuestions.length})`,
             icon: Layers
           },
           {
             id: 'notes' as const,
             label: `Notes (${notes.filter(n => n.status === 'pending').length} pending)`,
             icon: BookOpen
+          },
+          {
+            id: 'requests' as const,
+            label: `Requests (${resourceRequests.filter(r => r.status === 'Open').length})`,
+            icon: AlertTriangle
           },
           { id: 'contributors' as const, label: `Contributors (${contributors.length})`, icon: Users },
           { id: 'announcements' as const, label: `Notices (${adminNotices.length})`, icon: Megaphone },
@@ -628,6 +735,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 {/* Review Controls */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
+                    <label className="block text-xs font-bold mb-1">MBBS Professional Exam</label>
+                    <select
+                      value={editProf}
+                      onChange={e => setEditProf(e.target.value as ProfessionalExamId)}
+                      className="min-h-[40px] text-xs"
+                    >
+                      {profConfigs.map(cfg => (
+                        <option key={cfg.id} value={cfg.id}>
+                          {cfg.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1">Subject</label>
+                    <input
+                      value={editSubject}
+                      onChange={e => setEditSubject(e.target.value)}
+                      placeholder="Subject"
+                      className="min-h-[40px] text-xs"
+                    />
+                  </div>
+                  <div>
                     <label className="block text-xs font-bold mb-1">Status</label>
                     <select
                       value={editStatus}
@@ -652,11 +782,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold mb-1">Chapter</label>
+                    <label className="block text-xs font-bold mb-1">Chapter / Topic</label>
                     <input
                       value={editChapter}
                       onChange={e => setEditChapter(e.target.value)}
                       placeholder="Assign Chapter"
+                      className="min-h-[40px] text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold mb-1">Year</label>
+                    <input
+                      value={editYear}
+                      onChange={e => setEditYear(e.target.value)}
+                      placeholder="2025"
                       className="min-h-[40px] text-xs"
                     />
                   </div>
@@ -807,23 +946,72 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* TAB 2: CHAPTER REVIEW & TAXONOMY */}
+      {/* TAB 2: TAXONOMY, PROF CATEGORIES & CLASSIFICATION */}
       {tab === 'chapters' && (
         <div className="space-y-6">
-          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4">
-            <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
-              Add Custom Chapter or Year to Taxonomy
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-5">
+            <div>
+              <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                Manage MBBS Professional Exam Taxonomy
+              </h3>
+              <p className="text-xs text-[var(--mut)] m-0 mt-0.5">
+                Add subjects to any MBBS Professional Examination, or register new Chapters and Years.
+              </p>
+            </div>
+
+            {/* Add Subject to Professional Exam */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <select
+                value={newSubjectProf}
+                onChange={e => setNewSubjectProf(e.target.value as ProfessionalExamId)}
+                className="text-sm min-h-[42px]"
+              >
+                {profConfigs.map(cfg => (
+                  <option key={cfg.id} value={cfg.id}>
+                    {cfg.title}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={newSubjectName}
+                onChange={e => setNewSubjectName(e.target.value)}
+                placeholder="New Subject Name..."
+                className="text-sm min-h-[42px]"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  handleAddTaxonomy({
+                    type: 'subject',
+                    professionalExam: newSubjectProf,
+                    subject: newSubjectName
+                  })
+                }
+                className="btn min-h-[42px]"
+              >
+                <Plus size={15} /> Add Subject to Prof
+              </button>
+            </div>
+
+            {/* Add Chapter */}
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 border-t border-[var(--line-light)]">
               <select
                 value={newChapterSubj}
                 onChange={e => setNewChapterSubj(e.target.value)}
                 className="text-sm min-h-[42px]"
               >
-                <option value="Anatomy">Anatomy</option>
-                <option value="Physiology">Physiology</option>
-                <option value="Biochemistry">Biochemistry</option>
-                <option value="Pathology">Pathology</option>
+                {Array.from(
+                  new Set([
+                    ...getSubjectsForProf('First Professional', customTaxonomy),
+                    ...getSubjectsForProf('Second Professional', customTaxonomy),
+                    ...getSubjectsForProf('Third Professional', customTaxonomy),
+                    ...getSubjectsForProf('Fourth Professional', customTaxonomy)
+                  ])
+                ).map(s => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
               <select
                 value={newChapterPaper}
@@ -832,6 +1020,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               >
                 <option value="Paper-I">Paper-I</option>
                 <option value="Paper-II">Paper-II</option>
+                <option value="General">General</option>
               </select>
               <input
                 value={newChapterName}
@@ -855,6 +1044,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </button>
             </div>
 
+            {/* Add Year */}
             <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--line-light)]">
               <input
                 value={newYearVal}
@@ -875,15 +1065,117 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             </div>
           </div>
 
+          {/* Reclassify Published Community Papers */}
+          {publishedPapers.length > 0 && (
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4">
+              <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                Published Question Papers Classification ({publishedPapers.length})
+              </h3>
+              <div className="space-y-2.5 max-h-[420px] overflow-y-auto">
+                {publishedPapers.map(p => {
+                  const current = paperProfEdits[p.id] || {
+                    professionalExam: p.professionalExam || 'First Professional',
+                    classificationRole: p.classificationRole || 'Main Professional Examination Subject',
+                    subject: p.subject,
+                    paper: p.paper || 'General',
+                    chapter: p.chapter || ''
+                  };
+                  return (
+                    <div
+                      key={p.id}
+                      className="p-3.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] space-y-2"
+                    >
+                      <div className="font-bold text-xs sm:text-sm text-[var(--ink)]">
+                        {p.examName} &middot; <span className="text-[var(--mut)]">{p.collegeName}</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-6 gap-2">
+                        <select
+                          value={current.professionalExam}
+                          onChange={e =>
+                            setPaperProfEdits(prev => ({
+                              ...prev,
+                              [p.id]: { ...current, professionalExam: e.target.value as ProfessionalExamId }
+                            }))
+                          }
+                          className="text-xs min-h-[38px]"
+                        >
+                          {profConfigs.map(cfg => (
+                            <option key={cfg.id} value={cfg.id}>
+                              {cfg.shortLabel}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={current.classificationRole}
+                          onChange={e =>
+                            setPaperProfEdits(prev => ({
+                              ...prev,
+                              [p.id]: { ...current, classificationRole: e.target.value as SubjectClassificationRole }
+                            }))
+                          }
+                          className="text-xs min-h-[38px]"
+                        >
+                          <option value="Main Professional Examination Subject">Main Prof Subject</option>
+                          <option value="Phase Teaching / Formative Subject">Phase Teaching / Formative</option>
+                        </select>
+                        <input
+                          value={current.subject}
+                          onChange={e =>
+                            setPaperProfEdits(prev => ({
+                              ...prev,
+                              [p.id]: { ...current, subject: e.target.value }
+                            }))
+                          }
+                          placeholder="Subject"
+                          className="text-xs min-h-[38px]"
+                        />
+                        <input
+                          value={current.paper}
+                          onChange={e =>
+                            setPaperProfEdits(prev => ({
+                              ...prev,
+                              [p.id]: { ...current, paper: e.target.value }
+                            }))
+                          }
+                          placeholder="Paper"
+                          className="text-xs min-h-[38px]"
+                        />
+                        <input
+                          value={current.chapter}
+                          onChange={e =>
+                            setPaperProfEdits(prev => ({
+                              ...prev,
+                              [p.id]: { ...current, chapter: e.target.value }
+                            }))
+                          }
+                          placeholder="Chapter"
+                          className="text-xs min-h-[38px]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleReclassifyPublishedPaper(p)}
+                          className="btn sm min-h-[38px]"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Pending Chapter / Prof Classification */}
           <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4">
             <div className="flex items-center gap-2">
               <AlertTriangle size={18} className="text-amber-600" />
               <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
-                Questions Pending Chapter Classification ({pendingChapterQuestions.length})
+                Questions Pending Chapter / Prof Review ({pendingChapterQuestions.length})
               </h3>
             </div>
             <p className="text-xs text-[var(--mut)] m-0">
-              These MCQs had ambiguous stems and were safely marked as &ldquo;Pending Chapter Review&rdquo; rather than guessed. Assign verified chapters below.
+              These MCQs had ambiguous stems and were safely flagged for review rather than guessed. Assign verified Professional Exam stage, curriculum role, and chapters below.
             </p>
             <div className="space-y-2.5 max-h-[500px] overflow-y-auto">
               {pendingChapterQuestions.slice(0, 30).map(q => (
@@ -893,18 +1185,47 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 >
                   <div className="space-y-0.5 text-xs">
                     <div className="font-bold text-[#0D9488]">
-                      {q.subject} &bull; {q.paper} &bull; {q.session} ({q.id})
+                      {q.professionalExam} &bull; {q.subject} &bull; {q.paper} &bull; {q.session} ({q.id})
                     </div>
                     <div className="text-sm font-semibold text-[var(--ink)]">{q.stem}</div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <select
+                      value={profAssignValues[q.id] || q.professionalExam}
+                      onChange={e =>
+                        setProfAssignValues(prev => ({
+                          ...prev,
+                          [q.id]: e.target.value as ProfessionalExamId
+                        }))
+                      }
+                      className="!w-40 text-xs min-h-[38px]"
+                    >
+                      {profConfigs.map(cfg => (
+                        <option key={cfg.id} value={cfg.id}>
+                          {cfg.shortLabel}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={roleAssignValues[q.id] || q.classificationRole}
+                      onChange={e =>
+                        setRoleAssignValues(prev => ({
+                          ...prev,
+                          [q.id]: e.target.value as SubjectClassificationRole
+                        }))
+                      }
+                      className="!w-44 text-xs min-h-[38px]"
+                    >
+                      <option value="Main Professional Examination Subject">Main Prof Subject</option>
+                      <option value="Phase Teaching / Formative Subject">Phase Teaching / Formative</option>
+                    </select>
                     <input
                       value={chapterAssignValues[q.id] || ''}
                       onChange={e =>
                         setChapterAssignValues(prev => ({ ...prev, [q.id]: e.target.value }))
                       }
                       placeholder="Chapter name..."
-                      className="!w-44 text-xs min-h-[38px]"
+                      className="!w-40 text-xs min-h-[38px]"
                     />
                     <button
                       type="button"
@@ -924,49 +1245,125 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* TAB 3: NOTES MODERATION */}
       {tab === 'notes' && (
         <div className="space-y-3">
-          {notes.map(n => (
-            <div
-              key={n.id}
-              className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-            >
-              <div className="space-y-0.5">
-                <div className="text-xs font-bold text-[#0D9488]">
-                  {n.subject} &bull; {n.status.toUpperCase()}
+          {notes.map(n => {
+            const profVal = noteProfEdits[n.id] || n.professionalExam || 'First Professional';
+            const roleVal = noteRoleEdits[n.id] || n.classificationRole || 'Main Professional Examination Subject';
+            return (
+              <div
+                key={n.id}
+                className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
+              >
+                <div className="space-y-0.5 min-w-0">
+                  <div className="text-xs font-bold text-[#0D9488]">
+                    {n.professionalExam || 'First Professional'} &bull; {n.subject}
+                    {n.paper ? ` · ${n.paper}` : ''} &bull; {n.status.toUpperCase()}
+                  </div>
+                  <div className="font-bold text-sm text-[var(--ink)] truncate">{n.title}</div>
+                  <div className="text-xs text-[var(--mut)]">
+                    By {n.fullName} ({n.collegeName})
+                  </div>
                 </div>
-                <div className="font-bold text-sm text-[var(--ink)]">{n.title}</div>
-                <div className="text-xs text-[var(--mut)]">
-                  By {n.fullName} ({n.collegeName})
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {n.status !== 'approved' && (
-                  <button
-                    type="button"
-                    onClick={() => onModerateNote(n.id, 'approved')}
-                    className="btn sm good"
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <select
+                    value={profVal}
+                    onChange={e =>
+                      setNoteProfEdits(prev => ({ ...prev, [n.id]: e.target.value as ProfessionalExamId }))
+                    }
+                    className="!w-36 text-xs min-h-[36px]"
                   >
-                    Approve
-                  </button>
-                )}
-                {n.status !== 'rejected' && (
+                    {profConfigs.map(cfg => (
+                      <option key={cfg.id} value={cfg.id}>
+                        {cfg.shortLabel}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={roleVal}
+                    onChange={e =>
+                      setNoteRoleEdits(prev => ({
+                        ...prev,
+                        [n.id]: e.target.value as SubjectClassificationRole
+                      }))
+                    }
+                    className="!w-40 text-xs min-h-[36px]"
+                  >
+                    <option value="Main Professional Examination Subject">Main Prof Subject</option>
+                    <option value="Phase Teaching / Formative Subject">Phase Teaching / Formative</option>
+                  </select>
                   <button
                     type="button"
-                    onClick={() => onModerateNote(n.id, 'rejected')}
+                    onClick={() => handleUpdateNoteProf(n.id)}
+                    className="btn sm alt"
+                  >
+                    Save
+                  </button>
+                  {n.status !== 'approved' && (
+                    <button
+                      type="button"
+                      onClick={() => onModerateNote(n.id, 'approved')}
+                      className="btn sm good"
+                    >
+                      Approve
+                    </button>
+                  )}
+                  {n.status !== 'rejected' && (
+                    <button
+                      type="button"
+                      onClick={() => onModerateNote(n.id, 'rejected')}
+                      className="btn sm alt text-rose-600"
+                    >
+                      Reject
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onDeleteNote(n.id)}
                     className="btn sm alt text-rose-600"
                   >
-                    Reject
+                    <Trash2 size={13} />
                   </button>
-                )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* TAB 3B: RESOURCE REQUESTS */}
+      {tab === 'requests' && (
+        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl divide-y divide-[var(--line)]">
+          {resourceRequests.length === 0 ? (
+            <div className="p-6 text-center text-xs text-[var(--mut)]">
+              No student resource requests logged yet.
+            </div>
+          ) : (
+            resourceRequests.map(req => (
+              <div
+                key={req.id}
+                className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-bold text-[#0D9488]">
+                    {req.professionalExam} &bull; {req.subject} &bull; {req.resourceType}
+                  </div>
+                  <div className="text-sm font-bold text-[var(--ink)]">{req.topicOrExam}</div>
+                  {req.details && <div className="text-[var(--mut)]">{req.details}</div>}
+                  <div className="text-[var(--mut)]">
+                    By {req.requesterName} &bull; {new Date(req.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
                 <button
                   type="button"
-                  onClick={() => onDeleteNote(n.id)}
-                  className="btn sm alt text-rose-600"
+                  onClick={() =>
+                    handleToggleRequestStatus(req.id, req.status === 'Fulfilled' ? 'Open' : 'Fulfilled')
+                  }
+                  className={`btn sm shrink-0 ${req.status === 'Fulfilled' ? 'alt' : 'good'}`}
                 >
-                  <Trash2 size={13} />
+                  {req.status === 'Fulfilled' ? 'Reopen Request' : 'Mark Fulfilled'}
                 </button>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
 

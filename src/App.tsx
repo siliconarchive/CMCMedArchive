@@ -13,17 +13,21 @@ import {
   ShieldCheck,
   ChevronDown,
   ArrowRight,
-  Clock,
-  Megaphone,
   AlertCircle,
   CheckCircle2,
   Loader2,
   Layers,
-  Home
+  Home,
+  Settings,
+  Bookmark,
+  Clock,
+  BarChart3,
+  RotateCcw
 } from 'lucide-react';
 import { CmcLogo } from './components/CmcLogo';
 import { FloatingMedicalElements } from './components/FloatingMedicalElements';
 import { AnnouncementPopup } from './components/AnnouncementPopup';
+import { ProfOnboardingModal } from './components/ProfOnboardingModal';
 import { ArchiveExplorer } from './components/ArchiveExplorer';
 import { ExamSystem } from './components/ExamSystem';
 import { SubmitQuestionPapers } from './components/SubmitQuestionPapers';
@@ -32,21 +36,39 @@ import { ContributorsPage } from './components/ContributorsPage';
 import { NoticesPage } from './components/NoticesPage';
 import { AboutPlatformPage, AboutDeveloperPage } from './components/AboutPages';
 import { VivaBankPage, StudentLibraryPage, NoteUploadPage } from './components/LibraryAndNotes';
+import { ProfileHub } from './components/ProfileHub';
+import { WrongAnswerReviewPage } from './components/WrongAnswerReviewPage';
 import {
   AnnouncementRecord,
+  BookmarkRecord,
   ContributorRecord,
   CustomTaxonomy,
   PageRoute,
+  ProfessionalExamId,
+  ProfileTab,
   PublishedMcqQuestion,
   PublishedPaper,
   QuestionOverride,
+  RecentlyViewedRecord,
+  StudyState,
   UploadedItem,
   UserProfile
 } from './types';
+import { getProfConfig, getSubjectsForProf, isValidProfId } from './data/curriculumConfig';
+import {
+  loadLocalStudyState,
+  mergeStudyStates,
+  recordExamResultInState,
+  recordPracticeOutcomeInState,
+  recordRecentlyViewedInState,
+  saveLocalStudyState,
+  toggleBookmarkInState
+} from './data/studyTracker';
 
 const TELEGRAM_URL = 'https://t.me/Sifat_Islam_7';
 const AUTH_TOKEN_KEY = 'cmc_auth_token';
 const ANNOUNCEMENT_SEEN_KEY = 'cmc_announcement_dismissed';
+const PROF_STORAGE_KEY = 'cmc_selected_prof';
 
 const FALLBACK_ANNOUNCEMENT: AnnouncementRecord = {
   id: 'campaign_question_collection_2026',
@@ -63,7 +85,7 @@ const FALLBACK_ANNOUNCEMENT: AnnouncementRecord = {
   ctaText: 'SUBMIT YOUR QUESTION PAPERS',
   ctaTarget: 'submit',
   enabled: true,
-  autoDismissSeconds: 7,
+  autoDismissSeconds: 0,
   updatedAt: new Date().toISOString()
 };
 
@@ -77,11 +99,11 @@ function TelegramIcon({ className = 'w-4 h-4' }: { className?: string }) {
 
 export default function App() {
   const [page, setPage] = useState<PageRoute>('home');
+  const [profileTab, setProfileTab] = useState<ProfileTab>('info');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  const [openMenuGroup, setOpenMenuGroup] = useState<'study' | 'practice' | 'profile' | null>(null);
 
   // Archive & Exam deep-link presets
-  const [archiveTab, setArchiveTab] = useState<'cq' | 'mcq' | 'papers'>('cq');
   const [archiveSearch, setArchiveSearch] = useState('');
   const [archiveSubject, setArchiveSubject] = useState('all');
   const [heroSearchInput, setHeroSearchInput] = useState('');
@@ -95,6 +117,9 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
+
+  // Real Study State (Bookmarks, Recently Viewed, Wrong Answers, Exam History, Practice Counts)
+  const [studyState, setStudyState] = useState<StudyState>(() => loadLocalStudyState());
 
   // Server Data
   const [notes, setNotes] = useState<UploadedItem[]>([]);
@@ -114,6 +139,31 @@ export default function App() {
   const [popupOpen, setPopupOpen] = useState(false);
   const initialPopupTriggeredRef = useRef(false);
 
+  // Global MBBS Professional Examination Context
+  const [hasSavedProf, setHasSavedProf] = useState<boolean>(() => {
+    try {
+      return isValidProfId(localStorage.getItem(PROF_STORAGE_KEY));
+    } catch {
+      return false;
+    }
+  });
+  const [selectedProf, setSelectedProf] = useState<ProfessionalExamId>(() => {
+    try {
+      const saved = localStorage.getItem(PROF_STORAGE_KEY);
+      return isValidProfId(saved) ? saved : 'First Professional';
+    } catch {
+      return 'First Professional';
+    }
+  });
+  const [profModalMode, setProfModalMode] = useState<'onboarding' | 'switch' | null>(() => {
+    try {
+      return isValidProfId(localStorage.getItem(PROF_STORAGE_KEY)) ? null : 'onboarding';
+    } catch {
+      return 'onboarding';
+    }
+  });
+  const pendingPopupAnnouncementRef = useRef<AnnouncementRecord | null>(null);
+
   const [publishedPapers, setPublishedPapers] = useState<PublishedPaper[]>([]);
   const [publishedQuestions, setPublishedQuestions] = useState<PublishedMcqQuestion[]>([]);
   const [questionOverrides, setQuestionOverrides] = useState<Record<string, QuestionOverride>>({});
@@ -124,11 +174,159 @@ export default function App() {
   });
 
   const navigateTo = useCallback((target: PageRoute) => {
-    setPage(target);
+    if (target === 'settings') {
+      setProfileTab('settings');
+      setPage('profile');
+    } else if (target === 'profile') {
+      setPage('profile');
+    } else {
+      setPage(target);
+    }
     setMobileMenuOpen(false);
-    setMoreDropdownOpen(false);
+    setOpenMenuGroup(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
+
+  const openProfileSection = useCallback((tab: ProfileTab) => {
+    setProfileTab(tab);
+    setPage('profile');
+    setMobileMenuOpen(false);
+    setOpenMenuGroup(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const updateStudyState = useCallback(
+    (updater: (prev: StudyState) => StudyState) => {
+      setStudyState(prev => {
+        const next = updater(prev);
+        saveLocalStudyState(next);
+        if (authToken) {
+          fetch('/api/user/study-state', {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(next)
+          }).catch(() => {});
+        }
+        return next;
+      });
+    },
+    [authToken]
+  );
+
+  const handleToggleBookmark = useCallback(
+    (item: Omit<BookmarkRecord, 'savedAt'>) => {
+      updateStudyState(prev => toggleBookmarkInState(prev, item));
+    },
+    [updateStudyState]
+  );
+
+  const handleRecordRecentView = useCallback(
+    (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => {
+      updateStudyState(prev => recordRecentlyViewedInState(prev, item));
+    },
+    [updateStudyState]
+  );
+
+  const handlePracticeOutcome = useCallback(
+    (payload: {
+      id: string;
+      professionalExam: ProfessionalExamId;
+      subject: string;
+      paper: string;
+      chapter: string;
+      type: 'SBA' | 'TF';
+      stem: string;
+      explanation?: string;
+      isCorrect: boolean;
+    }) => {
+      updateStudyState(prev => recordPracticeOutcomeInState(prev, payload));
+    },
+    [updateStudyState]
+  );
+
+  const handleExamComplete = useCallback(
+    (summary: {
+      professionalExam: ProfessionalExamId;
+      subject: string;
+      mode: string;
+      totalQuestions: number;
+      scoreEarned: number;
+      percentage: number;
+    }) => {
+      updateStudyState(prev => recordExamResultInState(prev, summary));
+    },
+    [updateStudyState]
+  );
+
+  const handleClearWrongItem = useCallback(
+    (id: string) => {
+      updateStudyState(prev => ({
+        ...prev,
+        wrongAnswers: prev.wrongAnswers.filter(w => w.id !== id)
+      }));
+    },
+    [updateStudyState]
+  );
+
+  const persistSelectedProf = useCallback(
+    async (prof: ProfessionalExamId): Promise<{ ok: boolean; error?: string }> => {
+      setSelectedProf(prof);
+      setHasSavedProf(true);
+      setArchiveSubject('all');
+      setArchiveSearch('');
+      setExamPreset(null);
+      try {
+        localStorage.setItem(PROF_STORAGE_KEY, prof);
+      } catch {}
+
+      if (authToken) {
+        try {
+          const res = await fetch('/api/user/preference', {
+            method: 'PATCH',
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ preferredProf: prof })
+          });
+          const data = await res.json();
+          if (res.ok && data.user) {
+            setUserProfile(data.user);
+            return { ok: true };
+          }
+          return { ok: false, error: data.error || 'Could not sync preference to account.' };
+        } catch {
+          return { ok: false, error: 'Network error while saving preference.' };
+        }
+      }
+      return { ok: true };
+    },
+    [authToken]
+  );
+
+  const handleConfirmProfModal = useCallback(
+    async (prof: ProfessionalExamId) => {
+      const wasOnboarding = profModalMode === 'onboarding';
+      setProfModalMode(null);
+      await persistSelectedProf(prof);
+
+      if (wasOnboarding) {
+        let dismissedThisSession = false;
+        try {
+          dismissedThisSession = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
+        } catch {}
+        const pendingAnn = pendingPopupAnnouncementRef.current || announcement;
+        if (pendingAnn?.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
+          initialPopupTriggeredRef.current = true;
+          setPopupOpen(true);
+        }
+      }
+    },
+    [profModalMode, persistSelectedProf, announcement]
+  );
 
   const handleClosePopup = useCallback(() => {
     setPopupOpen(false);
@@ -146,19 +344,30 @@ export default function App() {
     navigateTo(dest);
   }, [announcement.ctaTarget, navigateTo]);
 
-  // Independent immediate startup popup check (never blocked by auth or heavy archive fetches)
+  // Independent immediate startup popup check — waits if Onboarding modal is currently showing
   useEffect(() => {
     let cancelled = false;
-    try {
-      sessionStorage.removeItem('cmc_announcement_seen');
-    } catch {}
-
-    const checkStartupAnnouncement = async () => {
+    const triggerOrDeferPopup = (ann: AnnouncementRecord) => {
       let dismissedThisSession = false;
       try {
         dismissedThisSession = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
       } catch {}
+      if (!ann.enabled || dismissedThisSession || initialPopupTriggeredRef.current) return;
 
+      let saved = false;
+      try {
+        saved = isValidProfId(localStorage.getItem(PROF_STORAGE_KEY));
+      } catch {}
+
+      if (!saved) {
+        pendingPopupAnnouncementRef.current = ann;
+      } else {
+        initialPopupTriggeredRef.current = true;
+        setPopupOpen(true);
+      }
+    };
+
+    const checkStartupAnnouncement = async () => {
       try {
         const res = await fetch('/api/announcements/active', { cache: 'no-store' });
         if (cancelled) return;
@@ -166,10 +375,7 @@ export default function App() {
           const data = await res.json();
           if (data?.announcement) {
             setAnnouncement(data.announcement);
-            if (data.announcement.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
-              initialPopupTriggeredRef.current = true;
-              setPopupOpen(true);
-            }
+            triggerOrDeferPopup(data.announcement);
             return;
           }
         }
@@ -177,9 +383,8 @@ export default function App() {
         console.warn('Could not fetch active announcement, checking fallback:', err);
       }
 
-      if (!cancelled && FALLBACK_ANNOUNCEMENT.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
-        initialPopupTriggeredRef.current = true;
-        setPopupOpen(true);
+      if (!cancelled) {
+        triggerOrDeferPopup(FALLBACK_ANNOUNCEMENT);
       }
     };
 
@@ -196,13 +401,18 @@ export default function App() {
     if (tok) headers.Authorization = `Bearer ${tok}`;
 
     try {
-      const [notesRes, archiveRes, contribRes, annRes, allAnnRes] = await Promise.all([
+      const requests: Promise<Response>[] = [
         fetch('/api/notes', { headers }),
         fetch('/api/archive/published'),
         fetch('/api/contributors'),
         fetch('/api/announcements/active', { cache: 'no-store' }),
         fetch('/api/announcements', { cache: 'no-store' })
-      ]);
+      ];
+      if (tok) {
+        requests.push(fetch('/api/user/study-state', { headers }));
+      }
+
+      const [notesRes, archiveRes, contribRes, annRes, allAnnRes, studyRes] = await Promise.all(requests);
 
       if (notesRes.ok) {
         const nd = await notesRes.json();
@@ -232,13 +442,27 @@ export default function App() {
         if (and.announcement) {
           setAnnouncement(and.announcement);
           let dismissedThisSession = false;
+          let savedProf = false;
           try {
             dismissedThisSession = sessionStorage.getItem(ANNOUNCEMENT_SEEN_KEY) === '1';
+            savedProf = isValidProfId(localStorage.getItem(PROF_STORAGE_KEY));
           } catch {}
           if (and.announcement.enabled && !dismissedThisSession && !initialPopupTriggeredRef.current) {
-            initialPopupTriggeredRef.current = true;
-            setPopupOpen(true);
+            if (savedProf) {
+              initialPopupTriggeredRef.current = true;
+              setPopupOpen(true);
+            } else {
+              pendingPopupAnnouncementRef.current = and.announcement;
+            }
           }
+        }
+      }
+      if (studyRes && studyRes.ok) {
+        const sd = await studyRes.json();
+        if (sd.studyState) {
+          const merged = mergeStudyStates(loadLocalStudyState(), sd.studyState);
+          saveLocalStudyState(merged);
+          setStudyState(merged);
         }
       }
     } catch (e) {
@@ -256,6 +480,14 @@ export default function App() {
           if (meRes.ok) {
             const meData = await meRes.json();
             setUserProfile(meData.user);
+            if (isValidProfId(meData.user?.preferredProf)) {
+              setSelectedProf(meData.user.preferredProf);
+              setHasSavedProf(true);
+              setProfModalMode(null);
+              try {
+                localStorage.setItem(PROF_STORAGE_KEY, meData.user.preferredProf);
+              } catch {}
+            }
           } else {
             localStorage.removeItem(AUTH_TOKEN_KEY);
             setAuthToken(null);
@@ -292,6 +524,14 @@ export default function App() {
       localStorage.setItem(AUTH_TOKEN_KEY, data.token);
       setAuthToken(data.token);
       setUserProfile(data.user);
+      if (isValidProfId(data.user?.preferredProf)) {
+        setSelectedProf(data.user.preferredProf);
+        setHasSavedProf(true);
+        setProfModalMode(null);
+        try {
+          localStorage.setItem(PROF_STORAGE_KEY, data.user.preferredProf);
+        } catch {}
+      }
       setAuthSuccess('Signed in successfully.');
       await loadPlatformData(data.token);
       setTimeout(() => {
@@ -314,7 +554,8 @@ export default function App() {
       email: String(formData.get('email') || ''),
       batch: String(formData.get('batch') || ''),
       roll: String(formData.get('roll') || ''),
-      password: String(formData.get('password') || '')
+      password: String(formData.get('password') || ''),
+      preferredProf: selectedProf
     };
 
     setAuthLoading(true);
@@ -387,26 +628,36 @@ export default function App() {
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setArchiveSearch(heroSearchInput.trim());
-    setArchiveTab('cq');
     setArchiveSubject('all');
     navigateTo('archive');
   };
 
   const navButtonClass = (active: boolean) =>
-    `px-3 py-2 rounded-lg text-sm font-bold transition-colors whitespace-nowrap min-h-[40px] inline-flex items-center gap-1.5 ${
+    `px-3 py-2 rounded-lg text-[13px] font-bold transition-colors whitespace-nowrap min-h-[40px] inline-flex items-center gap-1.5 ${
       active
         ? 'bg-[#0F2942] text-white dark:bg-sky-500/20 dark:text-sky-300'
         : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
     }`;
 
-  const showMobileBottomNav = !examActive && !authModal && !popupOpen;
+  const profConfig = getProfConfig(selectedProf, customTaxonomy);
+  const activeProfSubjects = getSubjectsForProf(selectedProf, customTaxonomy);
+  const showMobileBottomNav = !examActive && !authModal && !popupOpen && !profModalMode;
+
+  const isStudyActive = ['archive', 'question', 'teacher', 'library', 'upload'].includes(page);
+  const isPracticeActive = ['mcq', 'exam', 'wrong-review'].includes(page);
+  const isPapersActive = ['submit', 'community'].includes(page);
+  const isProfileActive = ['profile', 'settings'].includes(page);
+
+  const wrongAnswerCountForProf = studyState.wrongAnswers.filter(
+    w => w.professionalExam === selectedProf
+  ).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--ink)] relative">
       {/* Restrained Medical Background Illustrations (hidden during active exam) */}
       <FloatingMedicalElements page={page} dimmed={examActive} />
 
-      {/* Header */}
+      {/* Header — 5 Clean Consolidated Main Navigation Items */}
       <header className="ed-header">
         <div className="wrap ed-bar">
           <button
@@ -415,128 +666,213 @@ export default function App() {
             className="brand group shrink-0"
             aria-label="CMC MedArchive Home"
           >
-            {/* Compact logo lockup on phones (<640px) so 320px headers never wrap or clip */}
             <span className="sm:hidden flex items-center">
               <CmcLogo variant="compact" size="sm" showSubtitle={false} />
             </span>
-            <span className="hidden sm:flex items-center">
+            <span className="hidden sm:flex 2xl:hidden items-center">
+              <CmcLogo variant="full" size="sm" showSubtitle={false} />
+            </span>
+            <span className="hidden 2xl:flex items-center">
               <CmcLogo variant="full" size="md" showSubtitle={true} />
             </span>
           </button>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+          {/* Desktop Navigation — STRICTLY 5 MAIN SECTIONS */}
+          <nav className="hidden lg:flex items-center gap-1 shrink-0" aria-label="Main navigation">
+            {/* 1. Home */}
             <button type="button" onClick={() => navigateTo('home')} className={navButtonClass(page === 'home')}>
               Home
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setArchiveSearch('');
-                navigateTo('archive');
-              }}
-              className={navButtonClass(page === 'archive' || page === 'mcq' || page === 'question')}
-            >
-              Question Archive
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setExamPreset(null);
-                navigateTo('exam');
-              }}
-              className={navButtonClass(page === 'exam')}
-            >
-              Take an Exam
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateTo('submit')}
-              className={navButtonClass(page === 'submit')}
-            >
-              Submit Papers
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateTo('library')}
-              className={navButtonClass(page === 'library' || page === 'upload')}
-            >
-              Notes
-            </button>
-            <button
-              type="button"
-              onClick={() => navigateTo('teacher')}
-              className={navButtonClass(page === 'teacher')}
-            >
-              <span>Viva</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300 font-bold">
-                Dev
-              </span>
-            </button>
 
-            {/* More Dropdown */}
+            {/* 2. Study Dropdown */}
             <div className="relative">
               <button
                 type="button"
-                onClick={() => setMoreDropdownOpen(o => !o)}
-                className={navButtonClass(
-                  ['contributors', 'notices', 'about', 'developer'].includes(page)
-                )}
+                onClick={() => setOpenMenuGroup(g => (g === 'study' ? null : 'study'))}
+                className={navButtonClass(isStudyActive)}
+                aria-expanded={openMenuGroup === 'study'}
               >
-                <span>More</span>
+                <span>Study</span>
                 <ChevronDown size={14} />
               </button>
-
-              {moreDropdownOpen && (
+              {openMenuGroup === 'study' && (
                 <div
-                  className="absolute right-0 mt-1.5 w-56 rounded-xl bg-[var(--card)] border border-[var(--line)] shadow-xl py-1.5 z-50"
-                  onMouseLeave={() => setMoreDropdownOpen(false)}
+                  className="absolute left-0 mt-1.5 w-60 rounded-xl bg-[var(--card)] border border-[var(--line)] shadow-xl py-1.5 z-50"
+                  onMouseLeave={() => setOpenMenuGroup(null)}
                 >
                   <button
                     type="button"
-                    onClick={() => navigateTo('contributors')}
-                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
+                    onClick={() => {
+                      setArchiveSearch('');
+                      setArchiveSubject('all');
+                      navigateTo('archive');
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
                   >
-                    Contributors
+                    <span>Written Questions</span>
+                    <BookOpen size={14} className="text-[#0D9488]" />
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigateTo('notices')}
-                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
+                    onClick={() => navigateTo('teacher')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
                   >
-                    Notices &amp; Announcements
+                    <span>Viva Bank</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300">
+                      Under Dev
+                    </span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigateTo('about')}
-                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
+                    onClick={() => navigateTo('library')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
                   >
-                    About CMC MedArchive
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigateTo('developer')}
-                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
-                  >
-                    About the Developer
+                    <span>Notes Library</span>
+                    <Layers size={14} className="text-[#0D9488]" />
                   </button>
                 </div>
               )}
             </div>
 
-            {userProfile?.role === 'admin' && (
+            {/* 3. Practice Dropdown */}
+            <div className="relative">
               <button
                 type="button"
-                onClick={() => navigateTo('admin')}
-                className={navButtonClass(page === 'admin')}
+                onClick={() => setOpenMenuGroup(g => (g === 'practice' ? null : 'practice'))}
+                className={navButtonClass(isPracticeActive)}
+                aria-expanded={openMenuGroup === 'practice'}
               >
-                <ShieldCheck size={14} className="text-[#0D9488]" />
-                <span>Admin</span>
+                <span>Practice</span>
+                <ChevronDown size={14} />
               </button>
-            )}
+              {openMenuGroup === 'practice' && (
+                <div
+                  className="absolute left-0 mt-1.5 w-64 rounded-xl bg-[var(--card)] border border-[var(--line)] shadow-xl py-1.5 z-50"
+                  onMouseLeave={() => setOpenMenuGroup(null)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArchiveSearch('');
+                      setArchiveSubject('all');
+                      navigateTo('mcq');
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>MCQ Practice (SBA &amp; T/F)</span>
+                    <Layers size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setExamPreset(null);
+                      navigateTo('exam');
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Examination System</span>
+                    <Award size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigateTo('wrong-review')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Wrong Answer Review</span>
+                    {wrongAnswerCountForProf > 0 && (
+                      <span className="font-mono text-[11px] font-bold text-amber-600 tabular-nums">
+                        {wrongAnswerCountForProf}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Question Papers (One Main Nav Section) */}
+            <button
+              type="button"
+              onClick={() => navigateTo('submit')}
+              className={navButtonClass(isPapersActive)}
+            >
+              Question Papers
+            </button>
+
+            {/* 5. Profile Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setOpenMenuGroup(g => (g === 'profile' ? null : 'profile'))}
+                className={navButtonClass(isProfileActive || page === 'admin')}
+                aria-expanded={openMenuGroup === 'profile'}
+              >
+                <span>Profile</span>
+                <ChevronDown size={14} />
+              </button>
+              {openMenuGroup === 'profile' && (
+                <div
+                  className="absolute right-0 mt-1.5 w-64 rounded-xl bg-[var(--card)] border border-[var(--line)] shadow-xl py-1.5 z-50"
+                  onMouseLeave={() => setOpenMenuGroup(null)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => openProfileSection('info')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Personal Information</span>
+                    <User size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openProfileSection('settings')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Settings (Academic Preference)</span>
+                    <Settings size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openProfileSection('bookmarks')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Bookmarks</span>
+                    <Bookmark size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openProfileSection('recent')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Recently Viewed</span>
+                    <Clock size={14} className="text-[#0D9488]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openProfileSection('progress')}
+                    className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                  >
+                    <span>Study Progress</span>
+                    <BarChart3 size={14} className="text-[#0D9488]" />
+                  </button>
+                  {userProfile?.role === 'admin' && (
+                    <>
+                      <div className="my-1 border-t border-[var(--line-light)]" />
+                      <button
+                        type="button"
+                        onClick={() => navigateTo('admin')}
+                        className="w-full text-left px-4 py-2.5 text-xs font-bold text-[#0D9488] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
+                      >
+                        <span>Admin Panel</span>
+                        <ShieldCheck size={14} />
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </nav>
 
-          {/* Right Utilities — touchable >=40px, 320px safe */}
+          {/* Right Utilities */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <a
               href={TELEGRAM_URL}
@@ -565,10 +901,14 @@ export default function App() {
               </button>
             ) : (
               <div className="flex items-center gap-1.5">
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs font-bold text-[var(--ink)]">
-                  <User size={13} className="text-[#0D9488]" />
-                  <span>{userProfile.fullName.split(' ')[0]}</span>
-                </span>
+                <button
+                  type="button"
+                  onClick={() => openProfileSection('info')}
+                  className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs font-bold text-[var(--ink)] max-w-[120px] min-h-[38px]"
+                >
+                  <User size={13} className="text-[#0D9488] shrink-0" />
+                  <span className="truncate">{userProfile.fullName.split(' ')[0]}</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -593,75 +933,174 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Drawer */}
+        {/* Clean Mobile Drawer — Mirrors Simplified 5 Sections */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[var(--line)] bg-[var(--card)] px-4 py-3 space-y-1 shadow-xl max-h-[calc(100dvh-70px)] overflow-y-auto">
+          <div className="lg:hidden border-t border-[var(--line)] bg-[var(--card)] px-4 py-3 space-y-3 shadow-xl max-h-[calc(100dvh-70px)] overflow-y-auto">
             {userProfile && (
-              <div className="px-3.5 py-2.5 mb-2 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)] flex items-center justify-between text-xs">
+              <div className="px-3.5 py-2.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)] flex items-center justify-between text-xs">
                 <span className="font-bold text-[var(--ink)] truncate">{userProfile.fullName}</span>
                 <span className="text-[var(--mut)] uppercase font-semibold shrink-0 ml-2">{userProfile.role}</span>
               </div>
             )}
-            {[
-              { id: 'home' as PageRoute, label: 'Home' },
-              { id: 'archive' as PageRoute, label: 'Question Archive' },
-              { id: 'exam' as PageRoute, label: 'Take an Exam' },
-              { id: 'submit' as PageRoute, label: 'Submit Question Papers' },
-              { id: 'library' as PageRoute, label: 'Notes & Library' },
-              { id: 'teacher' as PageRoute, label: 'Viva Bank (Under Development)' },
-              { id: 'contributors' as PageRoute, label: 'Contributors' },
-              { id: 'notices' as PageRoute, label: 'Notices & Announcements' },
-              { id: 'about' as PageRoute, label: 'About CMC MedArchive' },
-              { id: 'developer' as PageRoute, label: 'About the Developer' }
-            ].map(item => (
+
+            <button
+              type="button"
+              onClick={() => navigateTo('home')}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] ${
+                page === 'home' ? 'bg-[#0F2942] text-white' : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
+              }`}
+            >
+              Home
+            </button>
+
+            <div className="space-y-1">
+              <div className="px-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#0D9488]">
+                Study
+              </div>
+              {[
+                { id: 'archive' as PageRoute, label: 'Written Questions' },
+                { id: 'teacher' as PageRoute, label: 'Viva Bank (Under Development)' },
+                { id: 'library' as PageRoute, label: 'Notes Library' }
+              ].map(item => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => navigateTo(item.id)}
+                  className={`w-full text-left px-3.5 py-2 rounded-xl text-sm font-semibold min-h-[42px] ${
+                    page === item.id ? 'bg-[#0F2942] text-white' : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <div className="px-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#0D9488]">
+                Practice
+              </div>
+              {[
+                { id: 'mcq' as PageRoute, label: 'MCQ Practice (SBA & T/F)' },
+                { id: 'exam' as PageRoute, label: 'Examination System' },
+                { id: 'wrong-review' as PageRoute, label: 'Wrong Answer Review' }
+              ].map(item => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => navigateTo(item.id)}
+                  className={`w-full text-left px-3.5 py-2 rounded-xl text-sm font-semibold min-h-[42px] ${
+                    page === item.id ? 'bg-[#0F2942] text-white' : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigateTo('submit')}
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] ${
+                isPapersActive ? 'bg-[#0F2942] text-white' : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
+              }`}
+            >
+              Question Papers
+            </button>
+
+            <div className="space-y-1">
+              <div className="px-3.5 text-[11px] font-extrabold uppercase tracking-wider text-[#0D9488]">
+                Profile
+              </div>
               <button
-                key={item.id}
                 type="button"
-                onClick={() => navigateTo(item.id)}
-                className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] ${
-                  page === item.id
-                    ? 'bg-[#0F2942] text-white dark:bg-sky-500/20 dark:text-sky-300'
-                    : 'text-[var(--ink)] hover:bg-[var(--bg-subtle)]'
-                }`}
+                onClick={() => openProfileSection('info')}
+                className="w-full text-left px-3.5 py-2 rounded-xl text-sm font-semibold min-h-[42px] text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
               >
-                {item.label}
+                Personal Info, Bookmarks &amp; Progress
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => openProfileSection('settings')}
+                className="w-full text-left px-3.5 py-2 rounded-xl text-sm font-semibold min-h-[42px] text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
+              >
+                Settings &rarr; Academic Preference ({profConfig.shortLabel})
+              </button>
+            </div>
+
             {userProfile?.role === 'admin' && (
               <button
                 type="button"
                 onClick={() => navigateTo('admin')}
                 className={`w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] flex items-center gap-2 ${
-                  page === 'admin'
-                    ? 'bg-[#0D9488] text-white'
-                    : 'text-[#0D9488] bg-teal-500/10'
+                  page === 'admin' ? 'bg-[#0D9488] text-white' : 'text-[#0D9488] bg-teal-500/10'
                 }`}
               >
                 <ShieldCheck size={16} /> Admin Panel
               </button>
             )}
-            <a
-              href={TELEGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-bold min-h-[44px] flex items-center gap-2 text-[#229ED9] hover:bg-[var(--bg-subtle)] no-underline"
-            >
-              <TelegramIcon className="w-4 h-4" />
-              <span>Join Telegram Community</span>
-            </a>
           </div>
         )}
       </header>
 
       {/* Main Content Area */}
       <main className={`flex-1 wrap py-5 sm:py-9 relative z-10 ${showMobileBottomNav ? 'pb-8 lg:pb-12' : ''}`}>
-        {/* ===================== HOMEPAGE (MOBILE-FIRST, CLEAN 4 PILLARS) ===================== */}
+        {/* Contextual Section Sub-Navigation Bar for Study & Practice */}
+        {!examActive && isStudyActive && (
+          <div className="mb-5 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-[var(--line-light)]">
+            {[
+              { id: 'archive' as PageRoute, label: 'Written Questions' },
+              { id: 'teacher' as PageRoute, label: 'Viva Bank' },
+              { id: 'library' as PageRoute, label: 'Notes Library' }
+            ].map(item => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => navigateTo(item.id)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] shrink-0 transition-colors ${
+                  page === item.id || (item.id === 'library' && page === 'upload') || (item.id === 'archive' && page === 'question')
+                    ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
+                    : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {!examActive && isPracticeActive && (
+          <div className="mb-5 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-[var(--line-light)]">
+            {[
+              { id: 'mcq' as PageRoute, label: 'MCQ Practice' },
+              { id: 'exam' as PageRoute, label: 'Examination System' },
+              {
+                id: 'wrong-review' as PageRoute,
+                label: `Wrong Answer Review${wrongAnswerCountForProf > 0 ? ` (${wrongAnswerCountForProf})` : ''}`
+              }
+            ].map(item => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => navigateTo(item.id)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] shrink-0 transition-colors ${
+                  page === item.id
+                    ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
+                    : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ===================== HOMEPAGE (CLEAN, UNCLUTTERED, NO PROF SWITCHER) ===================== */}
         {page === 'home' && (
-          <div className="space-y-9 sm:space-y-14">
+          <div className="space-y-9 sm:space-y-12">
             {/* Hero Section */}
-            <section className="max-w-3xl mx-auto text-center space-y-5 pt-2 sm:pt-6">
+            <section className="max-w-3xl mx-auto text-center space-y-5 pt-2 sm:pt-5">
               <p className="text-[11px] sm:text-xs font-extrabold uppercase tracking-[0.12em] text-[#0D9488] m-0">
-                Chittagong Medical College &middot; Bangladesh Medical Academic Archive
+                Chittagong Medical College &middot; MBBS Academic Archive
               </p>
 
               <h1 className="text-[1.85rem] sm:text-5xl font-extrabold tracking-tight text-[var(--ink)] leading-[1.15] m-0 text-balance">
@@ -669,10 +1108,10 @@ export default function App() {
               </h1>
 
               <p className="text-sm sm:text-lg text-[var(--ink-secondary)] max-w-2xl mx-auto leading-relaxed m-0">
-                A calm, structured academic library where medical students browse past examination questions, take timed online exams, and collaboratively build a verified archive across medical colleges.
+                Your Academic Space &mdash; <strong className="text-[var(--ink)]">{profConfig.shortLabel}</strong>. Focused on {profConfig.subtitle}.
               </p>
 
-              {/* Hero Search Bar */}
+              {/* Prof-Scoped Search Bar */}
               <form
                 onSubmit={handleHeroSearch}
                 className="max-w-xl mx-auto flex flex-col sm:flex-row gap-2.5 pt-1"
@@ -686,7 +1125,7 @@ export default function App() {
                     type="text"
                     value={heroSearchInput}
                     onChange={e => setHeroSearchInput(e.target.value)}
-                    placeholder="Search anatomy, brachial plexus, ECG..."
+                    placeholder={`Search ${profConfig.shortLabel} written questions or topics...`}
                     className="!pl-10 min-h-[48px] text-sm rounded-xl shadow-xs"
                   />
                 </div>
@@ -702,61 +1141,76 @@ export default function App() {
                   onClick={() => navigateTo('archive')}
                   className="ed-btn-primary min-h-[48px] w-full sm:w-auto"
                 >
-                  <span>Browse Question Archive</span>
+                  <span>Start Studying</span>
                   <ArrowRight size={16} className="ml-2" />
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setExamPreset(null);
-                    navigateTo('exam');
+                    navigateTo('mcq');
                   }}
                   className="ed-btn-outline min-h-[48px] w-full sm:w-auto"
                 >
-                  <span>Take an Online Exam</span>
+                  <span>Practice MCQs</span>
                 </button>
               </div>
             </section>
 
-            {/* Four Core Pillars: Learn, Practice, Contribute, Collaborate */}
-            <section className="space-y-4 sm:space-y-5">
-              <div className="flex items-end justify-between border-b border-[var(--line)] pb-3">
+            {/* Personalized Academic Workspace — Subject Shortcuts + 4 Clean Section Cards (NO Prof Switcher) */}
+            <section className="space-y-5">
+              <div className="bg-[var(--card)] border border-[var(--line)] rounded-2xl p-5 sm:p-6 space-y-4">
                 <div>
-                  <h2 className="text-lg sm:text-2xl font-extrabold text-[var(--ink)] m-0">
-                    Academic Workspace
+                  <h2 className="text-base sm:text-xl font-extrabold text-[var(--ink)] m-0">
+                    Your Academic Space &mdash; {profConfig.shortLabel}
                   </h2>
                   <p className="text-xs sm:text-sm text-[var(--mut)] m-0 mt-0.5">
-                    Organized around four essential medical study workflows
+                    Select any {profConfig.shortLabel} subject below to open the Written Archive.
                   </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {activeProfSubjects.map(subj => (
+                    <button
+                      key={subj}
+                      type="button"
+                      onClick={() => {
+                        setArchiveSubject(subj);
+                        setArchiveSearch('');
+                        navigateTo('archive');
+                      }}
+                      className="px-4 py-3 rounded-xl bg-[var(--bg-subtle)] hover:bg-[#0F2942] hover:text-white border border-[var(--line)] text-xs sm:text-sm font-bold transition-colors min-h-[46px] flex items-center justify-between gap-2 text-left"
+                    >
+                      <span className="truncate">{subj}</span>
+                      <ArrowRight size={14} className="shrink-0 opacity-75" />
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5">
-                {/* 1. Learn */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+                {/* 1. Study */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setArchiveTab('cq');
-                    navigateTo('archive');
-                  }}
+                  onClick={() => navigateTo('archive')}
                   className="cat-segment-card text-left group"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold uppercase tracking-wider text-[#0D9488] font-mono">
-                        01 &middot; Learn
+                        Study
                       </span>
-                      <Layers size={19} className="text-[#0F2942] dark:text-sky-400" />
+                      <BookOpen size={18} className="text-[#0F2942] dark:text-sky-400" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0">
-                      Structured Question Archive
+                    <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                      Written Questions, Viva &amp; Notes Library
                     </h3>
                     <p className="text-xs sm:text-sm text-[var(--mut)] m-0 leading-relaxed">
-                      Explore Written (CQ), separated SBA &amp; True/False MCQs, and Card/Term papers organized by Subject &rarr; Paper &rarr; Chapter &rarr; Year.
+                      Structured {profConfig.shortLabel} Written archive, peer study notes, and Resource Requests.
                     </p>
                   </div>
                   <div className="pt-3.5 text-xs font-bold text-[#0F2942] dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    <span>Open Archive</span>
+                    <span>Open Study Materials</span>
                     <ArrowRight size={14} />
                   </div>
                 </button>
@@ -764,33 +1218,30 @@ export default function App() {
                 {/* 2. Practice */}
                 <button
                   type="button"
-                  onClick={() => {
-                    setExamPreset(null);
-                    navigateTo('exam');
-                  }}
+                  onClick={() => navigateTo('mcq')}
                   className="cat-segment-card text-left group"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold uppercase tracking-wider text-[#0D9488] font-mono">
-                        02 &middot; Practice
+                        Practice
                       </span>
-                      <Award size={19} className="text-[#0D9488]" />
+                      <Award size={18} className="text-[#0D9488]" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0">
-                      Customizable Online Examination
+                    <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                      MCQ Practice, Timed Exams &amp; Wrong Review
                     </h3>
                     <p className="text-xs sm:text-sm text-[var(--mut)] m-0 leading-relaxed">
-                      Take Chapter-wise, Paper-wise, or Subject-wise timed tests using verified questions with question navigator and chapter analytics.
+                      Drills with separated SBA &amp; True/False questions plus timed self-assessments.
                     </p>
                   </div>
                   <div className="pt-3.5 text-xs font-bold text-[#0D9488] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    <span>Configure an Exam</span>
+                    <span>Start Practicing</span>
                     <ArrowRight size={14} />
                   </div>
                 </button>
 
-                {/* 3. Contribute */}
+                {/* 3. Question Papers */}
                 <button
                   type="button"
                   onClick={() => navigateTo('submit')}
@@ -799,132 +1250,67 @@ export default function App() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold uppercase tracking-wider text-[#0D9488] font-mono">
-                        03 &middot; Contribute
+                        Question Papers
                       </span>
-                      <FileUp size={19} className="text-[#0F2942] dark:text-sky-400" />
+                      <FileUp size={18} className="text-[#0D9488]" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0">
-                      Submit Question Papers
+                    <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                      Submit Papers &amp; Community Uploads
                     </h3>
                     <p className="text-xs sm:text-sm text-[var(--mut)] m-0 leading-relaxed">
-                      Upload Card, Term, or MCQ papers from CMC or any medical college via PDF, multi-page images, or verified Google Drive links.
+                      Share Card, Term, or MCQ papers via PDF, images, or Google Drive, and browse verified uploads.
                     </p>
                   </div>
-                  <div className="pt-3.5 text-xs font-bold text-[#0F2942] dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    <span>Submit Papers</span>
+                  <div className="pt-3.5 text-xs font-bold text-[#0D9488] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <span>Open Question Papers</span>
                     <ArrowRight size={14} />
                   </div>
                 </button>
 
-                {/* 4. Collaborate */}
+                {/* 4. Profile & Study Progress */}
                 <button
                   type="button"
-                  onClick={() => navigateTo('library')}
+                  onClick={() => openProfileSection('progress')}
                   className="cat-segment-card text-left group"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold uppercase tracking-wider text-[#0D9488] font-mono">
-                        04 &middot; Collaborate
+                        Profile &amp; Progress
                       </span>
-                      <BookOpen size={19} className="text-[#0D9488]" />
+                      <RotateCcw size={18} className="text-[#0F2942] dark:text-sky-400" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0">
-                      Student Library &amp; Academic Notes
+                    <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                      Bookmarks, Recently Viewed &amp; Study Progress
                     </h3>
                     <p className="text-xs sm:text-sm text-[var(--mut)] m-0 leading-relaxed">
-                      Access peer-reviewed diagrams, high-yield study summaries, and join medical student contributors across batches.
+                      Review saved items, track {profConfig.shortLabel} accuracy, and manage Settings.
                     </p>
                   </div>
-                  <div className="pt-3.5 text-xs font-bold text-[#0D9488] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    <span>Open Student Library</span>
+                  <div className="pt-3.5 text-xs font-bold text-[#0F2942] dark:text-sky-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <span>Open Profile</span>
                     <ArrowRight size={14} />
                   </div>
                 </button>
               </div>
             </section>
-
-            {/* Quick Subject Access Strip & Active Campaign Notice */}
-            <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 items-stretch">
-              <div className="lg:col-span-2 bg-[var(--card)] border border-[var(--line)] rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-4">
-                <div>
-                  <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
-                    Quick Subject Navigation
-                  </h3>
-                  <p className="text-xs text-[var(--mut)] mt-1 m-0">
-                    Jump straight to 1st Professional MBBS subjects across Paper-I and Paper-II.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                  {['Anatomy', 'Physiology', 'Biochemistry'].map(subj => (
-                    <button
-                      key={subj}
-                      type="button"
-                      onClick={() => {
-                        setArchiveSubject(subj);
-                        setArchiveTab('mcq');
-                        navigateTo('archive');
-                      }}
-                      className="px-4 py-2.5 rounded-xl bg-[var(--bg-subtle)] hover:bg-[#0F2942] hover:text-white border border-[var(--line)] text-xs sm:text-sm font-bold transition-colors min-h-[44px]"
-                    >
-                      {subj}
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => navigateTo('teacher')}
-                    className="px-4 py-2.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)] text-xs sm:text-sm font-bold text-[var(--ink-secondary)] inline-flex items-center justify-center gap-1.5 min-h-[44px]"
-                  >
-                    <Clock size={14} className="text-amber-600 shrink-0" />
-                    <span>Viva (Dev)</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-[var(--card)] border border-[#0D9488]/35 rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-4">
-                <div className="space-y-1.5">
-                  <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#0D9488]">
-                    <Megaphone size={13} />
-                    <span>Question Collection Drive</span>
-                  </div>
-                  <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
-                    Collecting Papers Across Medical Colleges
-                  </h3>
-                  <p className="text-xs text-[var(--mut)] m-0 leading-relaxed">
-                    Help expand Card, Term, and MCQ archives for future medical batches.
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 sm:flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => navigateTo('submit')}
-                    className="btn sm min-h-[42px]"
-                  >
-                    Submit Papers
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPopupOpen(true)}
-                    className="btn sm alt min-h-[42px]"
-                  >
-                    Read Notice
-                  </button>
-                </div>
-              </div>
-            </section>
           </div>
         )}
 
-        {/* ===================== OTHER PAGES ===================== */}
+        {/* ===================== STUDY & PRACTICE PAGES ===================== */}
         {(page === 'archive' || page === 'mcq' || page === 'question') && (
           <ArchiveExplorer
-            initialTab={page === 'mcq' ? 'mcq' : archiveTab}
+            selectedProf={selectedProf}
+            initialTab={page === 'mcq' ? 'mcq' : 'cq'}
             initialSearch={archiveSearch}
             initialSubject={archiveSubject}
-            publishedPapers={publishedPapers}
             publishedQuestions={publishedQuestions}
             questionOverrides={questionOverrides}
             customTaxonomy={customTaxonomy}
+            studyState={studyState}
+            onToggleBookmark={handleToggleBookmark}
+            onRecordRecentView={handleRecordRecentView}
+            onPracticeOutcome={handlePracticeOutcome}
             onNavigate={navigateTo}
             onStartQuickExam={preset => {
               setExamPreset(preset);
@@ -935,24 +1321,56 @@ export default function App() {
 
         {page === 'exam' && (
           <ExamSystem
+            selectedProf={selectedProf}
             publishedQuestions={publishedQuestions}
             questionOverrides={questionOverrides}
             customTaxonomy={customTaxonomy}
             preset={examPreset}
             onExamActiveChange={setExamActive}
+            onExamComplete={handleExamComplete}
+            onPracticeOutcome={handlePracticeOutcome}
             onNavigate={navigateTo}
           />
         )}
 
-        {page === 'submit' && (
-          <SubmitQuestionPapers userProfile={userProfile} authToken={authToken} />
+        {page === 'wrong-review' && (
+          <WrongAnswerReviewPage
+            selectedProf={selectedProf}
+            studyState={studyState}
+            publishedQuestions={publishedQuestions}
+            questionOverrides={questionOverrides}
+            customTaxonomy={customTaxonomy}
+            onPracticeOutcome={handlePracticeOutcome}
+            onClearWrongItem={handleClearWrongItem}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {(page === 'submit' || page === 'community') && (
+          <SubmitQuestionPapers
+            selectedProf={selectedProf}
+            userProfile={userProfile}
+            authToken={authToken}
+            publishedPapers={publishedPapers}
+            customTaxonomy={customTaxonomy}
+            studyState={studyState}
+            onToggleBookmark={handleToggleBookmark}
+            onRecordRecentView={handleRecordRecentView}
+            initialHubTab={page === 'community' ? 'community' : 'submit'}
+            onNavigate={navigateTo}
+          />
         )}
 
         {page === 'library' && (
           <StudentLibraryPage
+            selectedProf={selectedProf}
+            customTaxonomy={customTaxonomy}
             notes={notes}
             userProfile={userProfile}
             authToken={authToken}
+            studyState={studyState}
+            onToggleBookmark={handleToggleBookmark}
+            onRecordRecentView={handleRecordRecentView}
             onNavigate={navigateTo}
             onModerateNote={handleModerateNote}
             onDeleteNote={handleDeleteNote}
@@ -961,6 +1379,8 @@ export default function App() {
 
         {page === 'upload' && (
           <NoteUploadPage
+            selectedProf={selectedProf}
+            customTaxonomy={customTaxonomy}
             userProfile={userProfile}
             authToken={authToken}
             onOpenAuth={mode => {
@@ -973,7 +1393,36 @@ export default function App() {
           />
         )}
 
-        {page === 'teacher' && <VivaBankPage onNavigate={navigateTo} />}
+        {page === 'teacher' && (
+          <VivaBankPage
+            selectedProf={selectedProf}
+            customTaxonomy={customTaxonomy}
+            onNavigate={navigateTo}
+          />
+        )}
+
+        {(page === 'profile' || page === 'settings') && (
+          <ProfileHub
+            selectedProf={selectedProf}
+            customTaxonomy={customTaxonomy}
+            userProfile={userProfile}
+            studyState={studyState}
+            initialTab={page === 'settings' ? 'settings' : profileTab}
+            onUpdateProf={persistSelectedProf}
+            onRemoveBookmark={handleToggleBookmark}
+            onOpenAuth={mode => {
+              setAuthError(null);
+              setAuthSuccess(null);
+              setAuthModal(mode);
+            }}
+            onLogout={handleLogout}
+            onNavigate={(dest, opts) => {
+              if (opts?.subject) setArchiveSubject(opts.subject);
+              if (opts?.search) setArchiveSearch(opts.search);
+              navigateTo(dest);
+            }}
+          />
+        )}
 
         {page === 'contributors' && (
           <ContributorsPage contributors={contributors} onNavigate={navigateTo} />
@@ -1001,6 +1450,7 @@ export default function App() {
             announcement={announcement}
             questionOverrides={questionOverrides}
             customTaxonomy={customTaxonomy}
+            publishedPapers={publishedPapers}
             onRefreshAll={() => loadPlatformData()}
             onModerateNote={handleModerateNote}
             onDeleteNote={handleDeleteNote}
@@ -1015,19 +1465,17 @@ export default function App() {
             <div className="flex items-center gap-3 min-w-0">
               <CmcLogo variant="compact" size="sm" />
               <div className="text-xs text-[var(--mut)] leading-snug">
-                Chittagong Medical College &middot; Academic Question Archive &amp; Online Examination
+                Chittagong Medical College &middot; MBBS Question Archive &amp; Online Examination
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs font-semibold">
               {[
-                { id: 'archive' as PageRoute, label: 'Archive' },
-                { id: 'exam' as PageRoute, label: 'Take an Exam' },
-                { id: 'submit' as PageRoute, label: 'Submit Papers' },
                 { id: 'contributors' as PageRoute, label: 'Contributors' },
                 { id: 'notices' as PageRoute, label: 'Notices' },
                 { id: 'about' as PageRoute, label: 'About' },
-                { id: 'developer' as PageRoute, label: 'About the Developer' }
+                { id: 'developer' as PageRoute, label: 'Developer' },
+                { id: 'settings' as PageRoute, label: 'Settings' }
               ].map(link => (
                 <button
                   key={link.id}
@@ -1053,7 +1501,7 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Mobile Bottom Navigation Bar (hidden on Desktop and hidden during active Exam/Modals) */}
+      {/* Mobile Bottom Navigation Bar — Exact 5 Simplified Sections */}
       {showMobileBottomNav && (
         <nav
           className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[var(--card)]/95 backdrop-blur-md border-t border-[var(--line)] pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(15,41,66,0.06)]"
@@ -1064,17 +1512,27 @@ export default function App() {
               { id: 'home' as PageRoute, label: 'Home', icon: Home, active: page === 'home' },
               {
                 id: 'archive' as PageRoute,
-                label: 'Archive',
-                icon: Layers,
-                active: page === 'archive' || page === 'mcq' || page === 'question'
-              },
-              { id: 'exam' as PageRoute, label: 'Exam', icon: Award, active: page === 'exam' },
-              { id: 'submit' as PageRoute, label: 'Submit', icon: FileUp, active: page === 'submit' },
-              {
-                id: 'library' as PageRoute,
-                label: 'Notes',
+                label: 'Study',
                 icon: BookOpen,
-                active: page === 'library' || page === 'upload'
+                active: isStudyActive
+              },
+              {
+                id: 'mcq' as PageRoute,
+                label: 'Practice',
+                icon: Award,
+                active: isPracticeActive
+              },
+              {
+                id: 'submit' as PageRoute,
+                label: 'Papers',
+                icon: FileUp,
+                active: isPapersActive
+              },
+              {
+                id: 'profile' as PageRoute,
+                label: 'Profile',
+                icon: User,
+                active: isProfileActive || page === 'admin'
               }
             ].map(tab => {
               const Icon = tab.icon;
@@ -1083,13 +1541,15 @@ export default function App() {
                   key={tab.id}
                   type="button"
                   onClick={() => {
-                    if (tab.id === 'exam') setExamPreset(null);
-                    navigateTo(tab.id);
+                    if (tab.id === 'mcq') setExamPreset(null);
+                    if (tab.id === 'profile') {
+                      openProfileSection('info');
+                    } else {
+                      navigateTo(tab.id);
+                    }
                   }}
                   className={`flex flex-col items-center justify-center gap-0.5 py-2 min-h-[58px] transition-colors bg-transparent border-0 ${
-                    tab.active
-                      ? 'text-[#0D9488]'
-                      : 'text-[var(--mut)] hover:text-[var(--ink)]'
+                    tab.active ? 'text-[#0D9488]' : 'text-[var(--mut)] hover:text-[var(--ink)]'
                   }`}
                 >
                   <Icon size={19} strokeWidth={tab.active ? 2.4 : 1.9} />
@@ -1103,15 +1563,24 @@ export default function App() {
         </nav>
       )}
 
+      {/* First-Visit MBBS Professional Examination Onboarding Modal */}
+      <ProfOnboardingModal
+        isOpen={profModalMode !== null}
+        currentProf={selectedProf}
+        hasSavedProf={hasSavedProf}
+        customTaxonomy={customTaxonomy}
+        onConfirm={handleConfirmProfModal}
+      />
+
       {/* Announcement Campaign Popup */}
       <AnnouncementPopup
         announcement={announcement}
-        isOpen={popupOpen}
+        isOpen={popupOpen && profModalMode === null}
         onClose={handleClosePopup}
         onAction={handlePopupAction}
       />
 
-      {/* Sign In / Register Modal (No personal email or demo credentials exposed) */}
+      {/* Sign In / Register Modal */}
       {authModal && (
         <div
           className="modal-overlay"
