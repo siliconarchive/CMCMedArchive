@@ -38,6 +38,12 @@ import {
   PENDING_CHAPTER_LABEL
 } from '../data/archiveHelpers';
 import { getMergedProfConfigs, getSubjectsForProf } from '../data/curriculumConfig';
+import { appsScriptListUsers, appsScriptUpdateRole } from '../utils/appsScriptAuth';
+import {
+  listPapersRawFromAppsScript,
+  mapAppsScriptPaperToSubmission,
+  updateArchiveItemStatus
+} from '../utils/appsScriptArchive';
 
 interface AdminPanelProps {
   userProfile: UserProfile | null;
@@ -74,6 +80,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [resourceRequests, setResourceRequests] = useState<ResourceRequestRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
+  const [moderatingItemId, setModeratingItemId] = useState<string | null>(null);
 
   // Submission Filters & Selected
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -159,38 +166,58 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   }, [announcement]);
 
   const fetchAdminData = async () => {
-    if (!authToken || userProfile?.role !== 'admin') return;
+    if (userProfile?.role !== 'admin') return;
     setLoading(true);
     try {
-      const headers = { Authorization: `Bearer ${authToken}` };
-      const [subRes, usrRes, annRes, reqRes] = await Promise.all([
-        fetch('/api/admin/submissions', { headers }),
-        fetch('/api/admin/users', { headers }),
-        fetch('/api/admin/announcements', { headers }),
-        fetch('/api/resource-requests')
+      const usersPromise = appsScriptListUsers().catch(err => {
+        console.error('Failed to load users:', err);
+        setFeedback({ type: 'err', msg: err?.message || 'Failed to load registered users.' });
+        return null;
+      });
+
+      const papersPromise = listPapersRawFromAppsScript().catch(err => {
+        console.error('Failed to load papers:', err);
+        return null;
+      });
+
+      const headers: Record<string, string> = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+      const [appsUsers, appsPapers, annRes, reqRes] = await Promise.all([
+        usersPromise,
+        papersPromise,
+        authToken ? fetch('/api/admin/announcements', { headers }).catch(() => null) : Promise.resolve(null),
+        fetch('/api/resource-requests').catch(() => null)
       ]);
-      const subData = await subRes.json();
-      const usrData = await usrRes.json();
-      const annData = await annRes.json();
-      const reqData = reqRes.ok ? await reqRes.json() : { requests: [] };
-      if (subRes.ok && Array.isArray(subData.submissions)) {
-        setSubmissions(subData.submissions);
+
+      if (Array.isArray(appsUsers)) {
+        setUsers(appsUsers);
+      }
+
+      if (Array.isArray(appsPapers)) {
+        const mappedSubs = appsPapers.map(mapAppsScriptPaperToSubmission);
+        setSubmissions(mappedSubs);
         if (selectedSub) {
-          const updated = subData.submissions.find((s: QuestionSubmission) => s.id === selectedSub.id);
+          const updated = mappedSubs.find(s => s.id === selectedSub.id);
           if (updated) {
             setSelectedSub(updated);
             setDraftMcqs(updated.extractedMcqs || []);
+          } else {
+            setSelectedSub(null);
           }
         }
       }
-      if (usrRes.ok && Array.isArray(usrData.users)) {
-        setUsers(usrData.users);
+
+      if (annRes && annRes.ok) {
+        const annData = await annRes.json();
+        if (Array.isArray(annData.announcements) && annData.announcements.length > 0) {
+          setAdminNotices(annData.announcements);
+        }
       }
-      if (annRes.ok && Array.isArray(annData.announcements) && annData.announcements.length > 0) {
-        setAdminNotices(annData.announcements);
-      }
-      if (Array.isArray(reqData.requests)) {
-        setResourceRequests(reqData.requests);
+
+      if (reqRes && reqRes.ok) {
+        const reqData = await reqRes.json();
+        if (Array.isArray(reqData.requests)) {
+          setResourceRequests(reqData.requests);
+        }
       }
     } catch (e) {
       console.error('Failed to load admin data:', e);
@@ -220,11 +247,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     );
   }
 
-  const filteredSubs = submissions.filter(s => {
-    if (statusFilter !== 'all' && s.status !== statusFilter) return false;
-    if (categoryFilter !== 'all' && s.category !== categoryFilter) return false;
-    return true;
-  });
+  const filteredSubs = submissions
+    .filter(s => {
+      if (statusFilter !== 'all' && s.status.toLowerCase() !== statusFilter.toLowerCase()) return false;
+      if (categoryFilter !== 'all' && s.category !== categoryFilter) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const aPending = a.status === 'Pending' ? 0 : 1;
+      const bPending = b.status === 'Pending' ? 0 : 1;
+      return aPending - bPending;
+    });
 
   const openSubInspector = (sub: QuestionSubmission) => {
     setSelectedSub(sub);
@@ -237,6 +270,63 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setEditYear(sub.year || '');
     setDraftMcqs(sub.extractedMcqs || []);
     setPublishWithMcqs((sub.extractedMcqs || []).some(m => m.verifiedByAdmin));
+  };
+
+  const handleModeratePaperStatus = async (
+    paperId: string,
+    status: 'approved' | 'rejected' | 'deleted'
+  ) => {
+    setFeedback(null);
+    setModeratingItemId(paperId);
+    try {
+      await updateArchiveItemStatus('paper', paperId, status);
+      if (status === 'deleted' && selectedSub?.id === paperId) {
+        setSelectedSub(null);
+      }
+      setFeedback({
+        type: 'ok',
+        msg:
+          status === 'approved'
+            ? 'Question paper approved and published to the public archive.'
+            : status === 'rejected'
+              ? 'Question paper rejected.'
+              : 'Question paper deleted.'
+      });
+      await fetchAdminData();
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Paper status update failed.' });
+    } finally {
+      setModeratingItemId(null);
+    }
+  };
+
+  const handleModerateNoteAction = async (
+    noteId: string,
+    status: 'approved' | 'rejected' | 'deleted'
+  ) => {
+    setFeedback(null);
+    setModeratingItemId(noteId);
+    try {
+      if (status === 'deleted') {
+        await onDeleteNote(noteId);
+      } else {
+        await onModerateNote(noteId, status);
+      }
+      setFeedback({
+        type: 'ok',
+        msg:
+          status === 'approved'
+            ? 'Study note approved and published to Verified Notes.'
+            : status === 'rejected'
+              ? 'Study note rejected.'
+              : 'Study note deleted.'
+      });
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Note status update failed.' });
+    } finally {
+      setModeratingItemId(null);
+    }
   };
 
   const handleSaveSubmissionMeta = async () => {
@@ -520,22 +610,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleRoleChange = async (userId: string, role: UserRole) => {
-    if (!authToken) return;
-    const res = await fetch(`/api/admin/users/${userId}/role`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ role })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setFeedback({ type: 'err', msg: data.error || 'Role update failed.' });
+    if (userProfile && userId === userProfile.id && role !== 'admin') {
+      setFeedback({ type: 'err', msg: 'You cannot demote your own administrator account.' });
       return;
     }
-    setFeedback({ type: 'ok', msg: 'User role updated.' });
-    await fetchAdminData();
+    try {
+      const updatedUser = await appsScriptUpdateRole(userId, role);
+      setUsers(prev => prev.map(u => (u.id === userId ? updatedUser : u)));
+      setFeedback({ type: 'ok', msg: 'User role updated.' });
+      await fetchAdminData();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Role update failed.' });
+    }
   };
 
   return (
@@ -562,7 +648,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* Navigation Tabs — smoothly scrollable on 320px phones */}
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 -mx-1 px-1">
         {[
-          { id: 'submissions' as const, label: `Submissions (${submissions.length})`, icon: FileText },
+          {
+            id: 'submissions' as const,
+            label: `Papers (${submissions.filter(s => s.status === 'Pending').length} pending)`,
+            icon: FileText
+          },
           {
             id: 'chapters' as const,
             label: `Taxonomy & Review (${pendingChapterQuestions.length})`,
@@ -697,7 +787,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     Submitted Attachments
                   </div>
                   {selectedSub.files.map(f => {
-                    const authedUrl = `${f.url}?token=${encodeURIComponent(authToken || '')}`;
+                    const authedUrl =
+                      f.url.startsWith('/') && authToken
+                        ? `${f.url}?token=${encodeURIComponent(authToken)}`
+                        : f.url;
                     return (
                       <div key={f.id} className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] space-y-2">
                         <div className="flex items-center justify-between gap-2 text-xs">
@@ -932,11 +1025,33 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={handleSaveSubmissionMeta} className="btn alt min-h-[42px]">
-                      <Save size={14} /> Save Review
-                    </button>
-                    <button type="button" onClick={handlePublishSubmission} className="btn good min-h-[42px]">
-                      <CheckCircle2 size={14} /> Publish to Archive
+                    {selectedSub.status !== 'Approved' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === selectedSub.id}
+                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'approved')}
+                        className="btn good min-h-[42px]"
+                      >
+                        <CheckCircle2 size={14} /> Approve
+                      </button>
+                    )}
+                    {selectedSub.status !== 'Rejected' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === selectedSub.id}
+                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'rejected')}
+                        className="btn alt text-rose-600 min-h-[42px]"
+                      >
+                        <XCircle size={14} /> Reject
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={moderatingItemId === selectedSub.id}
+                      onClick={() => handleModeratePaperStatus(selectedSub.id, 'deleted')}
+                      className="btn alt text-rose-600 min-h-[42px]"
+                    >
+                      <Trash2 size={14} /> Delete
                     </button>
                   </div>
                 </div>
@@ -1245,87 +1360,118 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {/* TAB 3: NOTES MODERATION */}
       {tab === 'notes' && (
         <div className="space-y-3">
-          {notes.map(n => {
-            const profVal = noteProfEdits[n.id] || n.professionalExam || 'First Professional';
-            const roleVal = noteRoleEdits[n.id] || n.classificationRole || 'Main Professional Examination Subject';
-            return (
-              <div
-                key={n.id}
-                className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
-              >
-                <div className="space-y-0.5 min-w-0">
-                  <div className="text-xs font-bold text-[#0D9488]">
-                    {n.professionalExam || 'First Professional'} &bull; {n.subject}
-                    {n.paper ? ` · ${n.paper}` : ''} &bull; {n.status.toUpperCase()}
+          {notes.length === 0 ? (
+            <div className="empty text-xs">No study notes in the moderation queue yet.</div>
+          ) : (
+            [...notes]
+              .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
+              .map(n => {
+                const profVal = noteProfEdits[n.id] || n.professionalExam || 'First Professional';
+                const roleVal =
+                  noteRoleEdits[n.id] ||
+                  n.classificationRole ||
+                  'Main Professional Examination Subject';
+                return (
+                  <div
+                    key={n.id}
+                    className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
+                  >
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="text-xs font-bold text-[#0D9488]">
+                        {n.professionalExam || 'First Professional'} &bull; {n.subject}
+                        {n.paper ? ` · ${n.paper}` : ''} &bull; {n.status.toUpperCase()}
+                      </div>
+                      <div className="font-bold text-sm text-[var(--ink)] truncate">{n.title}</div>
+                      <div className="text-xs text-[var(--mut)]">
+                        By {n.fullName} ({n.collegeName})
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      <select
+                        value={profVal}
+                        onChange={e =>
+                          setNoteProfEdits(prev => ({
+                            ...prev,
+                            [n.id]: e.target.value as ProfessionalExamId
+                          }))
+                        }
+                        className="!w-36 text-xs min-h-[36px]"
+                      >
+                        {profConfigs.map(cfg => (
+                          <option key={cfg.id} value={cfg.id}>
+                            {cfg.shortLabel}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        value={roleVal}
+                        onChange={e =>
+                          setNoteRoleEdits(prev => ({
+                            ...prev,
+                            [n.id]: e.target.value as SubjectClassificationRole
+                          }))
+                        }
+                        className="!w-40 text-xs min-h-[36px]"
+                      >
+                        <option value="Main Professional Examination Subject">Main Prof Subject</option>
+                        <option value="Phase Teaching / Formative Subject">
+                          Phase Teaching / Formative
+                        </option>
+                      </select>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateNoteProf(n.id)}
+                        className="btn sm alt"
+                      >
+                        Save
+                      </button>
+                      {n.fileUrl && (
+                        <a
+                          href={
+                            n.fileUrl.startsWith('/') && authToken
+                              ? `${n.fileUrl}?token=${encodeURIComponent(authToken)}`
+                              : n.fileUrl
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn sm alt no-underline"
+                        >
+                          <ExternalLink size={12} /> Open
+                        </a>
+                      )}
+                      {n.status !== 'approved' && (
+                        <button
+                          type="button"
+                          disabled={moderatingItemId === n.id}
+                          onClick={() => handleModerateNoteAction(n.id, 'approved')}
+                          className="btn sm good"
+                        >
+                          Approve
+                        </button>
+                      )}
+                      {n.status !== 'rejected' && (
+                        <button
+                          type="button"
+                          disabled={moderatingItemId === n.id}
+                          onClick={() => handleModerateNoteAction(n.id, 'rejected')}
+                          className="btn sm alt text-rose-600"
+                        >
+                          Reject
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === n.id}
+                        onClick={() => handleModerateNoteAction(n.id, 'deleted')}
+                        className="btn sm alt text-rose-600"
+                      >
+                        <Trash2 size={13} /> Delete
+                      </button>
+                    </div>
                   </div>
-                  <div className="font-bold text-sm text-[var(--ink)] truncate">{n.title}</div>
-                  <div className="text-xs text-[var(--mut)]">
-                    By {n.fullName} ({n.collegeName})
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <select
-                    value={profVal}
-                    onChange={e =>
-                      setNoteProfEdits(prev => ({ ...prev, [n.id]: e.target.value as ProfessionalExamId }))
-                    }
-                    className="!w-36 text-xs min-h-[36px]"
-                  >
-                    {profConfigs.map(cfg => (
-                      <option key={cfg.id} value={cfg.id}>
-                        {cfg.shortLabel}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={roleVal}
-                    onChange={e =>
-                      setNoteRoleEdits(prev => ({
-                        ...prev,
-                        [n.id]: e.target.value as SubjectClassificationRole
-                      }))
-                    }
-                    className="!w-40 text-xs min-h-[36px]"
-                  >
-                    <option value="Main Professional Examination Subject">Main Prof Subject</option>
-                    <option value="Phase Teaching / Formative Subject">Phase Teaching / Formative</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateNoteProf(n.id)}
-                    className="btn sm alt"
-                  >
-                    Save
-                  </button>
-                  {n.status !== 'approved' && (
-                    <button
-                      type="button"
-                      onClick={() => onModerateNote(n.id, 'approved')}
-                      className="btn sm good"
-                    >
-                      Approve
-                    </button>
-                  )}
-                  {n.status !== 'rejected' && (
-                    <button
-                      type="button"
-                      onClick={() => onModerateNote(n.id, 'rejected')}
-                      className="btn sm alt text-rose-600"
-                    >
-                      Reject
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => onDeleteNote(n.id)}
-                    className="btn sm alt text-rose-600"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })
+          )}
         </div>
       )}
 

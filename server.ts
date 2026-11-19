@@ -887,6 +887,9 @@ interface AuthenticatedRequest extends Request {
   user?: StoredUser;
 }
 
+const APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbyt7nK3VNFjnBGvnRyystbOaYf23zNPIARKicPh_0RLQNV_xgmOFAzqNWmfacIkg2t4tw/exec';
+
 function resolveUserFromToken(token?: string): StoredUser | undefined {
   if (!token) return undefined;
   const now = Date.now();
@@ -899,8 +902,10 @@ function authMiddleware(req: AuthenticatedRequest, _res: Response, next: NextFun
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     const token = authHeader.substring(7).trim();
-    const user = resolveUserFromToken(token);
-    if (user) req.user = user;
+    const localUser = resolveUserFromToken(token);
+    if (localUser) {
+      req.user = localUser;
+    }
   }
   next();
 }
@@ -1054,103 +1059,81 @@ async function startServer() {
   app.use(express.urlencoded({ extended: true, limit: '15mb' }));
   app.use(authMiddleware);
 
-  // ===================== AUTHENTICATION API =====================
+  // ===================== SESSION BRIDGE FOR APPS SCRIPT AUTH =====================
 
-  app.post('/api/auth/register', (req: Request, res: Response) => {
+  app.post('/api/auth/session', async (req: Request, res: Response) => {
     try {
-      const { fullName, email, collegeName, batch, roll, password, preferredProf } = req.body;
-
-      if (!fullName || typeof fullName !== 'string' || !fullName.trim()) {
-        return res.status(400).json({ error: 'Full Name is required.' });
-      }
-      if (!collegeName || typeof collegeName !== 'string' || !collegeName.trim()) {
-        return res.status(400).json({ error: 'Medical College Name is required.' });
-      }
-      if (!batch || typeof batch !== 'string' || !batch.trim()) {
-        return res.status(400).json({ error: 'Batch / Session is required (e.g. CMC-67).' });
-      }
-      if (!email || typeof email !== 'string' || !email.includes('@')) {
-        return res.status(400).json({ error: 'A valid email address is required.' });
-      }
-      if (!password || typeof password !== 'string' || password.length < 6) {
-        return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+      const { userId, email } = req.body || {};
+      const cleanId = String(userId || '').trim();
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      if (!cleanId || !cleanEmail) {
+        return res.status(400).json({ error: 'userId and email are required.' });
       }
 
-      const normalizedEmail = email.trim().toLowerCase();
-      const existing = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
-      if (existing) {
-        return res.status(409).json({ error: 'An account with this email address already exists. Please sign in.' });
-      }
-
-      const isAdmin =
-        normalizedEmail === 'sifatislam.cmc67@gmail.com' ||
-        normalizedEmail.startsWith('admin@cmc.');
-
-      const salt = crypto.randomBytes(16).toString('hex');
-      const passwordHash = hashPassword(password, salt);
-
-      const newUser: StoredUser = {
-        id: `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-        fullName: fullName.trim(),
-        email: normalizedEmail,
-        collegeName: collegeName.trim(),
-        batch: batch.trim(),
-        roll: roll ? String(roll).trim() : '',
-        role: isAdmin ? 'admin' : 'student',
-        preferredProf: isValidProfId(preferredProf) ? preferredProf : undefined,
-        passwordHash,
-        salt,
-        createdAt: new Date().toISOString()
-      };
-
-      db.users.push(newUser);
-
-      const token = crypto.randomBytes(32).toString('hex');
-      const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
-      db.sessions.push({
-        token,
-        userId: newUser.id,
-        createdAt: new Date().toISOString(),
-        expiresAt
+      const gsRes = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'list_users' })
       });
+      const gsData = (await gsRes.json().catch(() => null)) as {
+        ok?: boolean;
+        success?: boolean;
+        users?: Array<Record<string, any>>;
+      } | null;
 
-      saveDatabase(db);
+      const list = Array.isArray(gsData?.users) ? gsData!.users : [];
+      const matched = list.find(
+        u =>
+          String(u.id || '').trim() === cleanId &&
+          String(u.email || '').trim().toLowerCase() === cleanEmail
+      );
 
-      return res.status(201).json({
-        success: true,
-        user: sanitizeUser(newUser),
-        token,
-        message: 'Registration successful.'
-      });
-    } catch (err: any) {
-      console.error('Registration error:', err);
-      return res.status(500).json({ error: 'Internal server error during registration.' });
-    }
-  });
-
-  app.post('/api/auth/login', (req: Request, res: Response) => {
-    try {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ error: 'Both email and password are required.' });
+      if (!matched) {
+        return res.status(401).json({ error: 'User account not found in directory.' });
       }
 
-      const normalizedEmail = String(email).trim().toLowerCase();
-      const user = db.users.find(u => u.email.toLowerCase() === normalizedEmail);
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid email or password.' });
-      }
+      const safeRole: UserRole =
+        matched.role === 'admin' || matched.role === 'contributor' ? matched.role : 'student';
+      const preferredProf = isValidProfId(matched.preferred_prof)
+        ? matched.preferred_prof
+        : undefined;
 
-      const isMatch = verifyPassword(String(password), user.salt, user.passwordHash);
-      if (!isMatch) {
-        return res.status(401).json({ error: 'Invalid email or password.' });
+      let stored = db.users.find(
+        u => u.id === cleanId || u.email.toLowerCase() === cleanEmail
+      );
+      if (stored) {
+        stored.id = cleanId;
+        stored.fullName = String(matched.full_name || stored.fullName);
+        stored.email = String(matched.email || stored.email);
+        stored.collegeName = String(matched.college_name || stored.collegeName);
+        stored.batch = String(matched.batch || stored.batch);
+        stored.roll = matched.roll ? String(matched.roll) : stored.roll || '';
+        stored.role = safeRole;
+        if (preferredProf && !stored.preferredProf) {
+          stored.preferredProf = preferredProf;
+        }
+      } else {
+        stored = {
+          id: cleanId,
+          fullName: String(matched.full_name || cleanEmail.split('@')[0]),
+          email: String(matched.email || cleanEmail),
+          collegeName: String(matched.college_name || 'Chittagong Medical College (CMC)'),
+          batch: String(matched.batch || ''),
+          roll: matched.roll ? String(matched.roll) : '',
+          role: safeRole,
+          preferredProf,
+          passwordHash: '',
+          salt: '',
+          createdAt: String(matched.created_at || new Date().toISOString())
+        };
+        db.users.push(stored);
       }
 
       const token = crypto.randomBytes(32).toString('hex');
       const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
       db.sessions.push({
         token,
-        userId: user.id,
+        userId: stored.id,
         createdAt: new Date().toISOString(),
         expiresAt
       });
@@ -1159,13 +1142,12 @@ async function startServer() {
 
       return res.status(200).json({
         success: true,
-        user: sanitizeUser(user),
         token,
-        message: 'Signed in successfully.'
+        user: sanitizeUser(stored)
       });
     } catch (err: any) {
-      console.error('Login error:', err);
-      return res.status(500).json({ error: 'Internal server error during authentication.' });
+      console.error('Session sync error:', err);
+      return res.status(500).json({ error: 'Failed to verify session.' });
     }
   });
 
@@ -1186,27 +1168,29 @@ async function startServer() {
         error: 'Invalid Professional Examination. Choose First, Second, Third, or Fourth Professional.'
       });
     }
-    const storedUser = db.users.find(u => u.id === req.user!.id);
-    if (!storedUser) {
-      return res.status(404).json({ error: 'User account not found.' });
+
+    const storedUser = db.users.find(
+      u => u.id === req.user!.id || u.email.toLowerCase() === req.user!.email.toLowerCase()
+    );
+    if (storedUser) {
+      storedUser.preferredProf = preferredProf;
+      saveDatabase(db);
     }
-    storedUser.preferredProf = preferredProf;
-    saveDatabase(db);
+
     return res.status(200).json({
       success: true,
-      user: sanitizeUser(storedUser),
+      user: { ...sanitizeUser(req.user!), preferredProf },
       preferredProf
     });
   });
 
   app.get('/api/user/study-state', requireAuth, (req: AuthenticatedRequest, res: Response) => {
-    const storedUser = db.users.find(u => u.id === req.user!.id);
-    if (!storedUser) {
-      return res.status(404).json({ error: 'User account not found.' });
-    }
+    const storedUser = db.users.find(
+      u => u.id === req.user!.id || u.email.toLowerCase() === req.user!.email.toLowerCase()
+    );
     return res.status(200).json({
       success: true,
-      studyState: storedUser.studyState || {
+      studyState: storedUser?.studyState || {
         bookmarks: [],
         recentlyViewed: [],
         wrongAnswers: [],
@@ -1217,12 +1201,8 @@ async function startServer() {
   });
 
   app.patch('/api/user/study-state', requireAuth, (req: AuthenticatedRequest, res: Response) => {
-    const storedUser = db.users.find(u => u.id === req.user!.id);
-    if (!storedUser) {
-      return res.status(404).json({ error: 'User account not found.' });
-    }
     const body = req.body || {};
-    storedUser.studyState = {
+    const nextStudyState: StudyState = {
       bookmarks: Array.isArray(body.bookmarks) ? body.bookmarks.slice(0, 150) : [],
       recentlyViewed: Array.isArray(body.recentlyViewed) ? body.recentlyViewed.slice(0, 80) : [],
       wrongAnswers: Array.isArray(body.wrongAnswers) ? body.wrongAnswers.slice(0, 200) : [],
@@ -1230,8 +1210,15 @@ async function startServer() {
       practicedIds:
         body.practicedIds && typeof body.practicedIds === 'object' ? body.practicedIds : {}
     };
-    saveDatabase(db);
-    return res.status(200).json({ success: true, studyState: storedUser.studyState });
+
+    const storedUser = db.users.find(
+      u => u.id === req.user!.id || u.email.toLowerCase() === req.user!.email.toLowerCase()
+    );
+    if (storedUser) {
+      storedUser.studyState = nextStudyState;
+      saveDatabase(db);
+    }
+    return res.status(200).json({ success: true, studyState: nextStudyState });
   });
 
   // Resource Requests (Prof-scoped missing resource / topic requests)
@@ -2556,29 +2543,6 @@ CRITICAL INTEGRITY RULES:
     db.announcements.splice(idx, 1);
     saveDatabase(db);
     return res.status(200).json({ success: true });
-  });
-
-  // Users & Role Management Admin
-  app.get('/api/admin/users', requireAdmin, (_req: AuthenticatedRequest, res: Response) => {
-    return res.status(200).json({
-      success: true,
-      users: db.users.map(sanitizeUser)
-    });
-  });
-
-  app.patch('/api/admin/users/:id/role', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
-    const { role } = req.body || {};
-    if (!['student', 'contributor', 'admin'].includes(role)) {
-      return res.status(400).json({ error: 'Invalid role. Allowed: student, contributor, admin.' });
-    }
-    const user = db.users.find(u => u.id === req.params.id);
-    if (!user) return res.status(404).json({ error: 'User not found.' });
-    if (user.id === req.user?.id && role !== 'admin') {
-      return res.status(400).json({ error: 'You cannot demote your own administrator account.' });
-    }
-    user.role = role;
-    saveDatabase(db);
-    return res.status(200).json({ success: true, user: sanitizeUser(user) });
   });
 
   // GET /api/stats (Platform stats)

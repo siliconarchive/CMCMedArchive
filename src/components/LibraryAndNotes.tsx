@@ -43,6 +43,7 @@ import {
   isDentalSubjectOrProgram,
   subjectMatchesCanonical
 } from '../data/curriculumConfig';
+import { fileToBase64, submitNoteToAppsScript } from '../utils/appsScriptArchive';
 
 export const VivaBankPage: React.FC<{
   selectedProf: ProfessionalExamId;
@@ -228,9 +229,15 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
       notes.filter(item => {
         if (isDentalSubjectOrProgram(item.prog, item.subject)) return false;
         if (item.classificationRole === 'Phase Teaching / Formative Subject') return false;
-        return (item.professionalExam || 'First Professional') === selectedProf;
+        if ((item.professionalExam || 'First Professional') !== selectedProf) return false;
+        const isAdmin = userProfile?.role === 'admin';
+        const isOwner =
+          Boolean(userProfile) &&
+          (item.uploadedByUserId === userProfile?.id ||
+            item.uploadedByEmail?.toLowerCase() === userProfile?.email?.toLowerCase());
+        return item.status === 'approved' || isAdmin || isOwner;
       }),
-    [notes, selectedProf]
+    [notes, selectedProf, userProfile]
   );
 
   const availableSubjects = useMemo(() => {
@@ -251,13 +258,14 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
 
   const tabFiltered = mbbsNotes.filter(item => {
     if (tab === 'my') {
-      return userProfile && (item.uploadedByUserId === userProfile.id || item.uploadedByEmail === userProfile.email);
+      return (
+        userProfile &&
+        (item.uploadedByUserId === userProfile.id ||
+          item.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase())
+      );
     }
-    if (tab === 'pending') return item.status === 'pending';
-    return (
-      item.status === 'approved' ||
-      (userProfile && (item.uploadedByUserId === userProfile.id || item.uploadedByEmail === userProfile.email))
-    );
+    if (tab === 'pending') return userProfile?.role === 'admin' && item.status === 'pending';
+    return item.status === 'approved';
   });
 
   const filtered = tabFiltered.filter(item => {
@@ -582,7 +590,9 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
                   (res.uploadedByUserId === userProfile.id || res.uploadedByEmail === userProfile.email);
                 const isAdmin = userProfile?.role === 'admin';
                 const fileHref = res.fileUrl
-                  ? `${res.fileUrl}${authToken ? `?token=${encodeURIComponent(authToken)}` : ''}`
+                  ? res.fileUrl.startsWith('/') && authToken
+                    ? `${res.fileUrl}?token=${encodeURIComponent(authToken)}`
+                    : res.fileUrl
                   : '';
                 const isBookmarked = bookmarkedKeys.has(`note_${res.id}`);
 
@@ -764,7 +774,9 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
   const [paper, setPaper] = useState('Paper-I');
   const [topic, setTopic] = useState('');
   const [description, setDescription] = useState('');
+  const [uploadMethod, setUploadMethod] = useState<'file' | 'drive_link'>('file');
   const [file, setFile] = useState<File | null>(null);
+  const [driveUrl, setDriveUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -780,9 +792,14 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authToken) return;
-    if (!file) {
+    if (!userProfile) return;
+
+    if (uploadMethod === 'file' && !file) {
       setError('Please select a PDF or image file.');
+      return;
+    }
+    if (uploadMethod === 'drive_link' && !driveUrl.trim()) {
+      setError('Please paste a valid Google Drive link.');
       return;
     }
 
@@ -791,36 +808,51 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
     setSuccess(null);
 
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('fullName', fullName);
-      fd.append('collegeName', collegeName);
-      fd.append('title', title);
-      fd.append('professionalExam', noteProf);
-      fd.append('subject', subject);
-      fd.append('paper', paper);
-      fd.append('prog', 'MBBS');
-      fd.append('topic', topic);
-      fd.append('description', description);
+      let file_base64 = '';
+      let file_name = '';
+      let mime_type = '';
+      let file_type = 'drive_link';
+      let file_url = '';
 
-      const res = await fetch('/api/notes/upload', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${authToken}` },
-        body: fd
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Upload failed.');
-        return;
+      if (uploadMethod === 'file' && file) {
+        const encoded = await fileToBase64(file);
+        file_base64 = encoded.file_base64;
+        file_name = encoded.file_name;
+        mime_type = encoded.mime_type;
+        file_type = encoded.mime_type.startsWith('image/') ? 'image' : 'pdf';
+      } else {
+        file_url = driveUrl.trim();
+        file_type = 'drive_link';
       }
-      setSuccess(data.message || 'Note uploaded successfully.');
+
+      await submitNoteToAppsScript({
+        title: title.trim(),
+        prof: noteProf,
+        college_name: collegeName.trim(),
+        subject,
+        paper,
+        topic: topic.trim(),
+        contributor_name: fullName.trim() || userProfile.fullName,
+        contributor_email: userProfile.email,
+        description: description.trim(),
+        file_url,
+        file_base64,
+        file_name,
+        mime_type,
+        file_type
+      });
+
+      setSuccess(
+        'Study note submitted! Status is pending — it is awaiting admin approval and will appear in Verified Notes once approved.'
+      );
       setTitle('');
       setTopic('');
       setDescription('');
       setFile(null);
+      setDriveUrl('');
       await onUploadComplete();
-    } catch {
-      setError('Network error while uploading note.');
+    } catch (err: any) {
+      setError(err?.message || 'Network error while uploading note.');
     } finally {
       setSubmitting(false);
     }
@@ -970,28 +1002,75 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
             />
           </div>
 
-          <div className="border-2 border-dashed border-[var(--line)] rounded-xl p-5 text-center bg-[var(--bg-subtle)]">
-            <input
-              type="file"
-              id="note-upload-file"
-              accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
-              className="hidden"
-              onChange={e => setFile(e.target.files?.[0] || null)}
-            />
-            {!file ? (
-              <label htmlFor="note-upload-file" className="cursor-pointer block space-y-1.5">
-                <FileUp size={30} className="mx-auto text-[#0D9488]" />
-                <div className="text-sm font-bold text-[var(--ink)]">Click to choose PDF or Image (max 25 MB)</div>
-              </label>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadMethod('file');
+                  setError(null);
+                }}
+                className={`py-2.5 px-3 rounded-xl border text-xs font-bold min-h-[42px] ${
+                  uploadMethod === 'file'
+                    ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488] ring-1 ring-[#0D9488]'
+                    : 'border-[var(--line)] bg-[var(--card-subtle)] text-[var(--ink-secondary)]'
+                }`}
+              >
+                Upload PDF / Image
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUploadMethod('drive_link');
+                  setError(null);
+                }}
+                className={`py-2.5 px-3 rounded-xl border text-xs font-bold min-h-[42px] ${
+                  uploadMethod === 'drive_link'
+                    ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488] ring-1 ring-[#0D9488]'
+                    : 'border-[var(--line)] bg-[var(--card-subtle)] text-[var(--ink-secondary)]'
+                }`}
+              >
+                Google Drive Link
+              </button>
+            </div>
+
+            {uploadMethod === 'file' ? (
+              <div className="border-2 border-dashed border-[var(--line)] rounded-xl p-5 text-center bg-[var(--bg-subtle)]">
+                <input
+                  type="file"
+                  id="note-upload-file"
+                  accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
+                  className="hidden"
+                  onChange={e => setFile(e.target.files?.[0] || null)}
+                />
+                {!file ? (
+                  <label htmlFor="note-upload-file" className="cursor-pointer block space-y-1.5">
+                    <FileUp size={30} className="mx-auto text-[#0D9488]" />
+                    <div className="text-sm font-bold text-[var(--ink)]">Click to choose PDF or Image (max 25 MB)</div>
+                  </label>
+                ) : (
+                  <div className="flex items-center justify-between gap-2 bg-[var(--card)] p-3 rounded-lg border border-[var(--line)]">
+                    <div className="flex items-center gap-2 truncate text-xs font-bold">
+                      <FileText size={16} className="text-[#0D9488] shrink-0" />
+                      <span className="truncate">{file.name}</span>
+                    </div>
+                    <button type="button" onClick={() => setFile(null)} className="p-1 text-[var(--mut)] hover:text-rose-600">
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
-              <div className="flex items-center justify-between gap-2 bg-[var(--card)] p-3 rounded-lg border border-[var(--line)]">
-                <div className="flex items-center gap-2 truncate text-xs font-bold">
-                  <FileText size={16} className="text-[#0D9488] shrink-0" />
-                  <span className="truncate">{file.name}</span>
-                </div>
-                <button type="button" onClick={() => setFile(null)} className="p-1 text-[var(--mut)] hover:text-rose-600">
-                  <X size={16} />
-                </button>
+              <div>
+                <label className="block text-xs font-bold mb-1">Google Drive URL *</label>
+                <input
+                  type="url"
+                  value={driveUrl}
+                  onChange={e => setDriveUrl(e.target.value)}
+                  placeholder="https://drive.google.com/file/d/... or /drive/folders/..."
+                  required
+                  className="min-h-[44px] text-sm"
+                />
               </div>
             )}
           </div>

@@ -573,19 +573,37 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
             </div>
 
             <div className="p-4 sm:p-5 overflow-y-auto space-y-4">
-              {previewFile.mimeType.startsWith('image/') ? (
-                <img
-                  src={previewFile.url}
-                  alt={previewFile.originalName}
-                  className="w-full max-h-[65dvh] object-contain rounded-lg border border-[var(--line)] bg-[var(--bg-subtle)]"
-                />
-              ) : (
-                <iframe
-                  src={previewFile.url}
-                  title={previewFile.originalName}
-                  className="w-full h-[65dvh] rounded-lg border border-[var(--line)] bg-white"
-                />
-              )}
+              {(() => {
+                const rawUrl = previewFile.url;
+                const driveMatch =
+                  rawUrl.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i) ||
+                  rawUrl.match(/drive\.google\.com\/open\?id=([^&#]+)/i);
+                const driveId = driveMatch?.[1];
+
+                if (driveId) {
+                  return (
+                    <iframe
+                      src={`https://drive.google.com/file/d/${driveId}/preview`}
+                      title={previewFile.originalName}
+                      className="w-full h-[65dvh] rounded-lg border border-[var(--line)] bg-white"
+                    />
+                  );
+                }
+
+                return previewFile.mimeType.startsWith('image/') ? (
+                  <img
+                    src={rawUrl}
+                    alt={previewFile.originalName}
+                    className="w-full max-h-[65dvh] object-contain rounded-lg border border-[var(--line)] bg-[var(--bg-subtle)]"
+                  />
+                ) : (
+                  <iframe
+                    src={rawUrl}
+                    title={previewFile.originalName}
+                    className="w-full h-[65dvh] rounded-lg border border-[var(--line)] bg-white"
+                  />
+                );
+              })()}
 
               {previewPaper.files.length > 1 && (
                 <div className="flex flex-wrap gap-2 pt-2 border-t border-[var(--line)]">

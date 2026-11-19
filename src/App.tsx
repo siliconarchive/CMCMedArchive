@@ -65,10 +65,32 @@ import {
   toggleBookmarkInState
 } from './data/studyTracker';
 
+import { appsScriptLogin, appsScriptRegister } from './utils/appsScriptAuth';
+import {
+  listApprovedPapersFromAppsScript,
+  listNotesFromAppsScript,
+  updateArchiveItemStatus
+} from './utils/appsScriptArchive';
+
 const TELEGRAM_URL = 'https://t.me/Sifat_Islam_7';
 const AUTH_TOKEN_KEY = 'cmc_auth_token';
+const AUTH_USER_KEY = 'cmc_auth_user';
 const ANNOUNCEMENT_SEEN_KEY = 'cmc_announcement_dismissed';
 const PROF_STORAGE_KEY = 'cmc_selected_prof';
+
+function loadStoredAuthUser(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(AUTH_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as UserProfile;
+    if (parsed && typeof parsed.id === 'string' && typeof parsed.email === 'string') {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
 
 const FALLBACK_ANNOUNCEMENT: AnnouncementRecord = {
   id: 'campaign_question_collection_2026',
@@ -112,7 +134,7 @@ export default function App() {
 
   // Auth State
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem(AUTH_TOKEN_KEY));
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(() => loadStoredAuthUser());
   const [authModal, setAuthModal] = useState<'signin' | 'signup' | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -282,6 +304,14 @@ export default function App() {
         localStorage.setItem(PROF_STORAGE_KEY, prof);
       } catch {}
 
+      if (userProfile) {
+        const updatedProfile: UserProfile = { ...userProfile, preferredProf: prof };
+        setUserProfile(updatedProfile);
+        try {
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(updatedProfile));
+        } catch {}
+      }
+
       if (authToken) {
         try {
           const res = await fetch('/api/user/preference', {
@@ -292,19 +322,20 @@ export default function App() {
             },
             body: JSON.stringify({ preferredProf: prof })
           });
-          const data = await res.json();
-          if (res.ok && data.user) {
-            setUserProfile(data.user);
-            return { ok: true };
+          if (res.ok) {
+            const data = await res.json();
+            if (data.user) {
+              setUserProfile(data.user);
+              try {
+                localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+              } catch {}
+            }
           }
-          return { ok: false, error: data.error || 'Could not sync preference to account.' };
-        } catch {
-          return { ok: false, error: 'Network error while saving preference.' };
-        }
+        } catch {}
       }
       return { ok: true };
     },
-    [authToken]
+    [authToken, userProfile]
   );
 
   const handleConfirmProfModal = useCallback(
@@ -402,7 +433,6 @@ export default function App() {
 
     try {
       const requests: Promise<Response>[] = [
-        fetch('/api/notes', { headers }),
         fetch('/api/archive/published'),
         fetch('/api/contributors'),
         fetch('/api/announcements/active', { cache: 'no-store' }),
@@ -412,15 +442,34 @@ export default function App() {
         requests.push(fetch('/api/user/study-state', { headers }));
       }
 
-      const [notesRes, archiveRes, contribRes, annRes, allAnnRes, studyRes] = await Promise.all(requests);
+      const [
+        gsPapersResult,
+        gsNotesResult,
+        archiveRes,
+        contribRes,
+        annRes,
+        allAnnRes,
+        studyRes
+      ] = await Promise.all([
+        listApprovedPapersFromAppsScript().catch(err => {
+          console.error('Failed to load papers from Apps Script:', err);
+          return null;
+        }),
+        listNotesFromAppsScript().catch(err => {
+          console.error('Failed to load notes from Apps Script:', err);
+          return null;
+        }),
+        ...requests
+      ]);
 
-      if (notesRes.ok) {
-        const nd = await notesRes.json();
-        if (Array.isArray(nd.notes)) setNotes(nd.notes);
+      if (Array.isArray(gsNotesResult)) {
+        setNotes(gsNotesResult);
+      }
+      if (Array.isArray(gsPapersResult)) {
+        setPublishedPapers(gsPapersResult);
       }
       if (archiveRes.ok) {
         const ad = await archiveRes.json();
-        if (Array.isArray(ad.publishedPapers)) setPublishedPapers(ad.publishedPapers);
         if (Array.isArray(ad.publishedQuestions)) setPublishedQuestions(ad.publishedQuestions);
         if (ad.questionOverrides) setQuestionOverrides(ad.questionOverrides);
         if (ad.customTaxonomy) setCustomTaxonomy(ad.customTaxonomy);
@@ -470,29 +519,50 @@ export default function App() {
     }
   };
 
+  const syncBackendSession = async (user: UserProfile, existingToken?: string | null): Promise<string> => {
+    const fallbackToken = existingToken || `apps_script_${user.id}`;
+    try {
+      const res = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, email: user.email })
+      });
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+          setAuthToken(data.token);
+          if (data.user) {
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+            setUserProfile(data.user);
+          }
+          return data.token as string;
+        }
+      }
+    } catch {}
+
+    localStorage.setItem(AUTH_TOKEN_KEY, fallbackToken);
+    setAuthToken(fallbackToken);
+    return fallbackToken;
+  };
+
   useEffect(() => {
     const init = async () => {
-      if (authToken) {
-        try {
-          const meRes = await fetch('/api/auth/me', {
-            headers: { Authorization: `Bearer ${authToken}` }
-          });
-          if (meRes.ok) {
-            const meData = await meRes.json();
-            setUserProfile(meData.user);
-            if (isValidProfId(meData.user?.preferredProf)) {
-              setSelectedProf(meData.user.preferredProf);
-              setHasSavedProf(true);
-              setProfModalMode(null);
-              try {
-                localStorage.setItem(PROF_STORAGE_KEY, meData.user.preferredProf);
-              } catch {}
-            }
-          } else {
-            localStorage.removeItem(AUTH_TOKEN_KEY);
-            setAuthToken(null);
-          }
-        } catch {}
+      const storedUser = loadStoredAuthUser();
+      if (storedUser) {
+        setUserProfile(storedUser);
+        if (isValidProfId(storedUser.preferredProf)) {
+          setSelectedProf(storedUser.preferredProf);
+          setHasSavedProf(true);
+          setProfModalMode(null);
+          try {
+            localStorage.setItem(PROF_STORAGE_KEY, storedUser.preferredProf);
+          } catch {}
+        }
+        const tok = await syncBackendSession(storedUser, localStorage.getItem(AUTH_TOKEN_KEY));
+        await loadPlatformData(tok);
+        return;
       }
       await loadPlatformData();
     };
@@ -503,7 +573,7 @@ export default function App() {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const email = String(formData.get('email') || '');
+    const email = String(formData.get('email') || '').trim();
     const password = String(formData.get('password') || '');
 
     setAuthLoading(true);
@@ -511,35 +581,28 @@ export default function App() {
     setAuthSuccess(null);
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setAuthError(data.error || 'Sign in failed.');
-        return;
-      }
-      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-      setAuthToken(data.token);
-      setUserProfile(data.user);
-      if (isValidProfId(data.user?.preferredProf)) {
-        setSelectedProf(data.user.preferredProf);
+      const user = await appsScriptLogin(email, password);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      setUserProfile(user);
+
+      if (isValidProfId(user.preferredProf)) {
+        setSelectedProf(user.preferredProf);
         setHasSavedProf(true);
         setProfModalMode(null);
         try {
-          localStorage.setItem(PROF_STORAGE_KEY, data.user.preferredProf);
+          localStorage.setItem(PROF_STORAGE_KEY, user.preferredProf);
         } catch {}
       }
+
+      const token = await syncBackendSession(user);
       setAuthSuccess('Signed in successfully.');
-      await loadPlatformData(data.token);
+      await loadPlatformData(token);
       setTimeout(() => {
         setAuthModal(null);
         setAuthSuccess(null);
       }, 600);
-    } catch {
-      setAuthError('Network error during sign in.');
+    } catch (err: any) {
+      setAuthError(err?.message || 'Sign in failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -549,41 +612,54 @@ export default function App() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const payload = {
-      fullName: String(formData.get('fullName') || ''),
-      collegeName: String(formData.get('collegeName') || ''),
-      email: String(formData.get('email') || ''),
-      batch: String(formData.get('batch') || ''),
-      roll: String(formData.get('roll') || ''),
+      full_name: String(formData.get('fullName') || '').trim(),
+      college_name: String(formData.get('collegeName') || '').trim(),
+      email: String(formData.get('email') || '').trim(),
+      batch: String(formData.get('batch') || '').trim(),
+      roll: String(formData.get('roll') || '').trim(),
       password: String(formData.get('password') || ''),
-      preferredProf: selectedProf
+      preferred_prof: selectedProf
     };
+
+    if (!payload.full_name) {
+      setAuthError('Full Name is required.');
+      return;
+    }
+    if (!payload.college_name) {
+      setAuthError('Medical College Name is required.');
+      return;
+    }
+    if (!payload.batch) {
+      setAuthError('Batch / Session is required (e.g. CMC-67).');
+      return;
+    }
+    if (!payload.email || !payload.email.includes('@')) {
+      setAuthError('A valid email address is required.');
+      return;
+    }
+    if (!payload.password || payload.password.length < 6) {
+      setAuthError('Password must be at least 6 characters long.');
+      return;
+    }
 
     setAuthLoading(true);
     setAuthError(null);
     setAuthSuccess(null);
 
     try {
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setAuthError(data.error || 'Registration failed.');
-        return;
-      }
-      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-      setAuthToken(data.token);
-      setUserProfile(data.user);
+      const user = await appsScriptRegister(payload);
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      setUserProfile(user);
+
+      const token = await syncBackendSession(user);
       setAuthSuccess('Account created successfully.');
-      await loadPlatformData(data.token);
+      await loadPlatformData(token);
       setTimeout(() => {
         setAuthModal(null);
         setAuthSuccess(null);
       }, 600);
-    } catch {
-      setAuthError('Network error during registration.');
+    } catch (err: any) {
+      setAuthError(err?.message || 'Registration failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -597,6 +673,7 @@ export default function App() {
       }).catch(() => {});
     }
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
     setAuthToken(null);
     setUserProfile(null);
     if (page === 'admin') setPage('home');
@@ -604,25 +681,15 @@ export default function App() {
   };
 
   const handleModerateNote = async (id: string, status: 'approved' | 'rejected') => {
-    if (!authToken) return;
-    const res = await fetch(`/api/notes/${id}/status`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status })
-    });
-    if (res.ok) await loadPlatformData();
+    if (userProfile?.role !== 'admin') return;
+    await updateArchiveItemStatus('note', id, status);
+    await loadPlatformData();
   };
 
   const handleDeleteNote = async (id: string) => {
-    if (!authToken) return;
-    const res = await fetch(`/api/notes/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    if (res.ok) await loadPlatformData();
+    if (!userProfile) return;
+    await updateArchiveItemStatus('note', id, 'deleted');
+    await loadPlatformData();
   };
 
   const handleHeroSearch = (e: React.FormEvent) => {
@@ -1356,6 +1423,7 @@ export default function App() {
             studyState={studyState}
             onToggleBookmark={handleToggleBookmark}
             onRecordRecentView={handleRecordRecentView}
+            onPaperSubmitted={() => loadPlatformData()}
             initialHubTab={page === 'community' ? 'community' : 'submit'}
             onNavigate={navigateTo}
           />

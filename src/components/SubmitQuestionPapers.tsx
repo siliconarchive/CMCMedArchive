@@ -35,6 +35,12 @@ import {
   getSubjectsForProf
 } from '../data/curriculumConfig';
 import { CommunityUploadsView } from './CommunityUploadsView';
+import {
+  fileToBase64,
+  listPapersRawFromAppsScript,
+  mapAppsScriptPaperToSubmission,
+  submitPaperToAppsScript
+} from '../utils/appsScriptArchive';
 
 interface SubmitQuestionPapersProps {
   selectedProf: ProfessionalExamId;
@@ -45,6 +51,7 @@ interface SubmitQuestionPapersProps {
   studyState?: StudyState;
   onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
+  onPaperSubmitted?: () => Promise<void>;
   initialHubTab?: 'submit' | 'community';
   onNavigate: (page: PageRoute) => void;
 }
@@ -82,6 +89,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   studyState,
   onToggleBookmark,
   onRecordRecentView,
+  onPaperSubmitted,
   initialHubTab = 'submit',
   onNavigate
 }) => {
@@ -173,18 +181,17 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   const fetchMySubmissions = async () => {
     setLoadingMine(true);
     try {
-      const tokens = loadSavedTrackingTokens()
-        .map(t => `${t.id}:${t.key}`)
-        .join(',');
-      const headers: Record<string, string> = {};
-      if (authToken) headers.Authorization = `Bearer ${authToken}`;
-      const res = await fetch(`/api/submissions/mine?tokens=${encodeURIComponent(tokens)}`, {
-        headers
-      });
-      const data = await res.json();
-      if (res.ok && Array.isArray(data.submissions)) {
-        setMySubmissions(data.submissions);
-      }
+      const savedIds = new Set(loadSavedTrackingTokens().map(t => t.id));
+      const userEmail = (userProfile?.email || '').trim().toLowerCase();
+      const rawPapers = await listPapersRawFromAppsScript();
+      const mine = rawPapers
+        .map(mapAppsScriptPaperToSubmission)
+        .filter(
+          sub =>
+            savedIds.has(sub.id) ||
+            (userEmail && sub.contributorEmail?.trim().toLowerCase() === userEmail)
+        );
+      setMySubmissions(mine);
     } catch (e) {
       console.error('Failed to fetch submissions:', e);
     } finally {
@@ -195,7 +202,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   useEffect(() => {
     fetchMySubmissions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken]);
+  }, [authToken, userProfile?.email]);
 
   const handleImagePick = (files: FileList | null) => {
     if (!files) return;
@@ -284,79 +291,75 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
     setUploadProgress(15);
 
     try {
-      let response: Response;
-      const headers: Record<string, string> = {};
-      if (authToken) headers.Authorization = `Bearer ${authToken}`;
+      const baseTitle = `${examName.trim()} (${category})`;
+      const baseMeta = {
+        prof: formProf,
+        college_name: effectiveCollege,
+        subject: subject.trim(),
+        paper: paper.trim(),
+        topic: chapter.trim(),
+        year: year.trim(),
+        session: session.trim(),
+        batch: contributorBatch.trim(),
+        contributor_name: contributorName.trim() || userProfile?.fullName || 'Anonymous Student',
+        contributor_email: userProfile?.email || '',
+        description: description.trim()
+      };
+
+      let lastCreated = null;
 
       if (method === 'drive_link') {
-        setUploadProgress(60);
-        response = await fetch('/api/submissions', {
-          method: 'POST',
-          headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            category,
-            method,
-            professionalExam: formProf,
-            collegeName: effectiveCollege,
-            examName: examName.trim(),
-            subject: subject.trim(),
-            paper: paper.trim(),
-            chapter: chapter.trim(),
-            year: year.trim(),
-            session: session.trim(),
-            collectionType,
-            description: description.trim(),
-            contributorName: contributorName.trim() || 'Anonymous Student',
-            contributorBatch: contributorBatch.trim(),
-            driveLinks: cleanLinks,
-            driveVerified: Boolean(driveTestResult?.accessible),
-            driveVerificationNote: driveTestResult?.message
-          })
-        });
-      } else {
-        const fd = new FormData();
-        fd.append('category', category);
-        fd.append('method', method);
-        fd.append('professionalExam', formProf);
-        fd.append('collegeName', effectiveCollege);
-        fd.append('examName', examName.trim());
-        fd.append('subject', subject.trim());
-        fd.append('paper', paper.trim());
-        fd.append('chapter', chapter.trim());
-        fd.append('year', year.trim());
-        fd.append('session', session.trim());
-        fd.append('collectionType', collectionType);
-        fd.append('description', description.trim());
-        fd.append('contributorName', contributorName.trim() || 'Anonymous Student');
-        fd.append('contributorBatch', contributorBatch.trim());
-
-        if (method === 'pdf' && pdfFile) {
-          fd.append('files', pdfFile);
-        } else {
-          imageFiles.forEach(img => fd.append('files', img.file));
-        }
-
         setUploadProgress(55);
-        response = await fetch('/api/submissions', {
-          method: 'POST',
-          headers,
-          body: fd
+        lastCreated = await submitPaperToAppsScript({
+          ...baseMeta,
+          title: baseTitle,
+          exam_name: examName.trim(),
+          file_url: cleanLinks.join(', '),
+          file_base64: '',
+          file_name: '',
+          mime_type: '',
+          file_type: 'drive_link'
         });
-      }
-
-      setUploadProgress(90);
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Submission failed.');
-        setUploadProgress(0);
-        return;
+        if (lastCreated?.id) saveTrackingToken(lastCreated.id, 'apps_script');
+      } else if (method === 'pdf' && pdfFile) {
+        setUploadProgress(40);
+        const encoded = await fileToBase64(pdfFile);
+        setUploadProgress(70);
+        lastCreated = await submitPaperToAppsScript({
+          ...baseMeta,
+          title: baseTitle,
+          exam_name: examName.trim(),
+          file_url: '',
+          file_base64: encoded.file_base64,
+          file_name: encoded.file_name,
+          mime_type: encoded.mime_type,
+          file_type: 'pdf'
+        });
+        if (lastCreated?.id) saveTrackingToken(lastCreated.id, 'apps_script');
+      } else {
+        for (let i = 0; i < imageFiles.length; i++) {
+          const img = imageFiles[i];
+          const encoded = await fileToBase64(img.file);
+          setUploadProgress(Math.round(((i + 1) / imageFiles.length) * 85));
+          const pageSuffix = imageFiles.length > 1 ? ` (Page ${i + 1})` : '';
+          lastCreated = await submitPaperToAppsScript({
+            ...baseMeta,
+            title: `${baseTitle}${pageSuffix}`,
+            exam_name: `${examName.trim()}${pageSuffix}`,
+            file_url: '',
+            file_base64: encoded.file_base64,
+            file_name: encoded.file_name,
+            mime_type: encoded.mime_type,
+            file_type: 'image'
+          });
+          if (lastCreated?.id) saveTrackingToken(lastCreated.id, 'apps_script');
+        }
       }
 
       setUploadProgress(100);
-      if (data.submission?.id && data.submission?.trackingKey) {
-        saveTrackingToken(data.submission.id, data.submission.trackingKey);
+      if (lastCreated) {
+        setSubmittedRecord(mapAppsScriptPaperToSubmission(lastCreated));
       }
-      setSubmittedRecord(data.submission);
 
       // Reset upload inputs
       setPdfFile(null);
@@ -367,8 +370,10 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
       setExamName('');
       setDescription('');
       await fetchMySubmissions();
-    } catch {
-      setError('Network error occurred while submitting question paper.');
+      await onPaperSubmitted?.();
+    } catch (err: any) {
+      setError(err?.message || 'Network error occurred while submitting question paper.');
+      setUploadProgress(0);
     } finally {
       setSubmitting(false);
     }
@@ -534,12 +539,12 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
               <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-extrabold text-base">
                 <CheckCircle2 size={20} />
-                <span>Question Paper Submitted Successfully!</span>
+                <span>Question Paper Submitted &amp; Awaiting Admin Approval!</span>
               </div>
               <p className="text-xs sm:text-sm text-[var(--ink-secondary)] m-0">
                 Tracking ID: <b className="font-mono text-[var(--ink)]">{submittedRecord.id}</b> &bull; Status:{' '}
-                <span className="font-bold">{submittedRecord.status}</span> &bull; Examination Stage:{' '}
-                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. An administrator will verify this upload before publishing it to Community Uploads.
+                <span className="font-bold">Pending Admin Approval (pending)</span> &bull; Examination Stage:{' '}
+                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. It will stay hidden from the public Question Papers archive until an administrator approves it.
               </p>
               <button type="button" onClick={() => setActiveView('track')} className="btn sm good">
                 View My Submissions &rarr;
