@@ -13,7 +13,10 @@ import {
   Layers,
   Calendar,
   User,
-  Bookmark
+  Bookmark,
+  Trash2,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
 import {
   BookmarkRecord,
@@ -24,7 +27,8 @@ import {
   RecentlyViewedRecord,
   StudyState,
   SubmissionCategory,
-  SubmissionFileRecord
+  SubmissionFileRecord,
+  UserProfile
 } from '../types';
 import {
   canonicalizeSubjectName,
@@ -38,9 +42,11 @@ interface CommunityUploadsViewProps {
   selectedProf: ProfessionalExamId;
   publishedPapers: PublishedPaper[];
   customTaxonomy: CustomTaxonomy;
+  userProfile?: UserProfile | null;
   studyState?: StudyState;
   onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
+  onDeletePaper?: (id: string) => Promise<void>;
   onNavigate: (page: PageRoute) => void;
   onSwitchToSubmitTab?: () => void;
   embedded?: boolean;
@@ -50,9 +56,11 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
   selectedProf,
   publishedPapers,
   customTaxonomy,
+  userProfile,
   studyState,
   onToggleBookmark,
   onRecordRecentView,
+  onDeletePaper,
   onNavigate,
   onSwitchToSubmitTab,
   embedded = false
@@ -67,6 +75,8 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
 
   const [previewPaper, setPreviewPaper] = useState<PublishedPaper | null>(null);
   const [previewFile, setPreviewFile] = useState<SubmissionFileRecord | null>(null);
+  const [deletingPaperId, setDeletingPaperId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Sync filters cleanly whenever the global selectedProf switches
   useEffect(() => {
@@ -184,6 +194,19 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
       title: p.examName,
       subtitle: `${p.category} · ${p.collegeName}${p.year ? ` · ${p.year}` : ''}`
     });
+  };
+
+  const handleDeletePaperClick = async (paperId: string) => {
+    if (userProfile?.role !== 'admin' || !onDeletePaper) return;
+    setDeleteError(null);
+    setDeletingPaperId(paperId);
+    try {
+      await onDeletePaper(paperId);
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Failed to delete question paper.');
+    } finally {
+      setDeletingPaperId(null);
+    }
   };
 
   return (
@@ -363,18 +386,25 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
         )}
       </div>
 
+      {deleteError && (
+        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2">
+          <AlertCircle size={16} className="shrink-0" />
+          <span>{deleteError}</span>
+        </div>
+      )}
+
       {/* Results List */}
       {filtered.length === 0 ? (
         <div className="empty space-y-3">
           <FileText size={36} className="mx-auto opacity-45" />
           <div className="font-bold text-[var(--ink)]">
             {scopedPapers.length === 0
-              ? `No approved community question papers published yet for ${profConfig.title}`
+              ? `No community question papers published yet for ${profConfig.title}`
               : 'No community question papers match your active filters'}
           </div>
           <p className="text-xs text-[var(--mut)] max-w-md mx-auto m-0">
             {scopedPapers.length === 0
-              ? 'Only administrator-approved papers appear here. Submit a Card, Term, or MCQ paper under Submit Question Papers to contribute.'
+              ? 'Submit a Card, Term, or MCQ paper under Submit Question Papers to publish it live for everyone.'
               : 'Try clearing one of the subject, topic, year, or exam-type filters.'}
           </p>
           <div className="flex flex-wrap justify-center gap-2 pt-1">
@@ -520,6 +550,23 @@ export const CommunityUploadsView: React.FC<CommunityUploadsViewProps> = ({
                         <ExternalLink size={12} />
                       </a>
                     ))}
+
+                    {userProfile?.role === 'admin' && onDeletePaper && (
+                      <button
+                        type="button"
+                        disabled={deletingPaperId === p.id}
+                        onClick={() => handleDeletePaperClick(p.id)}
+                        className="btn sm alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10 min-h-[38px] ml-auto"
+                        aria-label="Delete question paper"
+                      >
+                        {deletingPaperId === p.id ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={13} />
+                        )}
+                        <span>{deletingPaperId === p.id ? 'Deleting...' : 'Delete'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </article>

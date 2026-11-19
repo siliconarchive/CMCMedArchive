@@ -55,7 +55,6 @@ interface AdminPanelProps {
   customTaxonomy: CustomTaxonomy;
   publishedPapers: PublishedPaper[];
   onRefreshAll: () => Promise<void>;
-  onModerateNote: (id: string, status: 'approved' | 'rejected') => Promise<void>;
   onDeleteNote: (id: string) => Promise<void>;
 }
 
@@ -71,7 +70,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   customTaxonomy,
   publishedPapers,
   onRefreshAll,
-  onModerateNote,
   onDeleteNote
 }) => {
   const [tab, setTab] = useState<AdminTab>('submissions');
@@ -280,50 +278,39 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     setModeratingItemId(paperId);
     try {
       await updateArchiveItemStatus('paper', paperId, status);
-      if (status === 'deleted' && selectedSub?.id === paperId) {
-        setSelectedSub(null);
+      if (status === 'deleted') {
+        setSubmissions(prev => prev.filter(s => s.id !== paperId));
+        if (selectedSub?.id === paperId) {
+          setSelectedSub(null);
+        }
       }
       setFeedback({
         type: 'ok',
         msg:
-          status === 'approved'
-            ? 'Question paper approved and published to the public archive.'
-            : status === 'rejected'
-              ? 'Question paper rejected.'
-              : 'Question paper deleted.'
+          status === 'deleted'
+            ? 'Question paper permanently deleted from Google Sheet and website.'
+            : 'Question paper status updated.'
       });
       await fetchAdminData();
       await onRefreshAll();
     } catch (err: any) {
-      setFeedback({ type: 'err', msg: err?.message || 'Paper status update failed.' });
+      setFeedback({ type: 'err', msg: err?.message || 'Paper update failed.' });
     } finally {
       setModeratingItemId(null);
     }
   };
 
-  const handleModerateNoteAction = async (
-    noteId: string,
-    status: 'approved' | 'rejected' | 'deleted'
-  ) => {
+  const handleDeleteNoteFromAdmin = async (noteId: string) => {
     setFeedback(null);
     setModeratingItemId(noteId);
     try {
-      if (status === 'deleted') {
-        await onDeleteNote(noteId);
-      } else {
-        await onModerateNote(noteId, status);
-      }
+      await onDeleteNote(noteId);
       setFeedback({
         type: 'ok',
-        msg:
-          status === 'approved'
-            ? 'Study note approved and published to Verified Notes.'
-            : status === 'rejected'
-              ? 'Study note rejected.'
-              : 'Study note deleted.'
+        msg: 'Study note permanently deleted from Google Sheet and website.'
       });
     } catch (err: any) {
-      setFeedback({ type: 'err', msg: err?.message || 'Note status update failed.' });
+      setFeedback({ type: 'err', msg: err?.message || 'Note deletion failed.' });
     } finally {
       setModeratingItemId(null);
     }
@@ -650,7 +637,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         {[
           {
             id: 'submissions' as const,
-            label: `Papers (${submissions.filter(s => s.status === 'Pending').length} pending)`,
+            label: `Papers (${submissions.length})`,
             icon: FileText
           },
           {
@@ -660,7 +647,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           },
           {
             id: 'notes' as const,
-            label: `Notes (${notes.filter(n => n.status === 'pending').length} pending)`,
+            label: `Notes (${notes.length})`,
             icon: BookOpen
           },
           {
@@ -1025,33 +1012,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {selectedSub.status !== 'Approved' && (
-                      <button
-                        type="button"
-                        disabled={moderatingItemId === selectedSub.id}
-                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'approved')}
-                        className="btn good min-h-[42px]"
-                      >
-                        <CheckCircle2 size={14} /> Approve
-                      </button>
-                    )}
-                    {selectedSub.status !== 'Rejected' && (
-                      <button
-                        type="button"
-                        disabled={moderatingItemId === selectedSub.id}
-                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'rejected')}
-                        className="btn alt text-rose-600 min-h-[42px]"
-                      >
-                        <XCircle size={14} /> Reject
-                      </button>
-                    )}
                     <button
                       type="button"
                       disabled={moderatingItemId === selectedSub.id}
                       onClick={() => handleModeratePaperStatus(selectedSub.id, 'deleted')}
-                      className="btn alt text-rose-600 min-h-[42px]"
+                      className="btn alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10 min-h-[42px]"
                     >
-                      <Trash2 size={14} /> Delete
+                      {moderatingItemId === selectedSub.id ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={14} />
+                      )}
+                      <span>{moderatingItemId === selectedSub.id ? 'Deleting...' : 'Delete Paper'}</span>
                     </button>
                   </div>
                 </div>
@@ -1357,15 +1329,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* TAB 3: NOTES MODERATION */}
+      {/* TAB 3: NOTES */}
       {tab === 'notes' && (
         <div className="space-y-3">
           {notes.length === 0 ? (
-            <div className="empty text-xs">No study notes in the moderation queue yet.</div>
+            <div className="empty text-xs">No study notes published yet.</div>
           ) : (
-            [...notes]
-              .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
-              .map(n => {
+            notes.map(n => {
                 const profVal = noteProfEdits[n.id] || n.professionalExam || 'First Professional';
                 const roleVal =
                   noteRoleEdits[n.id] ||
@@ -1379,7 +1349,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div className="space-y-0.5 min-w-0">
                       <div className="text-xs font-bold text-[#0D9488]">
                         {n.professionalExam || 'First Professional'} &bull; {n.subject}
-                        {n.paper ? ` · ${n.paper}` : ''} &bull; {n.status.toUpperCase()}
+                        {n.paper ? ` · ${n.paper}` : ''} &bull; LIVE
                       </div>
                       <div className="font-bold text-sm text-[var(--ink)] truncate">{n.title}</div>
                       <div className="text-xs text-[var(--mut)]">
@@ -1439,33 +1409,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <ExternalLink size={12} /> Open
                         </a>
                       )}
-                      {n.status !== 'approved' && (
-                        <button
-                          type="button"
-                          disabled={moderatingItemId === n.id}
-                          onClick={() => handleModerateNoteAction(n.id, 'approved')}
-                          className="btn sm good"
-                        >
-                          Approve
-                        </button>
-                      )}
-                      {n.status !== 'rejected' && (
-                        <button
-                          type="button"
-                          disabled={moderatingItemId === n.id}
-                          onClick={() => handleModerateNoteAction(n.id, 'rejected')}
-                          className="btn sm alt text-rose-600"
-                        >
-                          Reject
-                        </button>
-                      )}
                       <button
                         type="button"
                         disabled={moderatingItemId === n.id}
-                        onClick={() => handleModerateNoteAction(n.id, 'deleted')}
-                        className="btn sm alt text-rose-600"
+                        onClick={() => handleDeleteNoteFromAdmin(n.id)}
+                        className="btn sm alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10"
                       >
-                        <Trash2 size={13} /> Delete
+                        {moderatingItemId === n.id ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={13} />
+                        )}
+                        <span>{moderatingItemId === n.id ? 'Deleting...' : 'Delete'}</span>
                       </button>
                     </div>
                   </div>

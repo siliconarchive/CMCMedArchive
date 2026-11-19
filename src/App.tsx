@@ -35,7 +35,8 @@ import { AdminPanel } from './components/AdminPanel';
 import { ContributorsPage } from './components/ContributorsPage';
 import { NoticesPage } from './components/NoticesPage';
 import { AboutPlatformPage, AboutDeveloperPage } from './components/AboutPages';
-import { VivaBankPage, StudentLibraryPage, NoteUploadPage } from './components/LibraryAndNotes';
+import { StudentLibraryPage, NoteUploadPage } from './components/LibraryAndNotes';
+import { VivaSection } from './components/VivaSection';
 import { ProfileHub } from './components/ProfileHub';
 import { WrongAnswerReviewPage } from './components/WrongAnswerReviewPage';
 import {
@@ -680,15 +681,17 @@ export default function App() {
     await loadPlatformData(null);
   };
 
-  const handleModerateNote = async (id: string, status: 'approved' | 'rejected') => {
+  const handleDeletePaper = async (id: string) => {
     if (userProfile?.role !== 'admin') return;
-    await updateArchiveItemStatus('note', id, status);
+    await updateArchiveItemStatus('paper', id, 'deleted');
+    setPublishedPapers(prev => prev.filter(p => p.id !== id));
     await loadPlatformData();
   };
 
   const handleDeleteNote = async (id: string) => {
     if (!userProfile) return;
     await updateArchiveItemStatus('note', id, 'deleted');
+    setNotes(prev => prev.filter(n => n.id !== id));
     await loadPlatformData();
   };
 
@@ -785,9 +788,7 @@ export default function App() {
                     className="w-full text-left px-4 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-[var(--bg-subtle)] flex items-center justify-between"
                   >
                     <span>Viva Bank</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-800 dark:text-amber-300">
-                      Under Dev
-                    </span>
+                    <Layers size={14} className="text-[#0D9488]" />
                   </button>
                   <button
                     type="button"
@@ -1026,7 +1027,7 @@ export default function App() {
               </div>
               {[
                 { id: 'archive' as PageRoute, label: 'Written Questions' },
-                { id: 'teacher' as PageRoute, label: 'Viva Bank (Under Development)' },
+                { id: 'teacher' as PageRoute, label: 'Viva Bank' },
                 { id: 'library' as PageRoute, label: 'Notes Library' }
               ].map(item => (
                 <button
@@ -1424,6 +1425,7 @@ export default function App() {
             onToggleBookmark={handleToggleBookmark}
             onRecordRecentView={handleRecordRecentView}
             onPaperSubmitted={() => loadPlatformData()}
+            onDeletePaper={handleDeletePaper}
             initialHubTab={page === 'community' ? 'community' : 'submit'}
             onNavigate={navigateTo}
           />
@@ -1440,7 +1442,6 @@ export default function App() {
             onToggleBookmark={handleToggleBookmark}
             onRecordRecentView={handleRecordRecentView}
             onNavigate={navigateTo}
-            onModerateNote={handleModerateNote}
             onDeleteNote={handleDeleteNote}
           />
         )}
@@ -1462,9 +1463,10 @@ export default function App() {
         )}
 
         {page === 'teacher' && (
-          <VivaBankPage
+          <VivaSection
             selectedProf={selectedProf}
             customTaxonomy={customTaxonomy}
+            userProfile={userProfile}
             onNavigate={navigateTo}
           />
         )}
@@ -1520,7 +1522,6 @@ export default function App() {
             customTaxonomy={customTaxonomy}
             publishedPapers={publishedPapers}
             onRefreshAll={() => loadPlatformData()}
-            onModerateNote={handleModerateNote}
             onDeleteNote={handleDeleteNote}
           />
         )}

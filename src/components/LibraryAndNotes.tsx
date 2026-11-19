@@ -45,79 +45,6 @@ import {
 } from '../data/curriculumConfig';
 import { fileToBase64, submitNoteToAppsScript } from '../utils/appsScriptArchive';
 
-export const VivaBankPage: React.FC<{
-  selectedProf: ProfessionalExamId;
-  customTaxonomy: CustomTaxonomy;
-  onNavigate: (page: PageRoute) => void;
-}> = ({ selectedProf, customTaxonomy, onNavigate }) => {
-  const profConfig = getProfConfig(selectedProf, customTaxonomy);
-
-  return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
-        <div>
-          <div className="text-xs font-extrabold uppercase tracking-wider text-[#0D9488]">
-            Study &middot; {profConfig.shortLabel}
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--ink)] m-0 mt-1">
-            Viva Question Bank
-          </h1>
-        </div>
-        <span className="px-3 py-1 bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 font-bold text-xs rounded-md">
-          Under Development
-        </span>
-      </div>
-
-      <div className="bg-[var(--card)] border border-amber-500/30 rounded-xl p-6 space-y-3">
-        <div className="flex items-start gap-3">
-          <Clock className="text-amber-600 shrink-0 mt-0.5" size={22} />
-          <div className="space-y-2">
-            <h2 className="text-lg font-bold text-[var(--ink)] m-0">
-              Viva Archiving in Progress ({profConfig.shortLabel})
-            </h2>
-            <p className="text-sm text-[var(--ink-secondary)] leading-relaxed m-0">
-              The examiner-wise viva repository for <strong className="text-[var(--ink)]">{profConfig.title}</strong> is currently being cataloged and verified. Questions are never fabricated before academic verification.
-            </p>
-            <div className="pt-1">
-              <div className="text-xs font-bold text-[var(--ink)] mb-1.5">
-                Official {profConfig.shortLabel} Examination Subjects:
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs text-[var(--ink-secondary)]">
-                {profConfig.subjects.map(subj => (
-                  <span
-                    key={subj}
-                    className="px-2.5 py-1 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] font-semibold"
-                  >
-                    {subj}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-[var(--card)] border border-dashed border-[var(--line-strong)] rounded-xl p-8 text-center space-y-3">
-        <BookOpen size={36} className="mx-auto text-[var(--mut)] opacity-60" />
-        <h3 className="text-base font-bold text-[var(--ink)] m-0">
-          Explore Available {profConfig.shortLabel} Resources
-        </h3>
-        <p className="text-xs text-[var(--mut)] max-w-md mx-auto m-0">
-          Review Written (CQ) questions, Notes Library summaries, or practice MCQs while Viva boards are being compiled.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3 pt-2">
-          <button type="button" className="btn min-h-[44px]" onClick={() => onNavigate('archive')}>
-            Written Questions &rarr;
-          </button>
-          <button type="button" className="btn alt min-h-[44px]" onClick={() => onNavigate('library')}>
-            Notes Library
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 interface StudentLibraryProps {
   selectedProf: ProfessionalExamId;
   customTaxonomy: CustomTaxonomy;
@@ -128,7 +55,6 @@ interface StudentLibraryProps {
   onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
   onNavigate: (page: PageRoute) => void;
-  onModerateNote: (id: string, status: 'approved' | 'rejected') => Promise<void>;
   onDeleteNote: (id: string) => Promise<void>;
 }
 
@@ -142,14 +68,15 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
   onToggleBookmark,
   onRecordRecentView,
   onNavigate,
-  onModerateNote,
   onDeleteNote
 }) => {
-  const [tab, setTab] = useState<'all' | 'my' | 'pending' | 'requests'>('all');
+  const [tab, setTab] = useState<'all' | 'my' | 'requests'>('all');
   const [search, setSearch] = useState('');
   const [subject, setSubject] = useState('all');
   const [paper, setPaper] = useState('all');
   const [kind, setKind] = useState('all');
+  const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Resource Requests state scoped to selectedProf
   const [requests, setRequests] = useState<ResourceRequestRecord[]>([]);
@@ -230,14 +157,9 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
         if (isDentalSubjectOrProgram(item.prog, item.subject)) return false;
         if (item.classificationRole === 'Phase Teaching / Formative Subject') return false;
         if ((item.professionalExam || 'First Professional') !== selectedProf) return false;
-        const isAdmin = userProfile?.role === 'admin';
-        const isOwner =
-          Boolean(userProfile) &&
-          (item.uploadedByUserId === userProfile?.id ||
-            item.uploadedByEmail?.toLowerCase() === userProfile?.email?.toLowerCase());
-        return item.status === 'approved' || isAdmin || isOwner;
+        return item.status !== 'rejected';
       }),
-    [notes, selectedProf, userProfile]
+    [notes, selectedProf]
   );
 
   const availableSubjects = useMemo(() => {
@@ -264,8 +186,7 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
           item.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase())
       );
     }
-    if (tab === 'pending') return userProfile?.role === 'admin' && item.status === 'pending';
-    return item.status === 'approved';
+    return true;
   });
 
   const filtered = tabFiltered.filter(item => {
@@ -287,9 +208,25 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
   }, [studyState?.bookmarks]);
 
   const myCount = userProfile
-    ? mbbsNotes.filter(n => n.uploadedByUserId === userProfile.id || n.uploadedByEmail === userProfile.email).length
+    ? mbbsNotes.filter(
+        n =>
+          n.uploadedByUserId === userProfile.id ||
+          n.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase()
+      ).length
     : 0;
-  const pendingCount = userProfile?.role === 'admin' ? mbbsNotes.filter(n => n.status === 'pending').length : 0;
+
+  const handleDeleteNoteClick = async (noteId: string) => {
+    if (!userProfile) return;
+    setDeleteError(null);
+    setDeletingNoteId(noteId);
+    try {
+      await onDeleteNote(noteId);
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Failed to delete study note.');
+    } finally {
+      setDeletingNoteId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -323,7 +260,7 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
               : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
           }`}
         >
-          Verified Notes ({mbbsNotes.filter(n => n.status === 'approved').length})
+          Study Notes ({mbbsNotes.length})
         </button>
 
         {userProfile && (
@@ -353,21 +290,6 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
           <MessageSquarePlus size={13} />
           <span>Resource Requests ({requests.length})</span>
         </button>
-
-        {userProfile?.role === 'admin' && (
-          <button
-            type="button"
-            onClick={() => setTab('pending')}
-            className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors min-h-[40px] flex items-center gap-1.5 ${
-              tab === 'pending'
-                ? 'bg-amber-600 text-white'
-                : 'bg-[var(--card)] border border-amber-300 text-amber-700 dark:text-amber-300'
-            }`}
-          >
-            <ShieldCheck size={13} />
-            <span>Pending Moderation ({pendingCount})</span>
-          </button>
-        )}
       </div>
 
       {/* Resource Requests View */}
@@ -564,12 +486,19 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
             </div>
           </div>
 
+          {deleteError && (
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
+              <span>{deleteError}</span>
+            </div>
+          )}
+
           {/* List */}
           {filtered.length === 0 ? (
             <div className="empty space-y-2">
               <BookOpen size={36} className="mx-auto mb-1 opacity-50" />
               <div className="font-bold text-[var(--ink)]">
-                No verified study notes found for {profConfig.shortLabel}
+                No study notes found for {profConfig.shortLabel}
               </div>
               <p className="text-xs text-[var(--mut)] mt-1 max-w-md mx-auto">
                 Clear filters, upload a study note, or log a request in the Resource Requests tab.
@@ -663,19 +592,9 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
 
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--line)] text-xs">
                       <div>
-                        {res.status === 'approved' ? (
-                          <span className="badge ok">
-                            <CheckCircle2 size={12} /> Verified
-                          </span>
-                        ) : res.status === 'rejected' ? (
-                          <span className="badge demo">
-                            <AlertCircle size={12} /> Rejected
-                          </span>
-                        ) : (
-                          <span className="badge demo">
-                            <Clock size={12} /> Pending
-                          </span>
-                        )}
+                        <span className="badge ok">
+                          <CheckCircle2 size={12} /> Published
+                        </span>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -700,33 +619,21 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
                             <span>Open File</span>
                           </a>
                         )}
-                        {isAdmin && res.status === 'pending' && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => onModerateNote(res.id, 'approved')}
-                              className="btn sm good min-h-[36px]"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => onModerateNote(res.id, 'rejected')}
-                              className="btn sm alt text-rose-600 min-h-[36px]"
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {(isOwner || isAdmin) && (
+                        {(isAdmin || isOwner) && (
                           <button
                             type="button"
-                            onClick={() => onDeleteNote(res.id)}
-                            className="p-2 rounded text-[var(--mut)] hover:text-rose-600"
+                            disabled={deletingNoteId === res.id}
+                            onClick={() => handleDeleteNoteClick(res.id)}
+                            className="btn sm alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10 min-h-[36px]"
                             title="Delete note"
                             aria-label="Delete note"
                           >
-                            <Trash2 size={14} />
+                            {deletingNoteId === res.id ? (
+                              <Loader2 size={13} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={13} />
+                            )}
+                            <span>{deletingNoteId === res.id ? 'Deleting...' : 'Delete'}</span>
                           </button>
                         )}
                       </div>
@@ -843,7 +750,7 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
       });
 
       setSuccess(
-        'Study note submitted! Status is pending — it is awaiting admin approval and will appear in Verified Notes once approved.'
+        'Study note submitted and published live to the Notes Library!'
       );
       setTitle('');
       setTopic('');

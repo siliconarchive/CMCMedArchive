@@ -291,11 +291,7 @@ export function mapAppsScriptPaperToSubmission(raw: AppsScriptPaperRecord): Ques
 export function mapAppsScriptNoteToUploadedItem(raw: AppsScriptNoteRecord): UploadedItem {
   const normStatus = normalizeItemStatus(raw.status);
   const safeStatus: 'pending' | 'approved' | 'rejected' =
-    normStatus === 'approved'
-      ? 'approved'
-      : normStatus === 'rejected'
-        ? 'rejected'
-        : 'pending';
+    normStatus === 'rejected' ? 'rejected' : 'approved';
   const mime = String(raw.mime_type || '');
   const ft = String(raw.file_type || '').toLowerCase();
   const kind = ft === 'image' || mime.startsWith('image/') ? 'Diagram' : 'Notes';
@@ -333,7 +329,7 @@ export async function submitPaperToAppsScript(
     (data.item as AppsScriptPaperRecord) || {
       id: `paper_${Date.now()}`,
       ...payload,
-      status: 'pending',
+      status: 'approved',
       created_at: new Date().toISOString()
     }
   );
@@ -350,7 +346,10 @@ export async function listPapersRawFromAppsScript(): Promise<AppsScriptPaperReco
 export async function listApprovedPapersFromAppsScript(): Promise<PublishedPaper[]> {
   const rawList = await listPapersRawFromAppsScript();
   return rawList
-    .filter(p => normalizeItemStatus(p.status) === 'approved')
+    .filter(p => {
+      const s = normalizeItemStatus(p.status);
+      return s !== 'deleted' && s !== 'rejected';
+    })
     .map(mapAppsScriptPaperToPublished);
 }
 
@@ -366,7 +365,7 @@ export async function submitNoteToAppsScript(
     (data.item as AppsScriptNoteRecord) || {
       id: `note_${Date.now()}`,
       ...payload,
-      status: 'pending',
+      status: 'approved',
       created_at: new Date().toISOString()
     }
   );

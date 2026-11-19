@@ -52,6 +52,7 @@ interface SubmitQuestionPapersProps {
   onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
   onPaperSubmitted?: () => Promise<void>;
+  onDeletePaper?: (id: string) => Promise<void>;
   initialHubTab?: 'submit' | 'community';
   onNavigate: (page: PageRoute) => void;
 }
@@ -90,6 +91,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   onToggleBookmark,
   onRecordRecentView,
   onPaperSubmitted,
+  onDeletePaper,
   initialHubTab = 'submit',
   onNavigate
 }) => {
@@ -443,7 +445,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
           <p className="text-sm text-[var(--mut)] m-0">
             {hubTab === 'submit'
               ? 'Submit Card, Term, or MCQ papers via PDF, Multiple Images, or Google Drive links.'
-              : 'Browse administrator-approved Card, Term, and MCQ papers for your selected Professional Examination.'}
+              : 'Browse community Card, Term, and MCQ papers for your selected Professional Examination.'}
           </p>
         </div>
 
@@ -486,9 +488,11 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
           selectedProf={selectedProf}
           publishedPapers={publishedPapers}
           customTaxonomy={customTaxonomy}
+          userProfile={userProfile}
           studyState={studyState}
           onToggleBookmark={onToggleBookmark}
           onRecordRecentView={onRecordRecentView}
+          onDeletePaper={onDeletePaper}
           onSwitchToSubmitTab={() => setHubTab('submit')}
           onNavigate={onNavigate}
         />
@@ -524,7 +528,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
               </button>
             </div>
             <span className="text-[11px] text-[var(--mut)] px-2">
-              Only admin-approved papers appear in Community Uploads
+              Submitted papers go live immediately in Community Uploads
             </span>
           </div>
 
@@ -539,16 +543,21 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
               <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-extrabold text-base">
                 <CheckCircle2 size={20} />
-                <span>Question Paper Submitted &amp; Awaiting Admin Approval!</span>
+                <span>Question Paper Published Live!</span>
               </div>
               <p className="text-xs sm:text-sm text-[var(--ink-secondary)] m-0">
                 Tracking ID: <b className="font-mono text-[var(--ink)]">{submittedRecord.id}</b> &bull; Status:{' '}
-                <span className="font-bold">Pending Admin Approval (pending)</span> &bull; Examination Stage:{' '}
-                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. It will stay hidden from the public Question Papers archive until an administrator approves it.
+                <span className="font-bold text-emerald-700 dark:text-emerald-300">Live</span> &bull; Examination Stage:{' '}
+                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. Your paper is now visible to all students in Community Uploads.
               </p>
-              <button type="button" onClick={() => setActiveView('track')} className="btn sm good">
-                View My Submissions &rarr;
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => setHubTab('community')} className="btn sm good">
+                  View in Community Uploads &rarr;
+                </button>
+                <button type="button" onClick={() => setActiveView('track')} className="btn sm alt">
+                  View My Submissions
+                </button>
+              </div>
             </div>
           )}
 
