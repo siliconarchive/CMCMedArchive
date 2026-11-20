@@ -104,11 +104,11 @@ export const AboutPlatformPage: React.FC<{ onNavigate: (page: PageRoute) => void
           <li><b>Moore&rsquo;s</b> Clinically Oriented Anatomy (9th Ed.)</li>
         </ul>
 
-        <div className="pt-3 flex flex-wrap gap-3">
-          <button type="button" onClick={() => onNavigate('archive')} className="btn min-h-[44px]">
+        <div className="pt-3 flex flex-col sm:flex-row sm:flex-wrap gap-3">
+          <button type="button" onClick={() => onNavigate('archive')} className="btn min-h-[44px] w-full sm:w-auto">
             Explore Question Archive &rarr;
           </button>
-          <button type="button" onClick={() => onNavigate('developer')} className="btn alt min-h-[44px]">
+          <button type="button" onClick={() => onNavigate('developer')} className="btn alt min-h-[44px] w-full sm:w-auto">
             About the Developer
           </button>
         </div>
@@ -166,8 +166,8 @@ export const AboutDeveloperPage: React.FC = () => {
       </div>
 
       {/* Community Contact */}
-      <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 flex items-center justify-between gap-4">
-        <div>
+      <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="min-w-0">
           <div className="text-sm font-bold text-[var(--ink)]">Academic Feedback &amp; Community</div>
           <div className="text-xs text-[var(--mut)] mt-0.5">
             Connect directly on Telegram for suggestions, corrections, or collaboration
@@ -177,11 +177,12 @@ export const AboutDeveloperPage: React.FC = () => {
           href={TELEGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="telegram-icon-btn dark shrink-0 !w-10 !h-10"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--line)] bg-[var(--bg-subtle)] hover:border-[#229ED9] text-xs font-bold text-[var(--ink)] no-underline shrink-0 min-h-[42px]"
           title="Connect on Telegram"
           aria-label="Connect on Telegram"
         >
-          <TelegramIcon className="w-5 h-5 text-[#229ED9]" />
+          <TelegramIcon className="w-4 h-4 text-[#229ED9]" />
+          <span>Join Telegram</span>
         </a>
       </div>
     </div>

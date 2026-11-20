@@ -22,8 +22,10 @@ import {
   Bookmark,
   Clock,
   BarChart3,
-  RotateCcw
+  RotateCcw,
+  ArrowLeft
 } from 'lucide-react';
+import { BackNavContext, BackNavContextValue } from './utils/BackNavContext';
 import { CmcLogo } from './components/CmcLogo';
 import { FloatingMedicalElements } from './components/FloatingMedicalElements';
 import { AnnouncementPopup } from './components/AnnouncementPopup';
@@ -66,7 +68,12 @@ import {
   toggleBookmarkInState
 } from './data/studyTracker';
 
-import { appsScriptLogin, appsScriptRegister } from './utils/appsScriptAuth';
+import {
+  appsScriptLogin,
+  appsScriptRegister,
+  isAdminUser,
+  normalizeUserRole
+} from './utils/appsScriptAuth';
 import {
   listApprovedPapersFromAppsScript,
   listNotesFromAppsScript,
@@ -79,13 +86,47 @@ const AUTH_USER_KEY = 'cmc_auth_user';
 const ANNOUNCEMENT_SEEN_KEY = 'cmc_announcement_dismissed';
 const PROF_STORAGE_KEY = 'cmc_selected_prof';
 
+const PAGE_LABELS: Record<PageRoute, string> = {
+  home: 'Home',
+  archive: 'Written Questions',
+  question: 'Written Questions',
+  mcq: 'MCQ Practice',
+  exam: 'Examination System',
+  'wrong-review': 'Wrong Review',
+  submit: 'Question Papers',
+  community: 'Community Uploads',
+  library: 'Notes Library',
+  upload: 'Upload Note',
+  teacher: 'Viva Bank',
+  profile: 'Profile',
+  settings: 'Settings',
+  admin: 'Admin Panel',
+  contributors: 'Contributors',
+  notices: 'Notices',
+  about: 'About',
+  developer: 'Developer'
+};
+
+interface HistoryEntry {
+  seq: number;
+  page: PageRoute;
+  profileTab: ProfileTab;
+  layerId?: string;
+  label?: string;
+  onUndo?: () => void;
+  inactive?: boolean;
+}
+
 function loadStoredAuthUser(): UserProfile | null {
   try {
     const raw = localStorage.getItem(AUTH_USER_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as UserProfile;
     if (parsed && typeof parsed.id === 'string' && typeof parsed.email === 'string') {
-      return parsed;
+      return {
+        ...parsed,
+        role: normalizeUserRole(parsed.role)
+      };
     }
     return null;
   } catch {
@@ -196,27 +237,288 @@ export default function App() {
     years: []
   });
 
-  const navigateTo = useCallback((target: PageRoute) => {
-    if (target === 'settings') {
-      setProfileTab('settings');
-      setPage('profile');
-    } else if (target === 'profile') {
-      setPage('profile');
-    } else {
-      setPage(target);
-    }
-    setMobileMenuOpen(false);
-    setOpenMenuGroup(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const historyStackRef = useRef<HistoryEntry[]>([
+    { seq: 0, page: 'home', profileTab: 'info', label: 'Home' }
+  ]);
+  const seqCounterRef = useRef<number>(1);
+  const authLayerRef = useRef<string | null>(null);
+  const [, setNavRevision] = useState<number>(0);
+
+  const syncNavState = useCallback(() => {
+    setNavRevision(r => r + 1);
   }, []);
 
-  const openProfileSection = useCallback((tab: ProfileTab) => {
-    setProfileTab(tab);
-    setPage('profile');
-    setMobileMenuOpen(false);
-    setOpenMenuGroup(null);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  useEffect(() => {
+    try {
+      window.history.replaceState({ cmcSeq: 0 }, '');
+    } catch {}
+
+    const handlePopState = (event: PopStateEvent) => {
+      const targetSeq =
+        event.state && typeof event.state.cmcSeq === 'number' ? event.state.cmcSeq : 0;
+      const stack = historyStackRef.current;
+
+      while (stack.length > 1 && stack[stack.length - 1].seq > targetSeq) {
+        const popped = stack.pop();
+        if (popped && popped.onUndo && !popped.inactive) {
+          try {
+            popped.onUndo();
+          } catch {}
+        }
+      }
+
+      const activeTop = stack[stack.length - 1] || {
+        seq: 0,
+        page: 'home' as PageRoute,
+        profileTab: 'info' as ProfileTab
+      };
+      setPage(activeTop.page);
+      setProfileTab(activeTop.profileTab);
+      setMobileMenuOpen(false);
+      setOpenMenuGroup(null);
+      syncNavState();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [syncNavState]);
+
+  const pushSubLayer = useCallback(
+    (label: string, onUndo: () => void): string => {
+      const seq = seqCounterRef.current++;
+      const layerId = `layer_${seq}`;
+      const stack = historyStackRef.current;
+      const current = stack[stack.length - 1] || {
+        seq: 0,
+        page: 'home' as PageRoute,
+        profileTab: 'info' as ProfileTab
+      };
+      stack.push({
+        seq,
+        page: current.page,
+        profileTab: current.profileTab,
+        layerId,
+        label,
+        onUndo
+      });
+      try {
+        window.history.pushState({ cmcSeq: seq }, '');
+      } catch {}
+      syncNavState();
+      return layerId;
+    },
+    [syncNavState]
+  );
+
+  const markLayerInactive = useCallback(
+    (layerId: string | null) => {
+      if (!layerId) return;
+      const entry = historyStackRef.current.find(e => e.layerId === layerId);
+      if (entry) {
+        entry.inactive = true;
+        syncNavState();
+      }
+    },
+    [syncNavState]
+  );
+
+  const popSubLayer = useCallback(
+    (layerId: string | null) => {
+      if (!layerId) return;
+      const stack = historyStackRef.current;
+      const top = stack[stack.length - 1];
+      const currentSeq =
+        window.history.state && typeof window.history.state.cmcSeq === 'number'
+          ? window.history.state.cmcSeq
+          : null;
+
+      if (top && top.layerId === layerId && !top.inactive && currentSeq === top.seq) {
+        window.history.back();
+        return;
+      }
+
+      const target = stack.find(e => e.layerId === layerId);
+      if (target && !target.inactive) {
+        target.inactive = true;
+        if (target.onUndo) {
+          try {
+            target.onUndo();
+          } catch {}
+        }
+        syncNavState();
+      }
+    },
+    [syncNavState]
+  );
+
+  const computeBackInfo = (): { canGoBack: boolean; backLabel: string; stepsBack: number } => {
+    const stack = historyStackRef.current;
+    let topIdx = stack.length - 1;
+    let stepsBack = 1;
+    while (topIdx > 0 && stack[topIdx].inactive) {
+      topIdx--;
+      stepsBack++;
+    }
+    if (topIdx <= 0) {
+      return { canGoBack: false, backLabel: 'Back', stepsBack: 0 };
+    }
+    const activeTop = stack[topIdx];
+    if (activeTop.layerId && activeTop.label) {
+      return { canGoBack: true, backLabel: activeTop.label, stepsBack };
+    }
+    let prevIdx = topIdx - 1;
+    while (prevIdx > 0 && stack[prevIdx].inactive) {
+      prevIdx--;
+    }
+    const prevEntry = stack[Math.max(0, prevIdx)];
+    return {
+      canGoBack: true,
+      backLabel: PAGE_LABELS[prevEntry.page] || 'Back',
+      stepsBack
+    };
+  };
+
+  const { canGoBack, backLabel, stepsBack } = computeBackInfo();
+
+  const goBack = useCallback(() => {
+    const info = computeBackInfo();
+    if (!info.canGoBack) return;
+    const stack = historyStackRef.current;
+    const currentSeq =
+      window.history.state && typeof window.history.state.cmcSeq === 'number'
+        ? window.history.state.cmcSeq
+        : stack[stack.length - 1]?.seq;
+
+    if (currentSeq !== undefined && stack.length > 1) {
+      window.history.go(-info.stepsBack);
+      return;
+    }
+
+    // Fallback if browser history state is unavailable
+    for (let i = 0; i < info.stepsBack && stack.length > 1; i++) {
+      const popped = stack.pop();
+      if (popped && popped.onUndo && !popped.inactive) {
+        try {
+          popped.onUndo();
+        } catch {}
+      }
+    }
+    const nextTop = stack[stack.length - 1];
+    if (nextTop) {
+      setPage(nextTop.page);
+      setProfileTab(nextTop.profileTab);
+    }
+    syncNavState();
+  }, [syncNavState]);
+
+  const navigateTo = useCallback(
+    (target: PageRoute) => {
+      const nextPage: PageRoute = target === 'settings' ? 'profile' : target;
+      const nextProfileTab: ProfileTab = target === 'settings' ? 'settings' : 'info';
+
+      const stack = historyStackRef.current;
+      const current = stack[stack.length - 1];
+      const alreadySame =
+        current &&
+        !current.layerId &&
+        current.page === nextPage &&
+        (nextPage !== 'profile' || current.profileTab === nextProfileTab);
+
+      if (!alreadySame) {
+        const seq = seqCounterRef.current++;
+        stack.push({
+          seq,
+          page: nextPage,
+          profileTab: nextPage === 'profile' ? nextProfileTab : current?.profileTab || 'info',
+          label: PAGE_LABELS[nextPage] || 'Back'
+        });
+        try {
+          window.history.pushState({ cmcSeq: seq }, '');
+        } catch {}
+      }
+
+      if (target === 'settings') {
+        setProfileTab('settings');
+        setPage('profile');
+      } else if (target === 'profile') {
+        setPage('profile');
+      } else {
+        setPage(target);
+      }
+      setMobileMenuOpen(false);
+      setOpenMenuGroup(null);
+      syncNavState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [syncNavState]
+  );
+
+  const openProfileSection = useCallback(
+    (tab: ProfileTab) => {
+      const stack = historyStackRef.current;
+      const current = stack[stack.length - 1];
+      const alreadySame =
+        current && !current.layerId && current.page === 'profile' && current.profileTab === tab;
+
+      if (!alreadySame) {
+        const seq = seqCounterRef.current++;
+        stack.push({
+          seq,
+          page: 'profile',
+          profileTab: tab,
+          label: 'Profile'
+        });
+        try {
+          window.history.pushState({ cmcSeq: seq }, '');
+        } catch {}
+      }
+
+      setProfileTab(tab);
+      setPage('profile');
+      setMobileMenuOpen(false);
+      setOpenMenuGroup(null);
+      syncNavState();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [syncNavState]
+  );
+
+  const openAuthModal = useCallback(
+    (mode: 'signin' | 'signup') => {
+      setAuthError(null);
+      setAuthSuccess(null);
+      if (!authLayerRef.current) {
+        const stack = historyStackRef.current;
+        const current = stack[stack.length - 1];
+        const returnLabel = current ? PAGE_LABELS[current.page] || 'Back' : 'Back';
+        authLayerRef.current = pushSubLayer(returnLabel, () => {
+          authLayerRef.current = null;
+          setAuthModal(null);
+        });
+      }
+      setAuthModal(mode);
+    },
+    [pushSubLayer]
+  );
+
+  const closeAuthModal = useCallback(() => {
+    if (authLayerRef.current) {
+      const id = authLayerRef.current;
+      authLayerRef.current = null;
+      popSubLayer(id);
+    } else {
+      setAuthModal(null);
+    }
+  }, [popSubLayer]);
+
+  const backNavValue: BackNavContextValue = {
+    canGoBack,
+    backLabel,
+    goBack,
+    pushSubLayer,
+    popSubLayer,
+    markLayerInactive
+  };
 
   const updateStudyState = useCallback(
     (updater: (prev: StudyState) => StudyState) => {
@@ -326,9 +628,13 @@ export default function App() {
           if (res.ok) {
             const data = await res.json();
             if (data.user) {
-              setUserProfile(data.user);
+              const normalizedUser: UserProfile = {
+                ...data.user,
+                role: normalizeUserRole(data.user.role)
+              };
+              setUserProfile(normalizedUser);
               try {
-                localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+                localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
               } catch {}
             }
           }
@@ -429,6 +735,7 @@ export default function App() {
   // Load user session & all dynamic platform data
   const loadPlatformData = async (tokenOverride?: string | null) => {
     const tok = tokenOverride !== undefined ? tokenOverride : authToken;
+    const isAuthenticated = Boolean(tok || loadStoredAuthUser());
     const headers: Record<string, string> = {};
     if (tok) headers.Authorization = `Bearer ${tok}`;
 
@@ -452,22 +759,31 @@ export default function App() {
         allAnnRes,
         studyRes
       ] = await Promise.all([
-        listApprovedPapersFromAppsScript().catch(err => {
-          console.error('Failed to load papers from Apps Script:', err);
-          return null;
-        }),
-        listNotesFromAppsScript().catch(err => {
-          console.error('Failed to load notes from Apps Script:', err);
-          return null;
-        }),
+        isAuthenticated
+          ? listApprovedPapersFromAppsScript().catch(err => {
+              console.error('Failed to load papers from Apps Script:', err);
+              return null;
+            })
+          : Promise.resolve([]),
+        isAuthenticated
+          ? listNotesFromAppsScript().catch(err => {
+              console.error('Failed to load notes from Apps Script:', err);
+              return null;
+            })
+          : Promise.resolve([]),
         ...requests
       ]);
 
-      if (Array.isArray(gsNotesResult)) {
-        setNotes(gsNotesResult);
-      }
-      if (Array.isArray(gsPapersResult)) {
-        setPublishedPapers(gsPapersResult);
+      if (!isAuthenticated) {
+        setNotes([]);
+        setPublishedPapers([]);
+      } else {
+        if (Array.isArray(gsNotesResult)) {
+          setNotes(gsNotesResult);
+        }
+        if (Array.isArray(gsPapersResult)) {
+          setPublishedPapers(gsPapersResult);
+        }
       }
       if (archiveRes.ok) {
         const ad = await archiveRes.json();
@@ -535,8 +851,12 @@ export default function App() {
           localStorage.setItem(AUTH_TOKEN_KEY, data.token);
           setAuthToken(data.token);
           if (data.user) {
-            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
-            setUserProfile(data.user);
+            const normalizedUser: UserProfile = {
+              ...data.user,
+              role: normalizeUserRole(data.user.role)
+            };
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
+            setUserProfile(normalizedUser);
           }
           return data.token as string;
         }
@@ -599,7 +919,7 @@ export default function App() {
       setAuthSuccess('Signed in successfully.');
       await loadPlatformData(token);
       setTimeout(() => {
-        setAuthModal(null);
+        closeAuthModal();
         setAuthSuccess(null);
       }, 600);
     } catch (err: any) {
@@ -656,7 +976,7 @@ export default function App() {
       setAuthSuccess('Account created successfully.');
       await loadPlatformData(token);
       setTimeout(() => {
-        setAuthModal(null);
+        closeAuthModal();
         setAuthSuccess(null);
       }, 600);
     } catch (err: any) {
@@ -677,19 +997,25 @@ export default function App() {
     localStorage.removeItem(AUTH_USER_KEY);
     setAuthToken(null);
     setUserProfile(null);
-    if (page === 'admin') setPage('home');
+    setPublishedPapers([]);
+    setNotes([]);
+    if (page === 'admin') navigateTo('home');
     await loadPlatformData(null);
   };
 
   const handleDeletePaper = async (id: string) => {
-    if (userProfile?.role !== 'admin') return;
+    if (!isAdminUser(userProfile)) {
+      throw new Error('Administrator privileges required to delete question papers.');
+    }
     await updateArchiveItemStatus('paper', id, 'deleted');
     setPublishedPapers(prev => prev.filter(p => p.id !== id));
     await loadPlatformData();
   };
 
   const handleDeleteNote = async (id: string) => {
-    if (!userProfile) return;
+    if (!userProfile) {
+      throw new Error('Authentication required to delete study notes.');
+    }
     await updateArchiveItemStatus('note', id, 'deleted');
     setNotes(prev => prev.filter(n => n.id !== id));
     await loadPlatformData();
@@ -723,9 +1049,10 @@ export default function App() {
   ).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--ink)] relative">
-      {/* Restrained Medical Background Illustrations (hidden during active exam) */}
-      <FloatingMedicalElements page={page} dimmed={examActive} />
+    <BackNavContext.Provider value={backNavValue}>
+      <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--ink)] relative">
+        {/* Restrained Medical Background Illustrations (hidden during active exam) */}
+        <FloatingMedicalElements page={page} dimmed={examActive} />
 
       {/* Header — 5 Clean Consolidated Main Navigation Items */}
       <header className="ed-header">
@@ -922,7 +1249,7 @@ export default function App() {
                     <span>Study Progress</span>
                     <BarChart3 size={14} className="text-[#0D9488]" />
                   </button>
-                  {userProfile?.role === 'admin' && (
+                  {isAdminUser(userProfile) && (
                     <>
                       <div className="my-1 border-t border-[var(--line-light)]" />
                       <button
@@ -956,11 +1283,7 @@ export default function App() {
             {!userProfile ? (
               <button
                 type="button"
-                onClick={() => {
-                  setAuthError(null);
-                  setAuthSuccess(null);
-                  setAuthModal('signin');
-                }}
+                onClick={() => openAuthModal('signin')}
                 className="btn sm min-h-[40px] !px-3"
                 aria-label="Sign In"
               >
@@ -1095,7 +1418,7 @@ export default function App() {
               </button>
             </div>
 
-            {userProfile?.role === 'admin' && (
+            {isAdminUser(userProfile) && (
               <button
                 type="button"
                 onClick={() => navigateTo('admin')}
@@ -1112,6 +1435,20 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className={`flex-1 wrap py-5 sm:py-9 relative z-10 ${showMobileBottomNav ? 'pb-8 lg:pb-12' : ''}`}>
+        {/* Contextual History-Aware Back Button */}
+        {!examActive && canGoBack && page !== 'home' && (
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={goBack}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--card)] border border-[var(--line)] text-xs font-bold text-[var(--ink-secondary)] hover:text-[#0D9488] hover:border-[#0D9488] transition-colors min-h-[36px]"
+            >
+              <ArrowLeft size={14} />
+              <span>Back to {backLabel}</span>
+            </button>
+          </div>
+        )}
+
         {/* Contextual Section Sub-Navigation Bar for Study & Practice */}
         {!examActive && isStudyActive && (
           <div className="mb-5 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-[var(--line-light)]">
@@ -1426,6 +1763,7 @@ export default function App() {
             onRecordRecentView={handleRecordRecentView}
             onPaperSubmitted={() => loadPlatformData()}
             onDeletePaper={handleDeletePaper}
+            onOpenAuth={openAuthModal}
             initialHubTab={page === 'community' ? 'community' : 'submit'}
             onNavigate={navigateTo}
           />
@@ -1441,6 +1779,7 @@ export default function App() {
             studyState={studyState}
             onToggleBookmark={handleToggleBookmark}
             onRecordRecentView={handleRecordRecentView}
+            onOpenAuth={openAuthModal}
             onNavigate={navigateTo}
             onDeleteNote={handleDeleteNote}
           />
@@ -1452,11 +1791,7 @@ export default function App() {
             customTaxonomy={customTaxonomy}
             userProfile={userProfile}
             authToken={authToken}
-            onOpenAuth={mode => {
-              setAuthError(null);
-              setAuthSuccess(null);
-              setAuthModal(mode);
-            }}
+            onOpenAuth={openAuthModal}
             onUploadComplete={() => loadPlatformData()}
             onNavigate={navigateTo}
           />
@@ -1467,6 +1802,7 @@ export default function App() {
             selectedProf={selectedProf}
             customTaxonomy={customTaxonomy}
             userProfile={userProfile}
+            onOpenAuth={openAuthModal}
             onNavigate={navigateTo}
           />
         )}
@@ -1480,11 +1816,7 @@ export default function App() {
             initialTab={page === 'settings' ? 'settings' : profileTab}
             onUpdateProf={persistSelectedProf}
             onRemoveBookmark={handleToggleBookmark}
-            onOpenAuth={mode => {
-              setAuthError(null);
-              setAuthSuccess(null);
-              setAuthModal(mode);
-            }}
+            onOpenAuth={openAuthModal}
             onLogout={handleLogout}
             onNavigate={(dest, opts) => {
               if (opts?.subject) setArchiveSubject(opts.subject);
@@ -1495,7 +1827,13 @@ export default function App() {
         )}
 
         {page === 'contributors' && (
-          <ContributorsPage contributors={contributors} onNavigate={navigateTo} />
+          <ContributorsPage
+            contributors={contributors}
+            userProfile={userProfile}
+            authToken={authToken}
+            onRefreshContributors={() => loadPlatformData()}
+            onNavigate={navigateTo}
+          />
         )}
 
         {page === 'notices' && (
@@ -1523,48 +1861,92 @@ export default function App() {
             publishedPapers={publishedPapers}
             onRefreshAll={() => loadPlatformData()}
             onDeleteNote={handleDeleteNote}
+            onDeletePaper={handleDeletePaper}
           />
         )}
       </main>
 
       {/* Footer */}
       <footer className={`relative z-10 ${showMobileBottomNav ? 'pb-24 lg:pb-10' : ''}`}>
-        <div className="wrap space-y-5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
-            <div className="flex items-center gap-3 min-w-0">
-              <CmcLogo variant="compact" size="sm" />
-              <div className="text-xs text-[var(--mut)] leading-snug">
-                Chittagong Medical College &middot; MBBS Question Archive &amp; Online Examination
+        <div className="wrap space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8">
+            {/* Brand & About */}
+            <div className="md:col-span-5 space-y-3 min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <CmcLogo variant="compact" size="sm" />
+                <div className="min-w-0">
+                  <div className="text-sm font-extrabold text-[var(--ink)] tracking-tight">
+                    CMC MedArchive
+                  </div>
+                  <div className="text-xs text-[var(--mut)] leading-snug">
+                    Chittagong Medical College &middot; MBBS Question Archive &amp; Exam Platform
+                  </div>
+                </div>
+              </div>
+              <p className="text-xs sm:text-[13px] text-[var(--ink-secondary)] leading-relaxed m-0">
+                A structured medical academic archive for students—organizing Written (CQ) questions, SBA &amp; True/False drills, Viva banks, and verified peer study notes in one calm, searchable workspace.
+              </p>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D9488]">
+                <Clock size={13} className="shrink-0" />
+                <span>Functional since November 2026</span>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-xs font-semibold">
-              {[
-                { id: 'contributors' as PageRoute, label: 'Contributors' },
-                { id: 'notices' as PageRoute, label: 'Notices' },
-                { id: 'about' as PageRoute, label: 'About' },
-                { id: 'developer' as PageRoute, label: 'Developer' },
-                { id: 'settings' as PageRoute, label: 'Settings' }
-              ].map(link => (
-                <button
-                  key={link.id}
-                  type="button"
-                  onClick={() => navigateTo(link.id)}
-                  className="text-[var(--ink-secondary)] hover:text-[#0D9488] bg-transparent border-0 p-0 min-h-[32px]"
-                >
-                  {link.label}
-                </button>
-              ))}
+            {/* Navigation Links */}
+            <div className="md:col-span-4 space-y-2.5 min-w-0">
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink)]">
+                Platform &amp; Credits
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs font-semibold">
+                {[
+                  { id: 'contributors' as PageRoute, label: 'Contributors & Team' },
+                  { id: 'notices' as PageRoute, label: 'Notices' },
+                  { id: 'about' as PageRoute, label: 'About' },
+                  { id: 'developer' as PageRoute, label: 'Developer' },
+                  { id: 'settings' as PageRoute, label: 'Settings' }
+                ].map(link => (
+                  <button
+                    key={link.id}
+                    type="button"
+                    onClick={() => navigateTo(link.id)}
+                    className="text-left text-[var(--ink-secondary)] hover:text-[#0D9488] bg-transparent border-0 p-0 min-h-[34px] flex items-center"
+                  >
+                    {link.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Communication */}
+            <div className="md:col-span-3 space-y-2.5 min-w-0">
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-[var(--ink)]">
+                Communication
+              </div>
+              <p className="text-xs text-[var(--mut)] leading-relaxed m-0">
+                Questions, paper contributions, or suggestions? Connect with the community on Telegram.
+              </p>
               <a
                 href={TELEGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="telegram-icon-btn dark !w-9 !h-9"
-                title="Join us on Telegram"
-                aria-label="Join us on Telegram"
+                className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-[var(--line)] bg-[var(--bg-subtle)] hover:border-[#229ED9] text-xs font-bold text-[var(--ink)] no-underline min-h-[42px] w-full sm:w-auto transition-colors"
+                title="Join Telegram Community"
+                aria-label="Join Telegram Community"
               >
-                <TelegramIcon className="w-4 h-4" />
+                <TelegramIcon className="w-4 h-4 text-[#229ED9] shrink-0" />
+                <span>Join Telegram</span>
               </a>
+            </div>
+          </div>
+
+          {/* Bottom Legal & Milestone Strip */}
+          <div className="pt-4 border-t border-[var(--line)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[var(--mut)]">
+            <div className="font-bold text-[var(--ink)]">
+              &copy;&#xFE0F;silicon &middot;{' '}
+              <span className="font-medium text-[var(--mut)]">CMC MedArchive</span>
+            </div>
+            <div className="font-medium">
+              Functional since November 2026
             </div>
           </div>
         </div>
@@ -1653,7 +2035,7 @@ export default function App() {
       {authModal && (
         <div
           className="modal-overlay"
-          onClick={() => setAuthModal(null)}
+          onClick={closeAuthModal}
           role="dialog"
           aria-modal="true"
         >
@@ -1667,7 +2049,7 @@ export default function App() {
               </div>
               <button
                 type="button"
-                onClick={() => setAuthModal(null)}
+                onClick={closeAuthModal}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-[var(--mut)] hover:text-[var(--ink)] hover:bg-[var(--card)]"
                 aria-label="Close modal"
               >
@@ -1806,6 +2188,7 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </BackNavContext.Provider>
   );
 }

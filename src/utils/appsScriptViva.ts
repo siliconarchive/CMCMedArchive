@@ -5,6 +5,7 @@ export const VIVA_APPS_SCRIPT_URL =
 
 export type VivaExaminerType = 'External' | 'Internal';
 export type VivaProfLabel = '1st Prof' | '2nd Prof' | '3rd Prof' | 'Final Prof';
+export type VivaApprovalStatus = 'pending' | 'approved' | 'rejected';
 
 export const VIVA_PROF_OPTIONS: VivaProfLabel[] = [
   '1st Prof',
@@ -24,6 +25,7 @@ export interface VivaItem {
   contributor_name: string;
   contributor_email: string;
   batch: string;
+  status: VivaApprovalStatus;
   created_at: string;
 }
 
@@ -37,10 +39,14 @@ export interface SubmitVivaPayload {
   contributor_name: string;
   contributor_email: string;
   batch: string;
+  status?: 'pending' | 'approved';
+  is_admin?: boolean;
 }
 
 interface RawVivaRecord {
-  id?: string;
+  id?: string | number;
+  viva_id?: string | number;
+  row_id?: string | number;
   prof?: string;
   subject?: string;
   examiner_type?: string;
@@ -51,6 +57,8 @@ interface RawVivaRecord {
   contributor_email?: string;
   batch?: string;
   status?: string;
+  is_admin?: boolean | string;
+  is_bank?: boolean | string;
   created_at?: string;
 }
 
@@ -59,12 +67,14 @@ interface VivaScriptResponse {
   success?: boolean;
   error?: string;
   message?: string;
-  id?: string;
+  id?: string | number;
   viva?: RawVivaRecord;
+  viva_list?: RawVivaRecord[];
   vivas?: RawVivaRecord[];
   items?: RawVivaRecord[];
   questions?: RawVivaRecord[];
-  data?: RawVivaRecord[];
+  item?: RawVivaRecord;
+  data?: RawVivaRecord[] | RawVivaRecord;
 }
 
 export function profIdToVivaProf(profId: ProfessionalExamId): VivaProfLabel {
@@ -93,9 +103,42 @@ export function normalizeExaminerType(raw?: string): VivaExaminerType {
   return String(raw || '').trim().toLowerCase() === 'internal' ? 'Internal' : 'External';
 }
 
-function mapRawVivaRecord(raw: RawVivaRecord, idx: number): VivaItem {
+function isTruthyFlag(val: unknown): boolean {
+  return val === true || String(val || '').trim().toLowerCase() === 'true';
+}
+
+export function normalizeVivaStatus(
+  rawStatus?: string,
+  rawRecord?: { is_admin?: unknown; is_bank?: unknown }
+): 'pending' | 'approved' | 'rejected' | 'deleted' {
+  const s = String(rawStatus || '').trim().toLowerCase();
+  if (s === 'approved' || s === 'published' || s === 'verified') return 'approved';
+  if (s === 'rejected') return 'rejected';
+  if (s === 'deleted') return 'deleted';
+  if (s === 'pending') return 'pending';
+  if (isTruthyFlag(rawRecord?.is_admin) || isTruthyFlag(rawRecord?.is_bank)) {
+    return 'approved';
+  }
+  return 'pending';
+}
+
+function mapRawVivaRecord(raw: RawVivaRecord, idx: number, fallbackStatus: VivaApprovalStatus = 'pending'): VivaItem {
+  const rawId = raw.id ?? raw.viva_id ?? raw.row_id;
+  const normStatus = raw.status !== undefined || raw.is_admin !== undefined || raw.is_bank !== undefined
+    ? normalizeVivaStatus(raw.status, raw)
+    : fallbackStatus;
+  const safeStatus: VivaApprovalStatus =
+    normStatus === 'approved'
+      ? 'approved'
+      : normStatus === 'rejected'
+        ? 'rejected'
+        : 'pending';
+
   return {
-    id: String(raw.id || `viva_${idx}_${Date.now()}`),
+    id:
+      rawId !== undefined && rawId !== null && String(rawId).trim() !== ''
+        ? String(rawId).trim()
+        : `viva_${idx}_${Date.now()}`,
     prof: normalizeVivaProf(raw.prof),
     subject: String(raw.subject || '').trim() || 'General',
     examiner_type: normalizeExaminerType(raw.examiner_type),
@@ -105,6 +148,7 @@ function mapRawVivaRecord(raw: RawVivaRecord, idx: number): VivaItem {
     contributor_name: String(raw.contributor_name || '').trim() || 'Student Contributor',
     contributor_email: String(raw.contributor_email || '').trim(),
     batch: String(raw.batch || '').trim(),
+    status: safeStatus,
     created_at: String(raw.created_at || new Date().toISOString())
   };
 }
@@ -134,10 +178,12 @@ async function postVivaScript(payload: Record<string, unknown>): Promise<VivaScr
   return data;
 }
 
-export async function listVivaFromAppsScript(): Promise<VivaItem[]> {
+export async function listVivaFromAppsScript(options?: {
+  includeUnapproved?: boolean;
+}): Promise<VivaItem[]> {
   const data = await postVivaScript({ action: 'list_viva' });
-  const rawList = data.viva
-    ? [data.viva]
+  const rawList = Array.isArray(data.viva_list)
+    ? data.viva_list
     : Array.isArray(data.vivas)
       ? data.vivas
       : Array.isArray(data.items)
@@ -146,34 +192,74 @@ export async function listVivaFromAppsScript(): Promise<VivaItem[]> {
           ? data.questions
           : Array.isArray(data.data)
             ? data.data
-            : [];
+            : data.viva
+              ? [data.viva]
+              : [];
 
   return rawList
     .filter(r => {
-      const s = String(r.status || '').trim().toLowerCase();
-      return s !== 'deleted' && s !== 'rejected' && Boolean(String(r.question || '').trim());
+      if (!String(r.question || '').trim()) return false;
+      const s = normalizeVivaStatus(r.status, r);
+      if (s === 'deleted') return false;
+      if (options?.includeUnapproved) return true;
+      return s === 'approved';
     })
-    .map(mapRawVivaRecord);
+    .map((r, idx) => mapRawVivaRecord(r, idx));
 }
 
 export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promise<VivaItem> {
+  const desiredStatus: VivaApprovalStatus = payload.status === 'approved' || payload.is_admin ? 'approved' : 'pending';
   const data = await postVivaScript({
     action: 'submit_viva',
-    ...payload
+    ...payload,
+    status: desiredStatus,
+    is_admin: Boolean(payload.is_admin)
   });
-  if (data.viva) {
-    return mapRawVivaRecord(data.viva, 0);
+  const created =
+    data.viva ||
+    data.item ||
+    (!Array.isArray(data.data) ? data.data : undefined);
+  if (created) {
+    return mapRawVivaRecord(created, 0, desiredStatus);
   }
   return {
     id: String(data.id || `viva_${Date.now()}`),
-    ...payload,
+    prof: payload.prof,
+    subject: payload.subject,
+    examiner_type: payload.examiner_type,
+    board_name: payload.board_name,
+    question: payload.question,
+    answer_hint: payload.answer_hint,
+    contributor_name: payload.contributor_name,
+    contributor_email: payload.contributor_email,
+    batch: payload.batch,
+    status: desiredStatus,
     created_at: new Date().toISOString()
   };
 }
 
+export async function updateVivaStatusFromAppsScript(
+  id: string,
+  status: 'approved' | 'rejected'
+): Promise<void> {
+  const cleanId = String(id || '').trim();
+  if (!cleanId) {
+    throw new Error('Missing Viva ID for status update.');
+  }
+  await postVivaScript({
+    action: 'update_viva_status',
+    id: cleanId,
+    status
+  });
+}
+
 export async function deleteVivaFromAppsScript(id: string): Promise<void> {
+  const cleanId = String(id || '').trim();
+  if (!cleanId) {
+    throw new Error('Missing Viva ID for deletion.');
+  }
   await postVivaScript({
     action: 'delete_viva',
-    id
+    id: cleanId
   });
 }

@@ -35,9 +35,19 @@ interface AppsScriptResponse {
   users?: AppsScriptUserRecord[];
 }
 
+export function normalizeUserRole(rawRole: unknown): UserRole {
+  const r = String(rawRole || '').trim().toLowerCase();
+  if (r === 'admin') return 'admin';
+  if (r === 'contributor') return 'contributor';
+  return 'student';
+}
+
+export function isAdminUser(user?: { role?: unknown } | null): boolean {
+  return String(user?.role || '').trim().toLowerCase() === 'admin';
+}
+
 export function mapAppsScriptUser(raw: AppsScriptUserRecord): UserProfile {
-  const safeRole: UserRole =
-    raw.role === 'admin' || raw.role === 'contributor' ? raw.role : 'student';
+  const safeRole = normalizeUserRole(raw.role);
 
   return {
     id: String(raw.id || ''),

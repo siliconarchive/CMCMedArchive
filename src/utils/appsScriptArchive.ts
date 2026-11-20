@@ -32,6 +32,8 @@ export interface AppsScriptPaperRecord {
   mime_type?: string;
   file_type?: string;
   status?: string;
+  is_admin?: boolean | string;
+  is_bank?: boolean | string;
   created_at?: string;
 }
 
@@ -51,6 +53,8 @@ export interface AppsScriptNoteRecord {
   mime_type?: string;
   file_type?: string;
   status?: string;
+  is_admin?: boolean | string;
+  is_bank?: boolean | string;
   created_at?: string;
 }
 
@@ -73,6 +77,8 @@ export interface SubmitPaperPayload {
   file_name: string;
   mime_type: string;
   file_type: string;
+  status?: 'pending' | 'approved';
+  is_admin?: boolean;
 }
 
 export interface SubmitNotePayload {
@@ -90,6 +96,8 @@ export interface SubmitNotePayload {
   file_name: string;
   mime_type: string;
   file_type: string;
+  status?: 'pending' | 'approved';
+  is_admin?: boolean;
 }
 
 interface ArchiveScriptResponse {
@@ -165,11 +173,22 @@ function normalizeProf(rawProf?: string): ProfessionalExamId {
   return 'First Professional';
 }
 
-function normalizeItemStatus(rawStatus?: string): 'pending' | 'approved' | 'rejected' | 'deleted' {
-  const s = String(rawStatus || 'pending').trim().toLowerCase();
+function isTruthyFlag(val: unknown): boolean {
+  return val === true || String(val || '').trim().toLowerCase() === 'true';
+}
+
+function normalizeItemStatus(
+  rawStatus?: string,
+  rawObj?: { is_admin?: unknown; is_bank?: unknown }
+): 'pending' | 'approved' | 'rejected' | 'deleted' {
+  const s = String(rawStatus || '').trim().toLowerCase();
   if (s === 'approved' || s === 'published' || s === 'verified') return 'approved';
   if (s === 'rejected') return 'rejected';
   if (s === 'deleted') return 'deleted';
+  if (s === 'pending') return 'pending';
+  if (isTruthyFlag(rawObj?.is_admin) || isTruthyFlag(rawObj?.is_bank)) {
+    return 'approved';
+  }
   return 'pending';
 }
 
@@ -205,8 +224,8 @@ export function mapAppsScriptPaperToPublished(raw: AppsScriptPaperRecord): Publi
     : null;
 
   return {
-    id: String(raw.id || ''),
-    submissionId: String(raw.id || ''),
+    id: String(raw.id || '').trim(),
+    submissionId: String(raw.id || '').trim(),
     category: inferCategory(raw),
     collegeName: String(raw.college_name || 'Chittagong Medical College (CMC)'),
     professionalExam: normalizeProf(raw.prof),
@@ -243,7 +262,7 @@ export function mapAppsScriptPaperToSubmission(raw: AppsScriptPaperRecord): Ques
   const method = inferMethod(raw);
   const fileUrl = String(raw.file_url || '').trim();
   const isDriveOnly = method === 'drive_link';
-  const normStatus = normalizeItemStatus(raw.status);
+  const normStatus = normalizeItemStatus(raw.status, raw);
   const displayStatus: SubmissionStatus =
     normStatus === 'approved'
       ? 'Approved'
@@ -252,7 +271,7 @@ export function mapAppsScriptPaperToSubmission(raw: AppsScriptPaperRecord): Ques
         : 'Pending';
 
   return {
-    id: String(raw.id || ''),
+    id: String(raw.id || '').trim(),
     category: inferCategory(raw),
     method,
     collegeName: String(raw.college_name || 'Chittagong Medical College (CMC)'),
@@ -289,15 +308,19 @@ export function mapAppsScriptPaperToSubmission(raw: AppsScriptPaperRecord): Ques
 }
 
 export function mapAppsScriptNoteToUploadedItem(raw: AppsScriptNoteRecord): UploadedItem {
-  const normStatus = normalizeItemStatus(raw.status);
+  const normStatus = normalizeItemStatus(raw.status, raw);
   const safeStatus: 'pending' | 'approved' | 'rejected' =
-    normStatus === 'rejected' ? 'rejected' : 'approved';
+    normStatus === 'approved'
+      ? 'approved'
+      : normStatus === 'rejected'
+        ? 'rejected'
+        : 'pending';
   const mime = String(raw.mime_type || '');
   const ft = String(raw.file_type || '').toLowerCase();
   const kind = ft === 'image' || mime.startsWith('image/') ? 'Diagram' : 'Notes';
 
   return {
-    id: String(raw.id || ''),
+    id: String(raw.id || '').trim(),
     fullName: String(raw.contributor_name || 'Student Contributor'),
     collegeName: String(raw.college_name || 'Chittagong Medical College (CMC)'),
     title: String(raw.title || 'Study Note'),
@@ -320,16 +343,19 @@ export function mapAppsScriptNoteToUploadedItem(raw: AppsScriptNoteRecord): Uplo
 export async function submitPaperToAppsScript(
   payload: SubmitPaperPayload
 ): Promise<AppsScriptPaperRecord> {
+  const desiredStatus = payload.status === 'approved' || payload.is_admin ? 'approved' : 'pending';
   const data = await postArchiveScript({
     action: 'submit_paper',
-    ...payload
+    ...payload,
+    status: desiredStatus,
+    is_admin: Boolean(payload.is_admin)
   });
   return (
     data.paper ||
     (data.item as AppsScriptPaperRecord) || {
       id: `paper_${Date.now()}`,
       ...payload,
-      status: 'approved',
+      status: desiredStatus,
       created_at: new Date().toISOString()
     }
   );
@@ -340,32 +366,32 @@ export async function listPapersRawFromAppsScript(): Promise<AppsScriptPaperReco
     action: 'list_papers'
   });
   const list = Array.isArray(data.papers) ? data.papers : [];
-  return list.filter(p => normalizeItemStatus(p.status) !== 'deleted');
+  return list.filter(p => normalizeItemStatus(p.status, p) !== 'deleted');
 }
 
 export async function listApprovedPapersFromAppsScript(): Promise<PublishedPaper[]> {
   const rawList = await listPapersRawFromAppsScript();
   return rawList
-    .filter(p => {
-      const s = normalizeItemStatus(p.status);
-      return s !== 'deleted' && s !== 'rejected';
-    })
+    .filter(p => normalizeItemStatus(p.status, p) === 'approved')
     .map(mapAppsScriptPaperToPublished);
 }
 
 export async function submitNoteToAppsScript(
   payload: SubmitNotePayload
 ): Promise<AppsScriptNoteRecord> {
+  const desiredStatus = payload.status === 'approved' || payload.is_admin ? 'approved' : 'pending';
   const data = await postArchiveScript({
     action: 'submit_note',
-    ...payload
+    ...payload,
+    status: desiredStatus,
+    is_admin: Boolean(payload.is_admin)
   });
   return (
     data.note ||
     (data.item as AppsScriptNoteRecord) || {
       id: `note_${Date.now()}`,
       ...payload,
-      status: 'approved',
+      status: desiredStatus,
       created_at: new Date().toISOString()
     }
   );
@@ -377,7 +403,7 @@ export async function listNotesFromAppsScript(): Promise<UploadedItem[]> {
   });
   const list = Array.isArray(data.notes) ? data.notes : [];
   return list
-    .filter(n => normalizeItemStatus(n.status) !== 'deleted')
+    .filter(n => normalizeItemStatus(n.status, n) !== 'deleted')
     .map(mapAppsScriptNoteToUploadedItem);
 }
 
@@ -386,10 +412,14 @@ export async function updateArchiveItemStatus(
   id: string,
   status: 'approved' | 'rejected' | 'deleted'
 ): Promise<void> {
+  const cleanId = String(id || '').trim();
+  if (!cleanId) {
+    throw new Error(`Missing ${type} ID for status update.`);
+  }
   await postArchiveScript({
     action: 'update_item_status',
     type,
-    id,
+    id: cleanId,
     status
   });
 }

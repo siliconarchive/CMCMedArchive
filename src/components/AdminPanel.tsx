@@ -15,7 +15,9 @@ import {
   Plus,
   AlertTriangle,
   RefreshCw,
-  Save
+  Save,
+  ArrowLeft,
+  Pencil
 } from 'lucide-react';
 import {
   AnnouncementRecord,
@@ -38,12 +40,23 @@ import {
   PENDING_CHAPTER_LABEL
 } from '../data/archiveHelpers';
 import { getMergedProfConfigs, getSubjectsForProf } from '../data/curriculumConfig';
-import { appsScriptListUsers, appsScriptUpdateRole } from '../utils/appsScriptAuth';
+import {
+  appsScriptListUsers,
+  appsScriptUpdateRole,
+  isAdminUser
+} from '../utils/appsScriptAuth';
 import {
   listPapersRawFromAppsScript,
   mapAppsScriptPaperToSubmission,
   updateArchiveItemStatus
 } from '../utils/appsScriptArchive';
+import {
+  deleteVivaFromAppsScript,
+  listVivaFromAppsScript,
+  updateVivaStatusFromAppsScript,
+  VivaItem
+} from '../utils/appsScriptViva';
+import { useBackNav } from '../utils/BackNavContext';
 
 interface AdminPanelProps {
   userProfile: UserProfile | null;
@@ -56,9 +69,18 @@ interface AdminPanelProps {
   publishedPapers: PublishedPaper[];
   onRefreshAll: () => Promise<void>;
   onDeleteNote: (id: string) => Promise<void>;
+  onDeletePaper?: (id: string) => Promise<void>;
 }
 
-type AdminTab = 'submissions' | 'chapters' | 'notes' | 'requests' | 'contributors' | 'announcements' | 'users';
+type AdminTab =
+  | 'submissions'
+  | 'chapters'
+  | 'notes'
+  | 'viva'
+  | 'requests'
+  | 'contributors'
+  | 'announcements'
+  | 'users';
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({
   userProfile,
@@ -70,15 +92,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   customTaxonomy,
   publishedPapers,
   onRefreshAll,
-  onDeleteNote
+  onDeleteNote,
+  onDeletePaper
 }) => {
+  const { pushSubLayer } = useBackNav();
   const [tab, setTab] = useState<AdminTab>('submissions');
   const [submissions, setSubmissions] = useState<QuestionSubmission[]>([]);
+  const [vivaItems, setVivaItems] = useState<VivaItem[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [resourceRequests, setResourceRequests] = useState<ResourceRequestRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; msg: string } | null>(null);
   const [moderatingItemId, setModeratingItemId] = useState<string | null>(null);
+
+  const switchAdminTab = (nextTab: AdminTab) => {
+    if (nextTab === tab) return;
+    const prevTab = tab;
+    pushSubLayer('Admin Panel', () => setTab(prevTab));
+    setTab(nextTab);
+  };
 
   // Submission Filters & Selected
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -122,11 +154,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [noteProfEdits, setNoteProfEdits] = useState<Record<string, ProfessionalExamId>>({});
   const [noteRoleEdits, setNoteRoleEdits] = useState<Record<string, SubjectClassificationRole>>({});
 
-  // Contributor Form
+  // Contributor & Team Member Form
+  const [editingContributorId, setEditingContributorId] = useState<string | null>(null);
   const [cName, setCName] = useState('');
+  const [cRole, setCRole] = useState('Contributor');
   const [cBatch, setCBatch] = useState('');
   const [cCollege, setCCollege] = useState('Chittagong Medical College (CMC)');
   const [cDesc, setCDesc] = useState('');
+  const [savingContributor, setSavingContributor] = useState(false);
 
   // Announcement & Multi-Notice Management State
   const [adminNotices, setAdminNotices] = useState<AnnouncementRecord[]>([announcement]);
@@ -164,24 +199,33 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   }, [announcement]);
 
   const fetchAdminData = async () => {
-    if (userProfile?.role !== 'admin') return;
+    if (!isAdminUser(userProfile)) return;
     setLoading(true);
     try {
+      const errors: string[] = [];
       const usersPromise = appsScriptListUsers().catch(err => {
         console.error('Failed to load users:', err);
-        setFeedback({ type: 'err', msg: err?.message || 'Failed to load registered users.' });
+        errors.push(err?.message || 'Failed to load registered users.');
         return null;
       });
 
       const papersPromise = listPapersRawFromAppsScript().catch(err => {
         console.error('Failed to load papers:', err);
+        errors.push(err?.message || 'Failed to load question papers.');
+        return null;
+      });
+
+      const vivaPromise = listVivaFromAppsScript({ includeUnapproved: true }).catch(err => {
+        console.error('Failed to load viva items:', err);
+        errors.push(err?.message || 'Failed to load viva questions.');
         return null;
       });
 
       const headers: Record<string, string> = authToken ? { Authorization: `Bearer ${authToken}` } : {};
-      const [appsUsers, appsPapers, annRes, reqRes] = await Promise.all([
+      const [appsUsers, appsPapers, appsViva, annRes, reqRes] = await Promise.all([
         usersPromise,
         papersPromise,
+        vivaPromise,
         authToken ? fetch('/api/admin/announcements', { headers }).catch(() => null) : Promise.resolve(null),
         fetch('/api/resource-requests').catch(() => null)
       ]);
@@ -193,32 +237,41 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       if (Array.isArray(appsPapers)) {
         const mappedSubs = appsPapers.map(mapAppsScriptPaperToSubmission);
         setSubmissions(mappedSubs);
-        if (selectedSub) {
-          const updated = mappedSubs.find(s => s.id === selectedSub.id);
+        setSelectedSub(prev => {
+          if (!prev) return null;
+          const updated = mappedSubs.find(s => s.id === prev.id);
           if (updated) {
-            setSelectedSub(updated);
             setDraftMcqs(updated.extractedMcqs || []);
-          } else {
-            setSelectedSub(null);
+            return updated;
           }
-        }
+          return null;
+        });
+      }
+
+      if (Array.isArray(appsViva)) {
+        setVivaItems(appsViva);
       }
 
       if (annRes && annRes.ok) {
-        const annData = await annRes.json();
-        if (Array.isArray(annData.announcements) && annData.announcements.length > 0) {
+        const annData = await annRes.json().catch(() => null);
+        if (Array.isArray(annData?.announcements) && annData.announcements.length > 0) {
           setAdminNotices(annData.announcements);
         }
       }
 
       if (reqRes && reqRes.ok) {
-        const reqData = await reqRes.json();
-        if (Array.isArray(reqData.requests)) {
+        const reqData = await reqRes.json().catch(() => null);
+        if (Array.isArray(reqData?.requests)) {
           setResourceRequests(reqData.requests);
         }
       }
-    } catch (e) {
+
+      if (errors.length > 0) {
+        setFeedback({ type: 'err', msg: errors[0] });
+      }
+    } catch (e: any) {
       console.error('Failed to load admin data:', e);
+      setFeedback({ type: 'err', msg: e?.message || 'Failed to load admin data.' });
     } finally {
       setLoading(false);
     }
@@ -233,7 +286,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     return buildUnifiedMcqQuestions([], questionOverrides).filter(q => q.chapterNeedsReview);
   }, [questionOverrides]);
 
-  if (!userProfile || userProfile.role !== 'admin') {
+  if (!isAdminUser(userProfile)) {
     return (
       <div className="max-w-xl mx-auto bg-[var(--card)] border border-rose-500/30 rounded-xl p-6 text-center space-y-2">
         <ShieldCheck size={36} className="mx-auto text-rose-600" />
@@ -258,6 +311,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     });
 
   const openSubInspector = (sub: QuestionSubmission) => {
+    if (!selectedSub || selectedSub.id !== sub.id) {
+      pushSubLayer('Papers List', () => setSelectedSub(null));
+    }
     setSelectedSub(sub);
     setEditProf(sub.professionalExam || 'First Professional');
     setEditSubject(sub.subject || 'Anatomy');
@@ -274,37 +330,90 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     paperId: string,
     status: 'approved' | 'rejected' | 'deleted'
   ) => {
+    if (!isAdminUser(userProfile) || moderatingItemId) return;
+    const cleanId = String(paperId || '').trim();
+    if (!cleanId) {
+      setFeedback({ type: 'err', msg: 'Missing paper ID for deletion.' });
+      return;
+    }
     setFeedback(null);
-    setModeratingItemId(paperId);
+    setModeratingItemId(cleanId);
     try {
-      await updateArchiveItemStatus('paper', paperId, status);
+      if (status === 'deleted' && onDeletePaper) {
+        await onDeletePaper(cleanId);
+      } else {
+        await updateArchiveItemStatus('paper', cleanId, status);
+        await onRefreshAll();
+      }
       if (status === 'deleted') {
-        setSubmissions(prev => prev.filter(s => s.id !== paperId));
-        if (selectedSub?.id === paperId) {
-          setSelectedSub(null);
-        }
+        setSubmissions(prev => prev.filter(s => s.id !== cleanId));
+        setSelectedSub(prev => (prev?.id === cleanId ? null : prev));
+      } else {
+        const nextStatus: SubmissionStatus = status === 'approved' ? 'Approved' : 'Rejected';
+        setSubmissions(prev =>
+          prev.map(s => (s.id === cleanId ? { ...s, status: nextStatus } : s))
+        );
+        setSelectedSub(prev =>
+          prev?.id === cleanId ? { ...prev, status: nextStatus } : prev
+        );
       }
       setFeedback({
         type: 'ok',
         msg:
           status === 'deleted'
             ? 'Question paper permanently deleted from Google Sheet and website.'
-            : 'Question paper status updated.'
+            : status === 'approved'
+              ? 'Question paper approved and published to Community Uploads.'
+              : 'Question paper rejected.'
       });
       await fetchAdminData();
-      await onRefreshAll();
     } catch (err: any) {
-      setFeedback({ type: 'err', msg: err?.message || 'Paper update failed.' });
+      setFeedback({ type: 'err', msg: err?.message || 'Paper moderation failed.' });
+    } finally {
+      setModeratingItemId(null);
+    }
+  };
+
+  const handleModerateNoteStatus = async (
+    noteId: string,
+    status: 'approved' | 'rejected'
+  ) => {
+    if (!isAdminUser(userProfile) || moderatingItemId) return;
+    const cleanId = String(noteId || '').trim();
+    if (!cleanId) {
+      setFeedback({ type: 'err', msg: 'Missing note ID for moderation.' });
+      return;
+    }
+    setFeedback(null);
+    setModeratingItemId(cleanId);
+    try {
+      await updateArchiveItemStatus('note', cleanId, status);
+      await onRefreshAll();
+      setFeedback({
+        type: 'ok',
+        msg:
+          status === 'approved'
+            ? 'Study note approved and published to Notes Library.'
+            : 'Study note rejected.'
+      });
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Note moderation failed.' });
     } finally {
       setModeratingItemId(null);
     }
   };
 
   const handleDeleteNoteFromAdmin = async (noteId: string) => {
+    if (!isAdminUser(userProfile) || moderatingItemId) return;
+    const cleanId = String(noteId || '').trim();
+    if (!cleanId) {
+      setFeedback({ type: 'err', msg: 'Missing note ID for deletion.' });
+      return;
+    }
     setFeedback(null);
-    setModeratingItemId(noteId);
+    setModeratingItemId(cleanId);
     try {
-      await onDeleteNote(noteId);
+      await onDeleteNote(cleanId);
       setFeedback({
         type: 'ok',
         msg: 'Study note permanently deleted from Google Sheet and website.'
@@ -316,34 +425,92 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
+  const handleModerateVivaStatus = async (
+    vivaId: string,
+    status: 'approved' | 'rejected'
+  ) => {
+    if (!isAdminUser(userProfile) || moderatingItemId) return;
+    const cleanId = String(vivaId || '').trim();
+    if (!cleanId) {
+      setFeedback({ type: 'err', msg: 'Missing Viva ID for moderation.' });
+      return;
+    }
+    setFeedback(null);
+    setModeratingItemId(cleanId);
+    try {
+      await updateVivaStatusFromAppsScript(cleanId, status);
+      setVivaItems(prev =>
+        prev.map(v => (v.id === cleanId ? { ...v, status } : v))
+      );
+      setFeedback({
+        type: 'ok',
+        msg:
+          status === 'approved'
+            ? 'Viva question approved and published live to Viva Bank.'
+            : 'Viva question rejected.'
+      });
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Viva status update failed.' });
+    } finally {
+      setModeratingItemId(null);
+    }
+  };
+
+  const handleDeleteVivaFromAdmin = async (vivaId: string) => {
+    if (!isAdminUser(userProfile) || moderatingItemId) return;
+    const cleanId = String(vivaId || '').trim();
+    if (!cleanId) {
+      setFeedback({ type: 'err', msg: 'Missing Viva ID for deletion.' });
+      return;
+    }
+    setFeedback(null);
+    setModeratingItemId(cleanId);
+    try {
+      await deleteVivaFromAppsScript(cleanId);
+      setVivaItems(prev => prev.filter(v => v.id !== cleanId));
+      setFeedback({
+        type: 'ok',
+        msg: 'Viva question permanently deleted from Google Sheet and website.'
+      });
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Viva deletion failed.' });
+    } finally {
+      setModeratingItemId(null);
+    }
+  };
+
   const handleSaveSubmissionMeta = async () => {
     if (!selectedSub || !authToken) return;
     setFeedback(null);
-    const res = await fetch(`/api/admin/submissions/${selectedSub.id}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        status: editStatus,
-        professionalExam: editProf,
-        subject: editSubject,
-        adminComment: editComment,
-        chapter: editChapter,
-        paper: editPaper,
-        year: editYear,
-        extractedMcqs: draftMcqs
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setFeedback({ type: 'err', msg: data.error || 'Update failed.' });
-      return;
+    try {
+      const res = await fetch(`/api/admin/submissions/${selectedSub.id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: editStatus,
+          professionalExam: editProf,
+          subject: editSubject,
+          adminComment: editComment,
+          chapter: editChapter,
+          paper: editPaper,
+          year: editYear,
+          extractedMcqs: draftMcqs
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Update failed.' });
+        return;
+      }
+      setFeedback({ type: 'ok', msg: `Updated submission ${selectedSub.id}.` });
+      await fetchAdminData();
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Failed to save submission changes.' });
     }
-    setFeedback({ type: 'ok', msg: `Updated submission ${selectedSub.id}.` });
-    await fetchAdminData();
-    await onRefreshAll();
   };
 
   const handleRunOcr = async () => {
@@ -355,7 +522,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         method: 'POST',
         headers: { Authorization: `Bearer ${authToken}` }
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setFeedback({ type: 'err', msg: data.error || 'OCR extraction failed.' });
         return;
@@ -366,6 +533,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         msg: data.note || 'OCR extraction completed.'
       });
       await fetchAdminData();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'OCR extraction failed.' });
     } finally {
       setOcrLoading(false);
     }
@@ -374,26 +543,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const handlePublishSubmission = async () => {
     if (!selectedSub || !authToken) return;
     setFeedback(null);
-    const res = await fetch(`/api/admin/submissions/${selectedSub.id}/publish`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        publishMcqs: publishWithMcqs,
-        verifiedMcqs: draftMcqs,
-        creditContributor: creditContrib
-      })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setFeedback({ type: 'err', msg: data.error || 'Publish failed.' });
-      return;
+    try {
+      const res = await fetch(`/api/admin/submissions/${selectedSub.id}/publish`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          publishMcqs: publishWithMcqs,
+          verifiedMcqs: draftMcqs,
+          creditContributor: creditContrib
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Publish failed.' });
+        return;
+      }
+      setFeedback({ type: 'ok', msg: data.message || 'Published to Archive.' });
+      await fetchAdminData();
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Publish failed.' });
     }
-    setFeedback({ type: 'ok', msg: data.message || 'Published to Archive.' });
-    await fetchAdminData();
-    await onRefreshAll();
   };
 
   const handleAssignChapterOverride = async (questionId: string) => {
@@ -402,22 +575,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const prof = profAssignValues[questionId];
     const role = roleAssignValues[questionId];
     if (!chap && !prof && !role) return;
-    const res = await fetch('/api/admin/question-override', {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        questionId,
-        ...(prof ? { professionalExam: prof, profNeedsReview: false } : {}),
-        ...(role ? { classificationRole: role } : {}),
-        ...(chap ? { chapter: chap, chapterNeedsReview: chap === PENDING_CHAPTER_LABEL } : {})
-      })
-    });
-    if (res.ok) {
+    setFeedback(null);
+    try {
+      const res = await fetch('/api/admin/question-override', {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          questionId,
+          ...(prof ? { professionalExam: prof, profNeedsReview: false } : {}),
+          ...(role ? { classificationRole: role } : {}),
+          ...(chap ? { chapter: chap, chapterNeedsReview: chap === PENDING_CHAPTER_LABEL } : {})
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Classification update failed.' });
+        return;
+      }
       setFeedback({ type: 'ok', msg: `Updated classification for ${questionId}.` });
       await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Classification update failed.' });
     }
   };
 
@@ -425,17 +606,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     if (!authToken) return;
     const patch = paperProfEdits[paperItem.id];
     if (!patch) return;
-    const res = await fetch(`/api/admin/published-papers/${paperItem.id}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(patch)
-    });
-    if (res.ok) {
+    setFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/published-papers/${paperItem.id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patch)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Paper update failed.' });
+        return;
+      }
       setFeedback({ type: 'ok', msg: `Updated paper "${paperItem.examName}" (${patch.professionalExam}).` });
       await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Paper update failed.' });
     }
   };
 
@@ -444,90 +633,174 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     const prof = noteProfEdits[noteId];
     const role = noteRoleEdits[noteId];
     if (!prof && !role) return;
-    const res = await fetch(`/api/admin/notes/${noteId}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        ...(prof ? { professionalExam: prof } : {}),
-        ...(role ? { classificationRole: role } : {})
-      })
-    });
-    if (res.ok) {
-      setFeedback({ type: 'ok', msg: `Updated note classification.` });
+    setFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/notes/${noteId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...(prof ? { professionalExam: prof } : {}),
+          ...(role ? { classificationRole: role } : {})
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Note classification update failed.' });
+        return;
+      }
+      setFeedback({ type: 'ok', msg: 'Updated note classification.' });
       await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Note classification update failed.' });
     }
   };
 
   const handleToggleRequestStatus = async (reqId: string, nextStatus: 'Open' | 'Fulfilled') => {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/resource-requests/${reqId}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ status: nextStatus })
-    });
-    if (res.ok) {
+    setFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/resource-requests/${reqId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Failed to update resource request.' });
+        return;
+      }
       setFeedback({ type: 'ok', msg: `Resource request marked ${nextStatus}.` });
       await fetchAdminData();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Failed to update resource request.' });
     }
   };
 
   const handleAddTaxonomy = async (payload: any) => {
     if (!authToken) return;
-    const res = await fetch('/api/admin/taxonomy', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
+    setFeedback(null);
+    try {
+      const res = await fetch('/api/admin/taxonomy', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Failed to update curriculum taxonomy.' });
+        return;
+      }
       setNewSubjectName('');
       setNewChapterName('');
       setNewYearVal('');
       setFeedback({ type: 'ok', msg: 'Curriculum taxonomy updated.' });
       await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Failed to update curriculum taxonomy.' });
     }
   };
 
-  const handleAddContributor = async (e: React.FormEvent) => {
+  const resetContributorForm = () => {
+    setEditingContributorId(null);
+    setCName('');
+    setCRole('Contributor');
+    setCBatch('');
+    setCCollege('Chittagong Medical College (CMC)');
+    setCDesc('');
+  };
+
+  const startEditContributor = (c: ContributorRecord) => {
+    setEditingContributorId(c.id);
+    setCName(c.name);
+    setCRole(c.role || 'Contributor');
+    setCBatch(c.batch || '');
+    setCCollege(c.college || 'Chittagong Medical College (CMC)');
+    setCDesc(c.contribution || '');
+    setFeedback(null);
+  };
+
+  const handleSaveContributor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authToken || !cName.trim()) return;
-    const res = await fetch('/api/admin/contributors', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        name: cName,
-        batch: cBatch,
-        college: cCollege,
-        contribution: cDesc
-      })
-    });
-    if (res.ok) {
-      setCName('');
-      setCBatch('');
-      setCDesc('');
-      setFeedback({ type: 'ok', msg: 'Contributor added.' });
+    if (!cName.trim()) return;
+    if (!authToken) {
+      setFeedback({ type: 'err', msg: 'Please sign in again to manage contributors.' });
+      return;
+    }
+    setFeedback(null);
+    setSavingContributor(true);
+    try {
+      const isEdit = Boolean(editingContributorId);
+      const url = isEdit
+        ? `/api/admin/contributors/${editingContributorId}`
+        : '/api/admin/contributors';
+      const res = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: cName.trim(),
+          role: cRole.trim() || 'Contributor',
+          batch: cBatch.trim(),
+          college: cCollege.trim(),
+          contribution: cDesc.trim()
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Could not save contributor.' });
+        return;
+      }
+      resetContributorForm();
+      setFeedback({
+        type: 'ok',
+        msg: isEdit ? 'Contributor details updated.' : 'Contributor added.'
+      });
       await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Could not save contributor.' });
+    } finally {
+      setSavingContributor(false);
     }
   };
 
   const handleDeleteContributor = async (id: string) => {
-    if (!authToken) return;
-    const res = await fetch(`/api/admin/contributors/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    if (res.ok) await onRefreshAll();
+    if (!authToken) {
+      setFeedback({ type: 'err', msg: 'Please sign in again to remove contributors.' });
+      return;
+    }
+    setFeedback(null);
+    setModeratingItemId(id);
+    try {
+      const res = await fetch(`/api/admin/contributors/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Could not remove contributor.' });
+        return;
+      }
+      if (editingContributorId === id) {
+        resetContributorForm();
+      }
+      setFeedback({ type: 'ok', msg: 'Contributor removed.' });
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Could not remove contributor.' });
+    } finally {
+      setModeratingItemId(null);
+    }
   };
 
   const handleSaveAnnouncement = async (e: React.FormEvent) => {
@@ -552,48 +825,57 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       : `/api/admin/announcements/${selectedNoticeId}`;
     const method = creatingNotice ? 'POST' : 'PUT';
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setFeedback({ type: 'err', msg: data.error || 'Could not save notice.' });
-      return;
-    }
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Could not save notice.' });
+        return;
+      }
 
-    setFeedback({
-      type: 'ok',
-      msg: creatingNotice ? 'New website notice published.' : 'Notice & campaign settings updated.'
-    });
-    if (creatingNotice && data.announcement) {
-      setSelectedNoticeId(data.announcement.id);
-      setCreatingNotice(false);
+      setFeedback({
+        type: 'ok',
+        msg: creatingNotice ? 'New website notice published.' : 'Notice & campaign settings updated.'
+      });
+      if (creatingNotice && data.announcement) {
+        setSelectedNoticeId(data.announcement.id);
+        setCreatingNotice(false);
+      }
+      await fetchAdminData();
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Could not save notice.' });
     }
-    await fetchAdminData();
-    await onRefreshAll();
   };
 
   const handleDeleteNotice = async (noticeId: string) => {
     if (!authToken) return;
-    const res = await fetch(`/api/admin/announcements/${noticeId}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${authToken}` }
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setFeedback({ type: 'err', msg: data.error || 'Cannot delete notice.' });
-      return;
+    setFeedback(null);
+    try {
+      const res = await fetch(`/api/admin/announcements/${noticeId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setFeedback({ type: 'err', msg: data.error || 'Cannot delete notice.' });
+        return;
+      }
+      setFeedback({ type: 'ok', msg: 'Notice deleted.' });
+      setSelectedNoticeId(announcement.id);
+      loadNoticeIntoForm(announcement);
+      await fetchAdminData();
+      await onRefreshAll();
+    } catch (err: any) {
+      setFeedback({ type: 'err', msg: err?.message || 'Cannot delete notice.' });
     }
-    setFeedback({ type: 'ok', msg: 'Notice deleted.' });
-    setSelectedNoticeId(announcement.id);
-    loadNoticeIntoForm(announcement);
-    await fetchAdminData();
-    await onRefreshAll();
   };
 
   const handleRoleChange = async (userId: string, role: UserRole) => {
@@ -641,14 +923,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             icon: FileText
           },
           {
-            id: 'chapters' as const,
-            label: `Taxonomy & Review (${pendingChapterQuestions.length})`,
-            icon: Layers
-          },
-          {
             id: 'notes' as const,
             label: `Notes (${notes.length})`,
             icon: BookOpen
+          },
+          {
+            id: 'viva' as const,
+            label: `Viva (${vivaItems.length})`,
+            icon: Sparkles
+          },
+          {
+            id: 'chapters' as const,
+            label: `Taxonomy & Review (${pendingChapterQuestions.length})`,
+            icon: Layers
           },
           {
             id: 'requests' as const,
@@ -664,7 +951,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <button
               key={t.id}
               type="button"
-              onClick={() => setTab(t.id)}
+              onClick={() => switchAdminTab(t.id)}
               className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 min-h-[42px] shrink-0 ${
                 tab === t.id
                   ? 'bg-[#0F2942] text-white dark:bg-sky-500/20 dark:text-sky-300'
@@ -726,25 +1013,70 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             ) : (
               <div className="space-y-2.5 max-h-[650px] overflow-y-auto pr-1">
                 {filteredSubs.map(sub => (
-                  <button
+                  <div
                     key={sub.id}
-                    type="button"
                     onClick={() => openSubInspector(sub)}
-                    className={`w-full text-left p-3.5 rounded-xl border transition-all ${
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openSubInspector(sub);
+                      }
+                    }}
+                    className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                       selectedSub?.id === sub.id
                         ? 'border-[#0D9488] bg-teal-50/60 dark:bg-teal-950/30'
                         : 'border-[var(--line)] bg-[var(--card)] hover:border-[var(--line-strong)]'
                     }`}
                   >
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="font-mono font-bold text-[#0D9488]">{sub.id}</span>
-                      <span className="badge">{sub.status}</span>
+                    <div className="flex items-center justify-between gap-2 text-[11px]">
+                      <span className="font-mono font-bold text-[#0D9488] truncate">{sub.id}</span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="badge">{sub.status}</span>
+                        {sub.status !== 'Approved' && sub.status !== 'Published' && (
+                          <button
+                            type="button"
+                            disabled={moderatingItemId === sub.id}
+                            onClick={e => {
+                              e.stopPropagation();
+                              handleModeratePaperStatus(sub.id, 'approved');
+                            }}
+                            className="px-2 py-1 rounded-md border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 text-[11px] font-bold inline-flex items-center gap-1"
+                            aria-label={`Approve paper ${sub.examName}`}
+                          >
+                            {moderatingItemId === sub.id ? (
+                              <Loader2 size={11} className="animate-spin" />
+                            ) : (
+                              <CheckCircle2 size={11} />
+                            )}
+                            <span>Approve</span>
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          disabled={moderatingItemId === sub.id}
+                          onClick={e => {
+                            e.stopPropagation();
+                            handleModeratePaperStatus(sub.id, 'deleted');
+                          }}
+                          className="px-2 py-1 rounded-md border border-rose-500/30 text-rose-600 hover:bg-rose-500/10 text-[11px] font-bold inline-flex items-center gap-1"
+                          aria-label={`Delete paper ${sub.examName}`}
+                        >
+                          {moderatingItemId === sub.id ? (
+                            <Loader2 size={11} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={11} />
+                          )}
+                          <span>Delete</span>
+                        </button>
+                      </div>
                     </div>
                     <div className="font-bold text-sm text-[var(--ink)] mt-1">{sub.examName}</div>
                     <div className="text-xs text-[var(--mut)] mt-0.5">
                       {sub.collegeName} &bull; {sub.subject} ({sub.category})
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -753,19 +1085,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           <div className="lg:col-span-7">
             {!selectedSub ? (
               <div className="empty text-sm">
-                Select a submission on the left to review files, verify Drive links, run OCR extraction, or publish.
+                Select a submission on the left to review files, verify Drive links, run OCR extraction, or approve.
               </div>
             ) : (
               <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-5">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line)] pb-3">
                   <div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSub(null)}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[#0D9488] bg-transparent border-0 p-0 mb-1"
+                    >
+                      <ArrowLeft size={12} /> Back to Papers List
+                    </button>
                     <div className="text-xs font-mono text-[#0D9488] font-bold">{selectedSub.id}</div>
                     <h3 className="text-lg font-extrabold text-[var(--ink)] m-0">{selectedSub.examName}</h3>
                     <div className="text-xs text-[var(--mut)]">
                       {selectedSub.collegeName} &bull; By {selectedSub.contributorName} ({selectedSub.contributorBatch || 'Student'})
                     </div>
                   </div>
-                  <span className="badge">{selectedSub.method.toUpperCase()}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="badge">{selectedSub.status}</span>
+                    <span className="badge">{selectedSub.method.toUpperCase()}</span>
+                  </div>
                 </div>
 
                 {/* Files / Links Preview */}
@@ -1012,6 +1354,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   </div>
 
                   <div className="flex flex-wrap gap-2">
+                    {selectedSub.status !== 'Approved' && selectedSub.status !== 'Published' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === selectedSub.id}
+                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'approved')}
+                        className="btn good min-h-[42px]"
+                      >
+                        {moderatingItemId === selectedSub.id ? (
+                          <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                          <CheckCircle2 size={14} />
+                        )}
+                        <span>Approve &amp; Publish</span>
+                      </button>
+                    )}
+                    {selectedSub.status !== 'Rejected' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === selectedSub.id}
+                        onClick={() => handleModeratePaperStatus(selectedSub.id, 'rejected')}
+                        className="btn alt text-amber-700 dark:text-amber-300 border-amber-500/30 min-h-[42px]"
+                      >
+                        <XCircle size={14} />
+                        <span>Reject</span>
+                      </button>
+                    )}
                     <button
                       type="button"
                       disabled={moderatingItemId === selectedSub.id}
@@ -1333,9 +1701,11 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       {tab === 'notes' && (
         <div className="space-y-3">
           {notes.length === 0 ? (
-            <div className="empty text-xs">No study notes published yet.</div>
+            <div className="empty text-xs">No study notes submitted yet.</div>
           ) : (
-            notes.map(n => {
+            [...notes]
+              .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
+              .map(n => {
                 const profVal = noteProfEdits[n.id] || n.professionalExam || 'First Professional';
                 const roleVal =
                   noteRoleEdits[n.id] ||
@@ -1347,9 +1717,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
                   >
                     <div className="space-y-0.5 min-w-0">
-                      <div className="text-xs font-bold text-[#0D9488]">
-                        {n.professionalExam || 'First Professional'} &bull; {n.subject}
-                        {n.paper ? ` · ${n.paper}` : ''} &bull; LIVE
+                      <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-1.5">
+                        <span>
+                          {n.professionalExam || 'First Professional'} &bull; {n.subject}
+                          {n.paper ? ` · ${n.paper}` : ''}
+                        </span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase ${
+                            n.status === 'approved'
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                              : n.status === 'rejected'
+                                ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                                : 'bg-amber-500/15 text-amber-800 dark:text-amber-300'
+                          }`}
+                        >
+                          {n.status === 'approved'
+                            ? 'Approved'
+                            : n.status === 'rejected'
+                              ? 'Rejected'
+                              : 'Pending Approval'}
+                        </span>
                       </div>
                       <div className="font-bold text-sm text-[var(--ink)] truncate">{n.title}</div>
                       <div className="text-xs text-[var(--mut)]">
@@ -1409,6 +1796,32 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <ExternalLink size={12} /> Open
                         </a>
                       )}
+                      {n.status !== 'approved' && (
+                        <button
+                          type="button"
+                          disabled={moderatingItemId === n.id}
+                          onClick={() => handleModerateNoteStatus(n.id, 'approved')}
+                          className="btn sm good"
+                        >
+                          {moderatingItemId === n.id ? (
+                            <Loader2 size={13} className="animate-spin" />
+                          ) : (
+                            <CheckCircle2 size={13} />
+                          )}
+                          <span>Approve</span>
+                        </button>
+                      )}
+                      {n.status === 'pending' && (
+                        <button
+                          type="button"
+                          disabled={moderatingItemId === n.id}
+                          onClick={() => handleModerateNoteStatus(n.id, 'rejected')}
+                          className="btn sm alt text-amber-700 dark:text-amber-300 border-amber-500/30"
+                        >
+                          <XCircle size={13} />
+                          <span>Reject</span>
+                        </button>
+                      )}
                       <button
                         type="button"
                         disabled={moderatingItemId === n.id}
@@ -1430,7 +1843,102 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* TAB 3B: RESOURCE REQUESTS */}
+      {/* TAB 3B: VIVA QUESTIONS */}
+      {tab === 'viva' && (
+        <div className="space-y-3">
+          {vivaItems.length === 0 ? (
+            <div className="empty text-xs">No Viva questions submitted yet.</div>
+          ) : (
+            [...vivaItems]
+              .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
+              .map(v => (
+                <div
+                  key={v.id}
+                  className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
+                >
+                  <div className="space-y-1 min-w-0">
+                    <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-1.5">
+                      <span>
+                        {v.examiner_type} Examiner &bull; {v.prof} &bull; {v.subject}
+                        {v.board_name ? ` · ${v.board_name}` : ''}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase ${
+                          v.status === 'approved'
+                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                            : v.status === 'rejected'
+                              ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                              : 'bg-amber-500/15 text-amber-800 dark:text-amber-300'
+                        }`}
+                      >
+                        {v.status === 'approved'
+                          ? 'Approved'
+                          : v.status === 'rejected'
+                            ? 'Rejected'
+                            : 'Pending Approval'}
+                      </span>
+                    </div>
+                    <div className="font-bold text-sm text-[var(--ink)] break-words">
+                      {v.question}
+                    </div>
+                    {v.answer_hint && (
+                      <div className="text-xs text-[var(--ink-secondary)] break-words">
+                        Hint: {v.answer_hint}
+                      </div>
+                    )}
+                    <div className="text-xs text-[var(--mut)]">
+                      By {v.contributor_name}
+                      {v.batch ? ` (${v.batch})` : ''}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    {v.status !== 'approved' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === v.id}
+                        onClick={() => handleModerateVivaStatus(v.id, 'approved')}
+                        className="btn sm good"
+                      >
+                        {moderatingItemId === v.id ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <CheckCircle2 size={13} />
+                        )}
+                        <span>Approve</span>
+                      </button>
+                    )}
+                    {v.status === 'pending' && (
+                      <button
+                        type="button"
+                        disabled={moderatingItemId === v.id}
+                        onClick={() => handleModerateVivaStatus(v.id, 'rejected')}
+                        className="btn sm alt text-amber-700 dark:text-amber-300 border-amber-500/30"
+                      >
+                        <XCircle size={13} />
+                        <span>Reject</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={moderatingItemId === v.id}
+                      onClick={() => handleDeleteVivaFromAdmin(v.id)}
+                      className="btn sm alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10"
+                    >
+                      {moderatingItemId === v.id ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={13} />
+                      )}
+                      <span>{moderatingItemId === v.id ? 'Deleting...' : 'Delete'}</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+          )}
+        </div>
+      )}
+
+      {/* TAB 3C: RESOURCE REQUESTS */}
       {tab === 'requests' && (
         <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl divide-y divide-[var(--line)]">
           {resourceRequests.length === 0 ? (
@@ -1468,67 +1976,171 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
         </div>
       )}
 
-      {/* TAB 4: CONTRIBUTORS */}
+      {/* TAB 4: CONTRIBUTORS & TEAM MEMBERS */}
       {tab === 'contributors' && (
         <div className="space-y-5">
           <form
-            onSubmit={handleAddContributor}
-            className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4"
+            onSubmit={handleSaveContributor}
+            className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 sm:p-5 space-y-4"
           >
-            <h3 className="text-base font-extrabold text-[var(--ink)] m-0">Add Verified Contributor</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input
-                value={cName}
-                onChange={e => setCName(e.target.value)}
-                placeholder="Full Name *"
-                required
-                className="text-sm min-h-[42px]"
-              />
-              <input
-                value={cBatch}
-                onChange={e => setCBatch(e.target.value)}
-                placeholder="Batch (e.g. CMC 67)"
-                className="text-sm min-h-[42px]"
-              />
-              <input
-                value={cCollege}
-                onChange={e => setCCollege(e.target.value)}
-                placeholder="Medical College"
-                className="text-sm min-h-[42px]"
-              />
-              <input
-                value={cDesc}
-                onChange={e => setCDesc(e.target.value)}
-                placeholder="Contribution summary"
-                className="text-sm min-h-[42px]"
-              />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-base font-extrabold text-[var(--ink)] m-0">
+                {editingContributorId
+                  ? 'Edit Contributor / Team Member'
+                  : 'Add Contributor or Team Member'}
+              </h3>
+              {editingContributorId && (
+                <button
+                  type="button"
+                  onClick={resetContributorForm}
+                  className="btn sm alt"
+                >
+                  Cancel Edit
+                </button>
+              )}
             </div>
-            <button type="submit" className="btn min-h-[42px]">
-              <Plus size={15} /> Add Contributor
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-[var(--ink-secondary)] mb-1">
+                  Full Name *
+                </label>
+                <input
+                  value={cName}
+                  onChange={e => setCName(e.target.value)}
+                  placeholder="e.g. MD Sadman Sami"
+                  required
+                  className="text-sm min-h-[42px]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[var(--ink-secondary)] mb-1">
+                  Role / Team Title
+                </label>
+                <input
+                  value={cRole}
+                  onChange={e => setCRole(e.target.value)}
+                  placeholder="e.g. Core Team, Contributor, Moderator"
+                  className="text-sm min-h-[42px]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[var(--ink-secondary)] mb-1">
+                  Batch
+                </label>
+                <input
+                  value={cBatch}
+                  onChange={e => setCBatch(e.target.value)}
+                  placeholder="e.g. CMC 67"
+                  className="text-sm min-h-[42px]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[var(--ink-secondary)] mb-1">
+                  Medical College
+                </label>
+                <input
+                  value={cCollege}
+                  onChange={e => setCCollege(e.target.value)}
+                  placeholder="Chittagong Medical College (CMC)"
+                  className="text-sm min-h-[42px]"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-[var(--ink-secondary)] mb-1">
+                  Contribution / Note
+                </label>
+                <input
+                  value={cDesc}
+                  onChange={e => setCDesc(e.target.value)}
+                  placeholder="e.g. Question Paper Archiving & Academic Data Contribution"
+                  className="text-sm min-h-[42px]"
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="submit"
+                disabled={savingContributor}
+                className="btn min-h-[42px]"
+              >
+                {savingContributor ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : editingContributorId ? (
+                  <Save size={15} />
+                ) : (
+                  <Plus size={15} />
+                )}
+                <span>
+                  {savingContributor
+                    ? 'Saving...'
+                    : editingContributorId
+                      ? 'Save Changes'
+                      : 'Add Contributor / Member'}
+                </span>
+              </button>
+            </div>
           </form>
 
           <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl divide-y divide-[var(--line)]">
-            {contributors.map(c => (
-              <div key={c.id} className="p-4 flex items-center justify-between gap-3">
-                <div>
-                  <div className="font-bold text-sm text-[var(--ink)]">
-                    {c.name} <span className="text-xs text-[#0D9488]">({c.batch})</span>
+            {contributors.length === 0 ? (
+              <div className="p-6 text-center text-xs text-[var(--mut)]">
+                No contributors or team members listed yet.
+              </div>
+            ) : (
+              contributors.map(c => (
+                <div
+                  key={c.id}
+                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                >
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-sm text-[var(--ink)] break-words">
+                        {c.name}
+                      </span>
+                      {c.role && (
+                        <span className="px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/25 text-[11px] font-bold text-[#0D9488]">
+                          {c.role}
+                        </span>
+                      )}
+                      {c.batch && (
+                        <span className="text-xs font-semibold text-[#0F2942] dark:text-sky-300">
+                          ({c.batch})
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-[var(--mut)] break-words">
+                      {c.college}
+                      {c.contribution ? ` · ${c.contribution}` : ''}
+                    </div>
                   </div>
-                  <div className="text-xs text-[var(--mut)]">
-                    {c.college} &bull; {c.contribution}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <button
+                      type="button"
+                      onClick={() => startEditContributor(c)}
+                      className="btn sm alt min-h-[36px]"
+                      aria-label={`Edit ${c.name}`}
+                    >
+                      <Pencil size={13} />
+                      <span>Edit</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={moderatingItemId === c.id}
+                      onClick={() => handleDeleteContributor(c.id)}
+                      className="btn sm alt text-rose-600 border-rose-500/30 hover:bg-rose-500/10 min-h-[36px]"
+                      aria-label={`Delete ${c.name}`}
+                    >
+                      {moderatingItemId === c.id ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={13} />
+                      )}
+                      <span>Remove</span>
+                    </button>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteContributor(c.id)}
-                  className="p-2 text-rose-600 hover:bg-rose-500/10 rounded-lg"
-                  aria-label="Delete contributor"
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       )}
@@ -1742,7 +2354,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               </div>
               <select
                 value={u.role}
-                disabled={u.id === userProfile.id}
+                disabled={u.id === userProfile?.id}
                 onChange={e => handleRoleChange(u.id, e.target.value as UserRole)}
                 className="sm:!w-40 text-xs min-h-[40px]"
               >

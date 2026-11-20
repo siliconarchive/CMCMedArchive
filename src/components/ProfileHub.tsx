@@ -28,6 +28,8 @@ import {
   UserProfile
 } from '../types';
 import { canonicalizeSubjectName, getMergedProfConfigs, getProfConfig } from '../data/curriculumConfig';
+import { isAdminUser } from '../utils/appsScriptAuth';
+import { useBackNav } from '../utils/BackNavContext';
 
 interface ProfileHubProps {
   selectedProf: ProfessionalExamId;
@@ -54,6 +56,7 @@ export const ProfileHub: React.FC<ProfileHubProps> = ({
   onLogout,
   onNavigate
 }) => {
+  const { pushSubLayer } = useBackNav();
   const [activeTab, setActiveTab] = useState<ProfileTab>(initialTab);
   const [draftProf, setDraftProf] = useState<ProfessionalExamId>(selectedProf);
   const [saving, setSaving] = useState(false);
@@ -62,6 +65,13 @@ export const ProfileHub: React.FC<ProfileHubProps> = ({
   useEffect(() => {
     setActiveTab(initialTab);
   }, [initialTab]);
+
+  const switchProfileTab = (nextTab: ProfileTab) => {
+    if (nextTab === activeTab) return;
+    const prevTab = activeTab;
+    pushSubLayer('Profile', () => setActiveTab(prevTab));
+    setActiveTab(nextTab);
+  };
 
   useEffect(() => {
     setDraftProf(selectedProf);
@@ -126,7 +136,7 @@ export const ProfileHub: React.FC<ProfileHubProps> = ({
           </p>
         </div>
 
-        {userProfile?.role === 'admin' && (
+        {isAdminUser(userProfile) && (
           <button
             type="button"
             onClick={() => onNavigate('admin')}
@@ -147,7 +157,7 @@ export const ProfileHub: React.FC<ProfileHubProps> = ({
             <button
               key={t.id}
               type="button"
-              onClick={() => setActiveTab(t.id)}
+              onClick={() => switchProfileTab(t.id)}
               className={`px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 min-h-[42px] whitespace-nowrap shrink-0 transition-colors ${
                 active
                   ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
@@ -171,7 +181,7 @@ export const ProfileHub: React.FC<ProfileHubProps> = ({
             </div>
             <button
               type="button"
-              onClick={() => setActiveTab('settings')}
+              onClick={() => switchProfileTab('settings')}
               className="text-xs font-bold text-[#0D9488] hover:underline bg-transparent border-0 p-1"
             >
               Change Academic Preference &rarr;

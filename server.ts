@@ -209,6 +209,7 @@ export interface PublishedMcqQuestion {
 export interface ContributorRecord {
   id: string;
   name: string;
+  role?: string;
   batch: string;
   college: string;
   contribution: string;
@@ -338,6 +339,7 @@ const DEFAULT_CONTRIBUTORS: ContributorRecord[] = [
   {
     id: 'contrib_sadman_sami',
     name: 'MD Sadman Sami',
+    role: 'Core Contributor',
     batch: 'CMC 67',
     college: 'Chittagong Medical College (CMC)',
     contribution: 'Question Paper Archiving & Academic Data Contribution',
@@ -709,9 +711,9 @@ function ensureDatabaseFields(raw: any): AppDatabase {
     }
   }
 
-  // Guarantee MD Sadman Sami is present in contributors if contributors was empty
-  if (!dbObj.contributors.some(c => c.name.toLowerCase().includes('sadman sami'))) {
-    dbObj.contributors.unshift(...DEFAULT_CONTRIBUTORS);
+  // Seed default contributor only if list is completely empty
+  if (dbObj.contributors.length === 0) {
+    dbObj.contributors.push(...DEFAULT_CONTRIBUTORS);
     changed = true;
   }
 
@@ -904,6 +906,11 @@ function authMiddleware(req: AuthenticatedRequest, _res: Response, next: NextFun
     const token = authHeader.substring(7).trim();
     const localUser = resolveUserFromToken(token);
     if (localUser) {
+      const normalizedRole =
+        String(localUser.role || '').trim().toLowerCase() === 'admin' ? 'admin' : 'student';
+      if (localUser.role !== normalizedRole) {
+        localUser.role = normalizedRole;
+      }
       req.user = localUser;
     }
   }
@@ -923,7 +930,7 @@ function requireAdmin(req: AuthenticatedRequest, res: Response, next: NextFuncti
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required.' });
   }
-  if (req.user.role !== 'admin') {
+  if (String(req.user.role || '').trim().toLowerCase() !== 'admin') {
     return res.status(403).json({ error: 'Administrator privileges required for this operation.' });
   }
   next();
@@ -1092,8 +1099,13 @@ async function startServer() {
         return res.status(401).json({ error: 'User account not found in directory.' });
       }
 
+      const normalizedRole = String(matched.role || '').trim().toLowerCase();
       const safeRole: UserRole =
-        matched.role === 'admin' || matched.role === 'contributor' ? matched.role : 'student';
+        normalizedRole === 'admin'
+          ? 'admin'
+          : normalizedRole === 'contributor'
+            ? 'contributor'
+            : 'student';
       const preferredProf = isValidProfId(matched.preferred_prof)
         ? matched.preferred_prof
         : undefined;
@@ -2446,22 +2458,40 @@ CRITICAL INTEGRITY RULES:
 
   // Contributors Admin
   app.post('/api/admin/contributors', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
-    const { name, batch, college, contribution } = req.body || {};
+    const { name, role, batch, college, contribution, verified } = req.body || {};
     if (!name || !String(name).trim()) {
       return res.status(400).json({ error: 'Contributor name is required.' });
     }
     const record: ContributorRecord = {
       id: `contrib_${Date.now()}_${crypto.randomBytes(2).toString('hex')}`,
       name: String(name).trim(),
-      batch: String(batch || 'CMC').trim(),
+      role: String(role || 'Contributor').trim(),
+      batch: String(batch || '').trim(),
       college: String(college || 'Chittagong Medical College (CMC)').trim(),
       contribution: String(contribution || 'Academic Question Archive Contributor').trim(),
-      verified: true,
+      verified: verified !== false,
       addedAt: new Date().toISOString()
     };
     db.contributors.push(record);
     saveDatabase(db);
     return res.status(201).json({ success: true, contributor: record });
+  });
+
+  app.put('/api/admin/contributors/:id', requireAdmin, (req: AuthenticatedRequest, res: Response) => {
+    const rec = db.contributors.find(c => c.id === req.params.id);
+    if (!rec) return res.status(404).json({ error: 'Contributor not found.' });
+    const { name, role, batch, college, contribution, verified } = req.body || {};
+    if (name !== undefined && !String(name).trim()) {
+      return res.status(400).json({ error: 'Contributor name cannot be empty.' });
+    }
+    if (name !== undefined) rec.name = String(name).trim();
+    if (role !== undefined) rec.role = String(role).trim();
+    if (batch !== undefined) rec.batch = String(batch).trim();
+    if (college !== undefined) rec.college = String(college).trim();
+    if (contribution !== undefined) rec.contribution = String(contribution).trim();
+    if (verified !== undefined) rec.verified = Boolean(verified);
+    saveDatabase(db);
+    return res.status(200).json({ success: true, contributor: rec });
   });
 
   app.delete('/api/admin/contributors/:id', requireAdmin, (req: AuthenticatedRequest, res: Response) => {

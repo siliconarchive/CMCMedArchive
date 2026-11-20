@@ -15,8 +15,14 @@ import {
   EyeOff,
   FileUp,
   Sparkles,
-  Bookmark
+  Bookmark,
+  ArrowLeft
 } from 'lucide-react';
+import {
+  getSavedSectionFilters,
+  saveSectionFilters,
+  useBackNav
+} from '../utils/BackNavContext';
 import {
   BookmarkRecord,
   CustomTaxonomy,
@@ -72,6 +78,18 @@ interface ArchiveExplorerProps {
 
 const PAGE_SIZE = 20;
 
+interface ArchiveFilterCache {
+  prof: ProfessionalExamId;
+  mcqSubSection: 'all' | 'SBA' | 'TF';
+  search: string;
+  subject: string;
+  paper: string;
+  chapter: string;
+  year: string;
+  college: string;
+  pageIdx: number;
+}
+
 export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
   selectedProf,
   initialTab = 'cq',
@@ -87,32 +105,88 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
   onNavigate,
   onStartQuickExam
 }) => {
+  const { pushSubLayer, popSubLayer, markLayerInactive } = useBackNav();
   const [activeTab, setActiveTab] = useState<'cq' | 'mcq'>(initialTab);
-  const [mcqSubSection, setMcqSubSection] = useState<'all' | 'SBA' | 'TF'>('all');
-  const [search, setSearch] = useState(initialSearch);
-  const [subject, setSubject] = useState(initialSubject);
-  const [paper, setPaper] = useState('all');
-  const [chapter, setChapter] = useState('all');
-  const [year, setYear] = useState('all');
-  const [college, setCollege] = useState('all');
-  const [pageIdx, setPageIdx] = useState(1);
+  const filterCacheKey = `archive_${activeTab}`;
+  const savedFilters = getSavedSectionFilters<ArchiveFilterCache>(filterCacheKey);
+  const canUseSaved = Boolean(savedFilters && savedFilters.prof === selectedProf);
+
+  const [mcqSubSection, setMcqSubSection] = useState<'all' | 'SBA' | 'TF'>(
+    canUseSaved ? savedFilters!.mcqSubSection : 'all'
+  );
+  const [search, setSearch] = useState(
+    initialSearch ? initialSearch : canUseSaved ? savedFilters!.search : ''
+  );
+  const [subject, setSubject] = useState(
+    initialSubject !== 'all' ? initialSubject : canUseSaved ? savedFilters!.subject : 'all'
+  );
+  const [paper, setPaper] = useState(
+    initialSubject !== 'all' ? 'all' : canUseSaved ? savedFilters!.paper : 'all'
+  );
+  const [chapter, setChapter] = useState(
+    initialSubject !== 'all' ? 'all' : canUseSaved ? savedFilters!.chapter : 'all'
+  );
+  const [year, setYear] = useState(canUseSaved ? savedFilters!.year : 'all');
+  const [college, setCollege] = useState(canUseSaved ? savedFilters!.college : 'all');
+  const [pageIdx, setPageIdx] = useState(
+    initialSearch || initialSubject !== 'all' ? 1 : canUseSaved ? savedFilters!.pageIdx : 1
+  );
 
   const prevProfRef = useRef<ProfessionalExamId>(selectedProf);
-  useEffect(() => {
-    setActiveTab(initialTab);
-    setPageIdx(1);
-  }, [initialTab]);
+  const prevInitialSearchRef = useRef<string>(initialSearch);
+  const prevInitialSubjectRef = useRef<string>(initialSubject);
+  const prevInitialTabRef = useRef<'cq' | 'mcq'>(initialTab);
 
   useEffect(() => {
-    setSearch(initialSearch);
-    setPageIdx(1);
+    saveSectionFilters<ArchiveFilterCache>(filterCacheKey, {
+      prof: selectedProf,
+      mcqSubSection,
+      search,
+      subject,
+      paper,
+      chapter,
+      year,
+      college,
+      pageIdx
+    });
+  }, [filterCacheKey, selectedProf, mcqSubSection, search, subject, paper, chapter, year, college, pageIdx]);
+
+  useEffect(() => {
+    if (prevInitialTabRef.current !== initialTab) {
+      prevInitialTabRef.current = initialTab;
+      setActiveTab(initialTab);
+      const tabSaved = getSavedSectionFilters<ArchiveFilterCache>(`archive_${initialTab}`);
+      if (tabSaved && tabSaved.prof === selectedProf) {
+        setMcqSubSection(tabSaved.mcqSubSection);
+        setSearch(initialSearch || tabSaved.search);
+        setSubject(initialSubject !== 'all' ? initialSubject : tabSaved.subject);
+        setPaper(initialSubject !== 'all' ? 'all' : tabSaved.paper);
+        setChapter(initialSubject !== 'all' ? 'all' : tabSaved.chapter);
+        setYear(tabSaved.year);
+        setCollege(tabSaved.college);
+        setPageIdx(initialSearch || initialSubject !== 'all' ? 1 : tabSaved.pageIdx);
+      } else {
+        setPageIdx(1);
+      }
+    }
+  }, [initialTab, selectedProf, initialSearch, initialSubject]);
+
+  useEffect(() => {
+    if (prevInitialSearchRef.current !== initialSearch) {
+      prevInitialSearchRef.current = initialSearch;
+      setSearch(initialSearch);
+      setPageIdx(1);
+    }
   }, [initialSearch]);
 
   useEffect(() => {
-    setSubject(initialSubject);
-    setPaper('all');
-    setChapter('all');
-    setPageIdx(1);
+    if (prevInitialSubjectRef.current !== initialSubject) {
+      prevInitialSubjectRef.current = initialSubject;
+      setSubject(initialSubject);
+      setPaper('all');
+      setChapter('all');
+      setPageIdx(1);
+    }
   }, [initialSubject]);
 
   useEffect(() => {
@@ -123,6 +197,7 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       setChapter('all');
       setYear('all');
       setCollege('all');
+      setMcqSubSection('all');
       setPageIdx(1);
     }
   }, [selectedProf]);
@@ -130,9 +205,19 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
   // Interactive CQ & MCQ states
   const [revealedCqAnswers, setRevealedCqAnswers] = useState<Record<string, boolean>>({});
   const [selectedCq, setSelectedCq] = useState<UnifiedCqQuestion | null>(null);
+  const cqLayerRef = useRef<string | null>(null);
   const [sbaResponses, setSbaResponses] = useState<Record<string, number>>({});
   const [tfResponses, setTfResponses] = useState<Record<string, Record<string, boolean>>>({});
   const [revealedMcqExplanations, setRevealedMcqExplanations] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    return () => {
+      if (cqLayerRef.current) {
+        markLayerInactive(cqLayerRef.current);
+        cqLayerRef.current = null;
+      }
+    };
+  }, [markLayerInactive]);
 
   const profConfig = getProfConfig(selectedProf, customTaxonomy);
 
@@ -299,6 +384,12 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
   );
 
   const openCqDetail = (q: UnifiedCqQuestion) => {
+    if (!cqLayerRef.current) {
+      cqLayerRef.current = pushSubLayer('Written Questions', () => {
+        cqLayerRef.current = null;
+        setSelectedCq(null);
+      });
+    }
     setSelectedCq(q);
     onRecordRecentView?.({
       id: q.id,
@@ -308,6 +399,16 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
       title: q.text.slice(0, 120),
       subtitle: `${q.paper} · ${q.chapter}${q.year ? ` · ${q.year}` : ''}`
     });
+  };
+
+  const closeCqDetail = () => {
+    if (cqLayerRef.current) {
+      const id = cqLayerRef.current;
+      cqLayerRef.current = null;
+      popSubLayer(id);
+    } else {
+      setSelectedCq(null);
+    }
   };
 
   const renderMcqCard = (q: UnifiedMcqQuestion, idx: number) => {
@@ -1071,15 +1172,25 @@ export const ArchiveExplorer: React.FC<ArchiveExplorerProps> = ({
 
       {/* CQ Detail Modal */}
       {selectedCq && (
-        <div className="modal-overlay" onClick={() => setSelectedCq(null)}>
+        <div className="modal-overlay" onClick={closeCqDetail}>
           <div className="modal-content !max-w-2xl" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="text-sm font-bold text-[var(--ink)]">
-                {selectedCq.subject} &bull; {selectedCq.paper}
+              <div className="flex items-center gap-2.5 min-w-0">
+                <button
+                  type="button"
+                  onClick={closeCqDetail}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[var(--line)] text-xs font-bold text-[var(--ink-secondary)] hover:text-[var(--ink)] hover:bg-[var(--bg-subtle)] shrink-0"
+                >
+                  <ArrowLeft size={13} />
+                  <span>Back</span>
+                </button>
+                <div className="text-sm font-bold text-[var(--ink)] truncate">
+                  {selectedCq.subject} &bull; {selectedCq.paper}
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => setSelectedCq(null)}
+                onClick={closeCqDetail}
                 className="p-1.5 rounded-lg text-[var(--mut)] hover:text-[var(--ink)]"
                 aria-label="Close"
               >

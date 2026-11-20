@@ -184,6 +184,7 @@ export interface PublishedMcqQuestion {
 export interface ContributorRecord {
   id: string;
   name: string;
+  role?: string;
   batch: string;
   college: string;
   contribution: string;

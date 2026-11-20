@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BookOpen,
   Clock,
@@ -15,13 +15,13 @@ import {
   ShieldAlert,
   LogIn,
   UserPlus,
-  ShieldCheck,
   FileUp,
   FileText,
   Loader2,
   Bookmark,
   MessageSquarePlus,
-  Send
+  Send,
+  ArrowLeft
 } from 'lucide-react';
 import {
   BookmarkRecord,
@@ -44,6 +44,13 @@ import {
   subjectMatchesCanonical
 } from '../data/curriculumConfig';
 import { fileToBase64, submitNoteToAppsScript } from '../utils/appsScriptArchive';
+import { isAdminUser } from '../utils/appsScriptAuth';
+import { AuthRequiredCard } from './AuthRequiredCard';
+import {
+  getSavedSectionFilters,
+  saveSectionFilters,
+  useBackNav
+} from '../utils/BackNavContext';
 
 interface StudentLibraryProps {
   selectedProf: ProfessionalExamId;
@@ -54,9 +61,20 @@ interface StudentLibraryProps {
   studyState?: StudyState;
   onToggleBookmark?: (item: Omit<BookmarkRecord, 'savedAt'>) => void;
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
+  onOpenAuth: (mode: 'signin' | 'signup') => void;
   onNavigate: (page: PageRoute) => void;
   onDeleteNote: (id: string) => Promise<void>;
 }
+
+interface LibraryFilterCache {
+  prof: ProfessionalExamId;
+  search: string;
+  subject: string;
+  paper: string;
+  kind: string;
+}
+
+const LIBRARY_FILTER_CACHE_KEY = 'notes_library';
 
 export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
   selectedProf,
@@ -67,16 +85,22 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
   studyState,
   onToggleBookmark,
   onRecordRecentView,
+  onOpenAuth,
   onNavigate,
   onDeleteNote
 }) => {
+  const { pushSubLayer } = useBackNav();
+  const saved = getSavedSectionFilters<LibraryFilterCache>(LIBRARY_FILTER_CACHE_KEY);
+  const useSaved = saved && saved.prof === selectedProf;
+
   const [tab, setTab] = useState<'all' | 'my' | 'requests'>('all');
-  const [search, setSearch] = useState('');
-  const [subject, setSubject] = useState('all');
-  const [paper, setPaper] = useState('all');
-  const [kind, setKind] = useState('all');
+  const [search, setSearch] = useState(useSaved ? saved.search : '');
+  const [subject, setSubject] = useState(useSaved ? saved.subject : 'all');
+  const [paper, setPaper] = useState(useSaved ? saved.paper : 'all');
+  const [kind, setKind] = useState(useSaved ? saved.kind : 'all');
   const [deletingNoteId, setDeletingNoteId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
 
   // Resource Requests state scoped to selectedProf
   const [requests, setRequests] = useState<ResourceRequestRecord[]>([]);
@@ -88,17 +112,38 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
   const [reqSubmitting, setReqSubmitting] = useState(false);
   const [reqNotice, setReqNotice] = useState<string | null>(null);
 
+  useEffect(() => {
+    saveSectionFilters<LibraryFilterCache>(LIBRARY_FILTER_CACHE_KEY, {
+      prof: selectedProf,
+      search,
+      subject,
+      paper,
+      kind
+    });
+  }, [selectedProf, search, subject, paper, kind]);
+
   const profConfig = getProfConfig(selectedProf, customTaxonomy);
   const profSubjects = useMemo(
     () => getSubjectsForProf(selectedProf, customTaxonomy),
     [selectedProf, customTaxonomy]
   );
 
+  const prevProfRef = useRef<ProfessionalExamId>(selectedProf);
   useEffect(() => {
-    setSubject('all');
-    setPaper('all');
+    if (prevProfRef.current !== selectedProf) {
+      prevProfRef.current = selectedProf;
+      setSubject('all');
+      setPaper('all');
+    }
     setReqSubject(profSubjects[0] || '');
   }, [selectedProf, profSubjects]);
+
+  const switchTab = (nextTab: 'all' | 'my' | 'requests') => {
+    if (nextTab === tab) return;
+    const prevTab = tab;
+    pushSubLayer('Notes Library', () => setTab(prevTab));
+    setTab(nextTab);
+  };
 
   const loadResourceRequests = async () => {
     setReqLoading(true);
@@ -151,43 +196,47 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
     }
   };
 
-  const mbbsNotes = useMemo(
-    () =>
-      notes.filter(item => {
-        if (isDentalSubjectOrProgram(item.prog, item.subject)) return false;
-        if (item.classificationRole === 'Phase Teaching / Formative Subject') return false;
-        if ((item.professionalExam || 'First Professional') !== selectedProf) return false;
-        return item.status !== 'rejected';
-      }),
-    [notes, selectedProf]
+  const mbbsNotes = useMemo(() => {
+    if (!userProfile) return [];
+    return notes.filter(item => {
+      if (isDentalSubjectOrProgram(item.prog, item.subject)) return false;
+      if (item.classificationRole === 'Phase Teaching / Formative Subject') return false;
+      if ((item.professionalExam || 'First Professional') !== selectedProf) return false;
+      return item.status !== 'rejected';
+    });
+  }, [notes, selectedProf, userProfile]);
+
+  const approvedMbbsNotes = useMemo(
+    () => mbbsNotes.filter(item => item.status === 'approved'),
+    [mbbsNotes]
   );
 
   const availableSubjects = useMemo(() => {
     const set = new Set<string>(profSubjects);
-    mbbsNotes.forEach(n => {
+    approvedMbbsNotes.forEach(n => {
       if (n.subject) set.add(canonicalizeSubjectName(n.subject));
     });
     return Array.from(set).sort();
-  }, [mbbsNotes, profSubjects]);
+  }, [approvedMbbsNotes, profSubjects]);
 
   const availablePapers = useMemo(() => {
     const set = new Set<string>(['Paper-I', 'Paper-II', 'General']);
-    mbbsNotes.forEach(n => {
+    approvedMbbsNotes.forEach(n => {
       if (subjectMatchesCanonical(n.subject, subject) && n.paper) set.add(n.paper);
     });
     return Array.from(set).sort();
-  }, [mbbsNotes, subject]);
+  }, [approvedMbbsNotes, subject]);
 
-  const tabFiltered = mbbsNotes.filter(item => {
-    if (tab === 'my') {
-      return (
-        userProfile &&
-        (item.uploadedByUserId === userProfile.id ||
-          item.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase())
-      );
-    }
-    return true;
-  });
+  const myNotes = useMemo(() => {
+    if (!userProfile) return [];
+    return mbbsNotes.filter(
+      n =>
+        n.uploadedByUserId === userProfile.id ||
+        n.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase()
+    );
+  }, [mbbsNotes, userProfile]);
+
+  const tabFiltered = tab === 'my' ? myNotes : approvedMbbsNotes;
 
   const filtered = tabFiltered.filter(item => {
     if (!subjectMatchesCanonical(item.subject, subject)) return false;
@@ -207,20 +256,16 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
     return set;
   }, [studyState?.bookmarks]);
 
-  const myCount = userProfile
-    ? mbbsNotes.filter(
-        n =>
-          n.uploadedByUserId === userProfile.id ||
-          n.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase()
-      ).length
-    : 0;
+  const myCount = myNotes.length;
 
   const handleDeleteNoteClick = async (noteId: string) => {
-    if (!userProfile) return;
+    if (!userProfile || deletingNoteId) return;
     setDeleteError(null);
+    setDeleteSuccess(null);
     setDeletingNoteId(noteId);
     try {
       await onDeleteNote(noteId);
+      setDeleteSuccess('Study note permanently deleted from Google Sheet and website.');
     } catch (err: any) {
       setDeleteError(err?.message || 'Failed to delete study note.');
     } finally {
@@ -253,20 +298,20 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => setTab('all')}
+          onClick={() => switchTab('all')}
           className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors min-h-[40px] ${
             tab === 'all'
               ? 'bg-[#173B55] text-white'
               : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
           }`}
         >
-          Study Notes ({mbbsNotes.length})
+          Study Notes{userProfile ? ` (${approvedMbbsNotes.length})` : ''}
         </button>
 
         {userProfile && (
           <button
             type="button"
-            onClick={() => setTab('my')}
+            onClick={() => switchTab('my')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors min-h-[40px] flex items-center gap-1.5 ${
               tab === 'my'
                 ? 'bg-[#173B55] text-white'
@@ -280,7 +325,7 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
 
         <button
           type="button"
-          onClick={() => setTab('requests')}
+          onClick={() => switchTab('requests')}
           className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors min-h-[40px] flex items-center gap-1.5 ${
             tab === 'requests'
               ? 'bg-[#0D9488] text-white'
@@ -290,6 +335,16 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
           <MessageSquarePlus size={13} />
           <span>Resource Requests ({requests.length})</span>
         </button>
+
+        {tab !== 'all' && (
+          <button
+            type="button"
+            onClick={() => switchTab('all')}
+            className="btn sm alt ml-auto min-h-[38px]"
+          >
+            <ArrowLeft size={13} /> Back to Study Notes
+          </button>
+        )}
       </div>
 
       {/* Resource Requests View */}
@@ -410,6 +465,12 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
             )}
           </div>
         </div>
+      ) : !userProfile ? (
+        <AuthRequiredCard
+          title="Sign In to View Uploaded Study Notes"
+          description="An account is required to view uploaded study notes, diagrams, and peer high-yield summaries."
+          onOpenAuth={onOpenAuth}
+        />
       ) : (
         <>
           {/* Filters */}
@@ -486,6 +547,18 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
             </div>
           </div>
 
+          {deleteSuccess && (
+            <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 font-semibold">
+                <CheckCircle2 size={16} className="shrink-0" />
+                <span>{deleteSuccess}</span>
+              </div>
+              <button type="button" onClick={() => setDeleteSuccess(null)} aria-label="Dismiss message">
+                <X size={15} />
+              </button>
+            </div>
+          )}
+
           {deleteError && (
             <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs sm:text-sm flex items-center gap-2">
               <AlertCircle size={16} className="shrink-0" />
@@ -498,14 +571,16 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
             <div className="empty space-y-2">
               <BookOpen size={36} className="mx-auto mb-1 opacity-50" />
               <div className="font-bold text-[var(--ink)]">
-                No study notes found for {profConfig.shortLabel}
+                {tab === 'my'
+                  ? `You have not uploaded any notes for ${profConfig.shortLabel} yet`
+                  : `No approved study notes found for ${profConfig.shortLabel}`}
               </div>
               <p className="text-xs text-[var(--mut)] mt-1 max-w-md mx-auto">
                 Clear filters, upload a study note, or log a request in the Resource Requests tab.
               </p>
               <button
                 type="button"
-                onClick={() => setTab('requests')}
+                onClick={() => switchTab('requests')}
                 className="btn sm alt mt-2"
               >
                 Request Missing Resource
@@ -516,8 +591,9 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
               {filtered.map(res => {
                 const isOwner =
                   userProfile &&
-                  (res.uploadedByUserId === userProfile.id || res.uploadedByEmail === userProfile.email);
-                const isAdmin = userProfile?.role === 'admin';
+                  (res.uploadedByUserId === userProfile.id ||
+                    res.uploadedByEmail?.toLowerCase() === userProfile.email.toLowerCase());
+                const isAdmin = isAdminUser(userProfile);
                 const fileHref = res.fileUrl
                   ? res.fileUrl.startsWith('/') && authToken
                     ? `${res.fileUrl}?token=${encodeURIComponent(authToken)}`
@@ -592,9 +668,19 @@ export const StudentLibraryPage: React.FC<StudentLibraryProps> = ({
 
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-[var(--line)] text-xs">
                       <div>
-                        <span className="badge ok">
-                          <CheckCircle2 size={12} /> Published
-                        </span>
+                        {res.status === 'approved' ? (
+                          <span className="badge ok">
+                            <CheckCircle2 size={12} /> Published
+                          </span>
+                        ) : res.status === 'rejected' ? (
+                          <span className="badge err">
+                            <AlertCircle size={12} /> Rejected
+                          </span>
+                        ) : (
+                          <span className="badge warn">
+                            <Clock size={12} /> Pending Approval
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -663,11 +749,11 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
   selectedProf,
   customTaxonomy,
   userProfile,
-  authToken,
   onOpenAuth,
   onUploadComplete,
   onNavigate
 }) => {
+  const { canGoBack, goBack } = useBackNav();
   const profConfigs = getMergedProfConfigs(customTaxonomy);
   const [noteProf, setNoteProf] = useState<ProfessionalExamId>(selectedProf);
   const [fullName, setFullName] = useState(userProfile?.fullName || '');
@@ -732,6 +818,8 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
         file_type = 'drive_link';
       }
 
+      const adminSubmit = isAdminUser(userProfile);
+
       await submitNoteToAppsScript({
         title: title.trim(),
         prof: noteProf,
@@ -746,11 +834,15 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
         file_base64,
         file_name,
         mime_type,
-        file_type
+        file_type,
+        status: adminSubmit ? 'approved' : 'pending',
+        is_admin: adminSubmit
       });
 
       setSuccess(
-        'Study note submitted and published live to the Notes Library!'
+        adminSubmit
+          ? 'Study note submitted and published live to the Notes Library!'
+          : 'Study note submitted! It is pending admin approval and will appear in the Notes Library once approved.'
       );
       setTitle('');
       setTopic('');
@@ -767,7 +859,14 @@ export const NoteUploadPage: React.FC<NoteUploadPageProps> = ({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="border-b border-[var(--line)] pb-4 space-y-1">
+      <div className="border-b border-[var(--line)] pb-4 space-y-2">
+        <button
+          type="button"
+          onClick={() => (canGoBack ? goBack() : onNavigate('library'))}
+          className="btn sm alt"
+        >
+          <ArrowLeft size={13} /> Back to Notes Library
+        </button>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--ink)] m-0">
           Upload Study Notes
         </h1>

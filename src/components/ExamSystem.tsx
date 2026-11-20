@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Clock,
   CheckCircle2,
@@ -14,8 +14,10 @@ import {
   BookOpen,
   Shuffle,
   Check,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
+import { useBackNav } from '../utils/BackNavContext';
 import {
   CustomTaxonomy,
   PageRoute,
@@ -95,6 +97,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   onPracticeOutcome,
   onNavigate
 }) => {
+  const { pushSubLayer, popSubLayer, markLayerInactive } = useBackNav();
   const allMcqsRaw = useMemo(
     () => buildUnifiedMcqQuestions(publishedQuestions, questionOverrides),
     [publishedQuestions, questionOverrides]
@@ -102,6 +105,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
 
   // Setup State — strictly governed by global selectedProf
   const [stage, setStage] = useState<ExamStage>('setup');
+  const confirmLayerRef = useRef<string | null>(null);
   const [mode, setMode] = useState<ExamMode>(preset?.chapter ? 'chapter' : preset?.paper ? 'paper' : 'subject');
   const profSubjects = getSubjectsForProf(selectedProf, customTaxonomy);
   const [subject, setSubject] = useState<string>(preset?.subject || profSubjects[0] || '');
@@ -144,6 +148,35 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   const [totalDurationSecs, setTotalDurationSecs] = useState<number>(0);
   const [timeTakenSecs, setTimeTakenSecs] = useState<number>(0);
   const [confirmSubmitOpen, setConfirmSubmitOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    return () => {
+      if (confirmLayerRef.current) {
+        markLayerInactive(confirmLayerRef.current);
+        confirmLayerRef.current = null;
+      }
+    };
+  }, [markLayerInactive]);
+
+  const openConfirmSubmit = () => {
+    if (!confirmLayerRef.current) {
+      confirmLayerRef.current = pushSubLayer('Exam', () => {
+        confirmLayerRef.current = null;
+        setConfirmSubmitOpen(false);
+      });
+    }
+    setConfirmSubmitOpen(true);
+  };
+
+  const closeConfirmSubmit = () => {
+    if (confirmLayerRef.current) {
+      const id = confirmLayerRef.current;
+      confirmLayerRef.current = null;
+      popSubLayer(id);
+    } else {
+      setConfirmSubmitOpen(false);
+    }
+  };
 
   const subjects = useMemo(() => {
     const base = getSubjectsForProf(selectedProf, customTaxonomy);
@@ -258,6 +291,10 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
   const finalizeExam = (forcedElapsed?: number) => {
     const elapsed = forcedElapsed !== undefined ? forcedElapsed : Math.max(0, totalDurationSecs - secondsLeft);
     setTimeTakenSecs(elapsed);
+    if (confirmLayerRef.current) {
+      markLayerInactive(confirmLayerRef.current);
+      confirmLayerRef.current = null;
+    }
     setConfirmSubmitOpen(false);
     setRecordedRunId(Date.now());
     setStage('results');
@@ -654,7 +691,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
 
             <button
               type="button"
-              onClick={() => setConfirmSubmitOpen(true)}
+              onClick={openConfirmSubmit}
               className="btn good min-h-[42px] !px-3.5"
             >
               Submit Exam
@@ -796,7 +833,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
               ) : (
                 <button
                   type="button"
-                  onClick={() => setConfirmSubmitOpen(true)}
+                  onClick={openConfirmSubmit}
                   className="btn good min-h-[44px]"
                 >
                   <Check size={16} /> Finish &amp; Submit
@@ -856,7 +893,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
 
         {/* Confirm Submit Modal */}
         {confirmSubmitOpen && (
-          <div className="modal-overlay" onClick={() => setConfirmSubmitOpen(false)}>
+          <div className="modal-overlay" onClick={closeConfirmSubmit}>
             <div className="modal-content max-w-md" onClick={e => e.stopPropagation()}>
               <div className="modal-header">
                 <h3 className="text-base font-bold m-0">Submit Examination?</h3>
@@ -876,7 +913,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() => setConfirmSubmitOpen(false)}
+                    onClick={closeConfirmSubmit}
                     className="btn alt min-h-[44px]"
                   >
                     Continue Exam
@@ -922,7 +959,7 @@ export const ExamSystem: React.FC<ExamSystemProps> = ({
               <RotateCcw size={15} /> Retake Exam
             </button>
             <button type="button" onClick={() => setStage('setup')} className="btn alt min-h-[44px]">
-              New Configuration
+              <ArrowLeft size={15} /> Back to Exam Setup
             </button>
           </div>
         </div>

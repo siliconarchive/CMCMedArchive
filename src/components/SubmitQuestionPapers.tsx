@@ -13,7 +13,8 @@ import {
   Clock,
   ShieldCheck,
   FileText,
-  Plus
+  Plus,
+  ArrowLeft
 } from 'lucide-react';
 import {
   BookmarkRecord,
@@ -41,6 +42,9 @@ import {
   mapAppsScriptPaperToSubmission,
   submitPaperToAppsScript
 } from '../utils/appsScriptArchive';
+import { isAdminUser } from '../utils/appsScriptAuth';
+import { AuthRequiredCard } from './AuthRequiredCard';
+import { useBackNav } from '../utils/BackNavContext';
 
 interface SubmitQuestionPapersProps {
   selectedProf: ProfessionalExamId;
@@ -53,6 +57,7 @@ interface SubmitQuestionPapersProps {
   onRecordRecentView?: (item: Omit<RecentlyViewedRecord, 'viewedAt'>) => void;
   onPaperSubmitted?: () => Promise<void>;
   onDeletePaper?: (id: string) => Promise<void>;
+  onOpenAuth: (mode: 'signin' | 'signup') => void;
   initialHubTab?: 'submit' | 'community';
   onNavigate: (page: PageRoute) => void;
 }
@@ -92,15 +97,40 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   onRecordRecentView,
   onPaperSubmitted,
   onDeletePaper,
+  onOpenAuth,
   initialHubTab = 'submit',
   onNavigate
 }) => {
+  const { pushSubLayer } = useBackNav();
   const [hubTab, setHubTab] = useState<'submit' | 'community'>(initialHubTab);
   const [activeView, setActiveView] = useState<'form' | 'track'>('form');
 
   useEffect(() => {
     setHubTab(initialHubTab);
   }, [initialHubTab]);
+
+  const switchHubTab = (nextHub: 'submit' | 'community') => {
+    if (nextHub === hubTab) return;
+    const prevHub = hubTab;
+    pushSubLayer(
+      prevHub === 'submit' ? 'Submit Question Papers' : 'Community Uploads',
+      () => setHubTab(prevHub)
+    );
+    setHubTab(nextHub);
+    if (nextHub === 'submit') {
+      setActiveView('form');
+    }
+  };
+
+  const switchActiveView = (nextView: 'form' | 'track') => {
+    if (nextView === activeView) return;
+    const prevView = activeView;
+    pushSubLayer(
+      prevView === 'form' ? 'Submission Form' : 'Track My Submissions',
+      () => setActiveView(prevView)
+    );
+    setActiveView(nextView);
+  };
 
   const profPaperCount = publishedPapers.filter(
     p =>
@@ -181,6 +211,10 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
     collegeChoice === 'Other Medical College' ? customCollege.trim() : collegeChoice;
 
   const fetchMySubmissions = async () => {
+    if (!userProfile) {
+      setMySubmissions([]);
+      return;
+    }
     setLoadingMine(true);
     try {
       const savedIds = new Set(loadSavedTrackingTokens().map(t => t.id));
@@ -202,7 +236,11 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
   };
 
   useEffect(() => {
-    fetchMySubmissions();
+    if (userProfile) {
+      fetchMySubmissions();
+    } else {
+      setMySubmissions([]);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, userProfile?.email]);
 
@@ -292,6 +330,8 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
     setSubmitting(true);
     setUploadProgress(15);
 
+    const adminSubmit = isAdminUser(userProfile);
+
     try {
       const baseTitle = `${examName.trim()} (${category})`;
       const baseMeta = {
@@ -305,7 +345,9 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
         batch: contributorBatch.trim(),
         contributor_name: contributorName.trim() || userProfile?.fullName || 'Anonymous Student',
         contributor_email: userProfile?.email || '',
-        description: description.trim()
+        description: description.trim(),
+        status: (adminSubmit ? 'approved' : 'pending') as 'approved' | 'pending',
+        is_admin: adminSubmit
       };
 
       let lastCreated = null;
@@ -454,10 +496,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             type="button"
             role="tab"
             aria-selected={hubTab === 'submit'}
-            onClick={() => {
-              setHubTab('submit');
-              setActiveView('form');
-            }}
+            onClick={() => switchHubTab('submit')}
             className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
               hubTab === 'submit'
                 ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
@@ -470,14 +509,14 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             type="button"
             role="tab"
             aria-selected={hubTab === 'community'}
-            onClick={() => setHubTab('community')}
+            onClick={() => switchHubTab('community')}
             className={`px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold min-h-[44px] ${
               hubTab === 'community'
                 ? 'bg-[#0F2942] text-white dark:bg-[#0D9488]'
                 : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
             }`}
           >
-            Community Uploads ({profPaperCount})
+            Community Uploads{userProfile ? ` (${profPaperCount})` : ''}
           </button>
         </div>
       </div>
@@ -493,7 +532,8 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
           onToggleBookmark={onToggleBookmark}
           onRecordRecentView={onRecordRecentView}
           onDeletePaper={onDeletePaper}
-          onSwitchToSubmitTab={() => setHubTab('submit')}
+          onOpenAuth={onOpenAuth}
+          onSwitchToSubmitTab={() => switchHubTab('submit')}
           onNavigate={onNavigate}
         />
       ) : (
@@ -503,7 +543,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setActiveView('form')}
+                onClick={() => switchActiveView('form')}
                 className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] ${
                   activeView === 'form'
                     ? 'bg-[var(--card)] text-[var(--ink)] shadow-xs border border-[var(--line)]'
@@ -515,7 +555,7 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
               <button
                 type="button"
                 onClick={() => {
-                  setActiveView('track');
+                  switchActiveView('track');
                   fetchMySubmissions();
                 }}
                 className={`px-3.5 py-2 rounded-lg text-xs font-bold min-h-[38px] ${
@@ -524,11 +564,13 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
                     : 'text-[var(--mut)]'
                 }`}
               >
-                Track My Submissions ({mySubmissions.length})
+                Track My Submissions{userProfile ? ` (${mySubmissions.length})` : ''}
               </button>
             </div>
             <span className="text-[11px] text-[var(--mut)] px-2">
-              Submitted papers go live immediately in Community Uploads
+              {isAdminUser(userProfile)
+                ? 'Admin submissions are published live immediately'
+                : 'Submissions remain pending until approved by an admin'}
             </span>
           </div>
 
@@ -543,18 +585,32 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
             <div className="p-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
               <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-extrabold text-base">
                 <CheckCircle2 size={20} />
-                <span>Question Paper Published Live!</span>
+                <span>
+                  {submittedRecord.status === 'Approved' || submittedRecord.status === 'Published'
+                    ? 'Question Paper Published Live!'
+                    : 'Question Paper Submitted for Admin Approval!'}
+                </span>
               </div>
               <p className="text-xs sm:text-sm text-[var(--ink-secondary)] m-0">
                 Tracking ID: <b className="font-mono text-[var(--ink)]">{submittedRecord.id}</b> &bull; Status:{' '}
-                <span className="font-bold text-emerald-700 dark:text-emerald-300">Live</span> &bull; Examination Stage:{' '}
-                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>. Your paper is now visible to all students in Community Uploads.
+                <span className="font-bold text-emerald-700 dark:text-emerald-300">
+                  {submittedRecord.status === 'Approved' || submittedRecord.status === 'Published'
+                    ? 'Live'
+                    : 'Pending Approval'}
+                </span>{' '}
+                &bull; Examination Stage:{' '}
+                <span className="font-bold">{submittedRecord.professionalExam || formProf}</span>.{' '}
+                {submittedRecord.status === 'Approved' || submittedRecord.status === 'Published'
+                  ? 'Your paper is now visible to signed-in students in Community Uploads.'
+                  : 'Your submission is awaiting admin review and will appear in Community Uploads once approved.'}
               </p>
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => setHubTab('community')} className="btn sm good">
-                  View in Community Uploads &rarr;
-                </button>
-                <button type="button" onClick={() => setActiveView('track')} className="btn sm alt">
+                {(submittedRecord.status === 'Approved' || submittedRecord.status === 'Published') && (
+                  <button type="button" onClick={() => switchHubTab('community')} className="btn sm good">
+                    View in Community Uploads &rarr;
+                  </button>
+                )}
+                <button type="button" onClick={() => switchActiveView('track')} className="btn sm alt">
                   View My Submissions
                 </button>
               </div>
@@ -1013,21 +1069,38 @@ export const SubmitQuestionPapers: React.FC<SubmitQuestionPapersProps> = ({
       {/* VIEW 2: TRACK SUBMISSIONS */}
       {activeView === 'track' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-extrabold text-[var(--ink)] m-0">My Submitted Question Papers</h2>
-            <button type="button" onClick={fetchMySubmissions} className="btn sm alt">
-              <RefreshCw size={13} className={loadingMine ? 'animate-spin' : ''} /> Refresh
-            </button>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => switchActiveView('form')}
+                className="btn sm alt"
+              >
+                <ArrowLeft size={13} /> Back to Form
+              </button>
+              <h2 className="text-lg font-extrabold text-[var(--ink)] m-0">My Submitted Question Papers</h2>
+            </div>
+            {userProfile && (
+              <button type="button" onClick={fetchMySubmissions} className="btn sm alt">
+                <RefreshCw size={13} className={loadingMine ? 'animate-spin' : ''} /> Refresh
+              </button>
+            )}
           </div>
 
-          {mySubmissions.length === 0 ? (
+          {!userProfile ? (
+            <AuthRequiredCard
+              title="Sign In to View Submitted Question Papers"
+              description="Please sign in or create an account to track your submitted question papers."
+              onOpenAuth={onOpenAuth}
+            />
+          ) : mySubmissions.length === 0 ? (
             <div className="empty">
               <Clock size={36} className="mx-auto mb-2 opacity-50" />
               <div className="font-bold text-[var(--ink)]">No tracked submissions yet</div>
               <p className="text-xs text-[var(--mut)] mt-1">
                 Submit a Card, Term, or MCQ paper and track its review status right here.
               </p>
-              <button type="button" onClick={() => setActiveView('form')} className="btn sm mt-3">
+              <button type="button" onClick={() => switchActiveView('form')} className="btn sm mt-3">
                 Submit Question Paper
               </button>
             </div>
