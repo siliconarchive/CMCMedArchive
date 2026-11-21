@@ -79,6 +79,8 @@ import {
   listNotesFromAppsScript,
   updateArchiveItemStatus
 } from './utils/appsScriptArchive';
+import { DEFAULT_SEED_CONTRIBUTORS } from './data/contributorsSeed';
+import { loadContributorsWithFallback } from './utils/appsScriptContributors';
 
 const TELEGRAM_URL = 'https://t.me/Sifat_Islam_7';
 const AUTH_TOKEN_KEY = 'cmc_auth_token';
@@ -187,16 +189,8 @@ export default function App() {
 
   // Server Data
   const [notes, setNotes] = useState<UploadedItem[]>([]);
-  const [contributors, setContributors] = useState<ContributorRecord[]>([
-    {
-      id: 'contrib_sadman_sami',
-      name: 'MD Sadman Sami',
-      batch: 'CMC 67',
-      college: 'Chittagong Medical College (CMC)',
-      contribution: 'Question Paper Archiving & Academic Data Contribution',
-      verified: true,
-      addedAt: ''
-    }
+  const [contributors, setContributors] = useState<ContributorRecord[]>(() => [
+    ...DEFAULT_SEED_CONTRIBUTORS
   ]);
   const [announcement, setAnnouncement] = useState<AnnouncementRecord>(FALLBACK_ANNOUNCEMENT);
   const [allNotices, setAllNotices] = useState<AnnouncementRecord[]>([FALLBACK_ANNOUNCEMENT]);
@@ -742,7 +736,6 @@ export default function App() {
     try {
       const requests: Promise<Response>[] = [
         fetch('/api/archive/published'),
-        fetch('/api/contributors'),
         fetch('/api/announcements/active', { cache: 'no-store' }),
         fetch('/api/announcements', { cache: 'no-store' })
       ];
@@ -753,8 +746,8 @@ export default function App() {
       const [
         gsPapersResult,
         gsNotesResult,
+        gsContributorsResult,
         archiveRes,
-        contribRes,
         annRes,
         allAnnRes,
         studyRes
@@ -771,6 +764,10 @@ export default function App() {
               return null;
             })
           : Promise.resolve([]),
+        loadContributorsWithFallback().catch(err => {
+          console.error('Failed to load contributors:', err);
+          return null;
+        }),
         ...requests
       ]);
 
@@ -785,17 +782,14 @@ export default function App() {
           setPublishedPapers(gsPapersResult);
         }
       }
+      if (Array.isArray(gsContributorsResult) && gsContributorsResult.length > 0) {
+        setContributors(gsContributorsResult);
+      }
       if (archiveRes.ok) {
         const ad = await archiveRes.json();
         if (Array.isArray(ad.publishedQuestions)) setPublishedQuestions(ad.publishedQuestions);
         if (ad.questionOverrides) setQuestionOverrides(ad.questionOverrides);
         if (ad.customTaxonomy) setCustomTaxonomy(ad.customTaxonomy);
-      }
-      if (contribRes.ok) {
-        const cd = await contribRes.json();
-        if (Array.isArray(cd.contributors) && cd.contributors.length > 0) {
-          setContributors(cd.contributors);
-        }
       }
       if (allAnnRes.ok) {
         const allD = await allAnnRes.json();
@@ -1831,6 +1825,7 @@ export default function App() {
             contributors={contributors}
             userProfile={userProfile}
             authToken={authToken}
+            onContributorsChange={setContributors}
             onRefreshContributors={() => loadPlatformData()}
             onNavigate={navigateTo}
           />
@@ -1859,6 +1854,7 @@ export default function App() {
             questionOverrides={questionOverrides}
             customTaxonomy={customTaxonomy}
             publishedPapers={publishedPapers}
+            onContributorsChange={setContributors}
             onRefreshAll={() => loadPlatformData()}
             onDeleteNote={handleDeleteNote}
             onDeletePaper={handleDeletePaper}

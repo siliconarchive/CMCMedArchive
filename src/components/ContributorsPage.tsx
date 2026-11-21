@@ -15,11 +15,17 @@ import {
 } from 'lucide-react';
 import { ContributorRecord, PageRoute, UserProfile } from '../types';
 import { isAdminUser } from '../utils/appsScriptAuth';
+import {
+  addContributorPersistent,
+  deleteContributorPersistent,
+  updateContributorPersistent
+} from '../utils/appsScriptContributors';
 
 interface ContributorsPageProps {
   contributors: ContributorRecord[];
   userProfile?: UserProfile | null;
   authToken?: string | null;
+  onContributorsChange?: React.Dispatch<React.SetStateAction<ContributorRecord[]>>;
   onRefreshContributors?: () => Promise<void>;
   onNavigate: (page: PageRoute) => void;
 }
@@ -28,6 +34,7 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
   contributors,
   userProfile,
   authToken,
+  onContributorsChange,
   onRefreshContributors,
   onNavigate
 }) => {
@@ -38,7 +45,7 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
   const [name, setName] = useState('');
   const [role, setRole] = useState('Contributor');
   const [batch, setBatch] = useState('');
-  const [college, setCollege] = useState('Chittagong Medical College (CMC)');
+  const [college, setCollege] = useState('Chittagong Medical College');
   const [contribution, setContribution] = useState('');
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -49,7 +56,7 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
     setName('');
     setRole('Contributor');
     setBatch('');
-    setCollege('Chittagong Medical College (CMC)');
+    setCollege('Chittagong Medical College');
     setContribution('');
     setFormOpen(false);
   };
@@ -59,7 +66,7 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
     setName('');
     setRole('Contributor');
     setBatch('');
-    setCollege('Chittagong Medical College (CMC)');
+    setCollege('Chittagong Medical College');
     setContribution('');
     setFeedback(null);
     setFormOpen(true);
@@ -70,7 +77,7 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
     setName(c.name);
     setRole(c.role || 'Contributor');
     setBatch(c.batch || '');
-    setCollege(c.college || 'Chittagong Medical College (CMC)');
+    setCollege(c.college || 'Chittagong Medical College');
     setContribution(c.contribution || '');
     setFeedback(null);
     setFormOpen(true);
@@ -79,36 +86,27 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!admin || !name.trim()) return;
-    if (!authToken) {
-      setFeedback({ type: 'err', text: 'Please sign in again to save contributor changes.' });
-      return;
-    }
 
     setSaving(true);
     setFeedback(null);
     try {
       const isEdit = Boolean(editingId);
-      const res = await fetch(
-        isEdit ? `/api/admin/contributors/${editingId}` : '/api/admin/contributors',
-        {
-          method: isEdit ? 'PUT' : 'POST',
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            role: role.trim() || 'Contributor',
-            batch: batch.trim(),
-            college: college.trim() || 'Chittagong Medical College (CMC)',
-            contribution: contribution.trim()
-          })
-        }
-      );
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setFeedback({ type: 'err', text: data.error || 'Could not save contributor.' });
-        return;
+      const input = {
+        name: name.trim(),
+        role: role.trim() || 'Contributor',
+        batch: batch.trim(),
+        college: college.trim() || 'Chittagong Medical College',
+        contribution: contribution.trim()
+      };
+
+      if (isEdit && editingId) {
+        const updated = await updateContributorPersistent(editingId, input, authToken);
+        onContributorsChange?.(prev =>
+          prev.map(item => (item.id === editingId ? updated : item))
+        );
+      } else {
+        const created = await addContributorPersistent(input, authToken);
+        onContributorsChange?.(prev => [...prev.filter(item => item.id !== created.id), created]);
       }
 
       resetForm();
@@ -126,23 +124,12 @@ export const ContributorsPage: React.FC<ContributorsPageProps> = ({
 
   const handleDelete = async (id: string) => {
     if (!admin) return;
-    if (!authToken) {
-      setFeedback({ type: 'err', text: 'Please sign in again to remove a contributor.' });
-      return;
-    }
 
     setDeletingId(id);
     setFeedback(null);
     try {
-      const res = await fetch(`/api/admin/contributors/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${authToken}` }
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setFeedback({ type: 'err', text: data.error || 'Could not remove contributor.' });
-        return;
-      }
+      await deleteContributorPersistent(id, authToken);
+      onContributorsChange?.(prev => prev.filter(item => item.id !== id));
       if (editingId === id) resetForm();
       setFeedback({ type: 'ok', text: 'Contributor removed.' });
       await onRefreshContributors?.();

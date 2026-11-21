@@ -56,6 +56,11 @@ import {
   updateVivaStatusFromAppsScript,
   VivaItem
 } from '../utils/appsScriptViva';
+import {
+  addContributorPersistent,
+  deleteContributorPersistent,
+  updateContributorPersistent
+} from '../utils/appsScriptContributors';
 import { useBackNav } from '../utils/BackNavContext';
 
 interface AdminPanelProps {
@@ -67,6 +72,7 @@ interface AdminPanelProps {
   questionOverrides: Record<string, QuestionOverride>;
   customTaxonomy: CustomTaxonomy;
   publishedPapers: PublishedPaper[];
+  onContributorsChange?: React.Dispatch<React.SetStateAction<ContributorRecord[]>>;
   onRefreshAll: () => Promise<void>;
   onDeleteNote: (id: string) => Promise<void>;
   onDeletePaper?: (id: string) => Promise<void>;
@@ -91,6 +97,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   questionOverrides,
   customTaxonomy,
   publishedPapers,
+  onContributorsChange,
   onRefreshAll,
   onDeleteNote,
   onDeletePaper
@@ -730,37 +737,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
   const handleSaveContributor = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cName.trim()) return;
-    if (!authToken) {
-      setFeedback({ type: 'err', msg: 'Please sign in again to manage contributors.' });
-      return;
-    }
+    if (!isAdminUser(userProfile) || !cName.trim()) return;
     setFeedback(null);
     setSavingContributor(true);
     try {
       const isEdit = Boolean(editingContributorId);
-      const url = isEdit
-        ? `/api/admin/contributors/${editingContributorId}`
-        : '/api/admin/contributors';
-      const res = await fetch(url, {
-        method: isEdit ? 'PUT' : 'POST',
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: cName.trim(),
-          role: cRole.trim() || 'Contributor',
-          batch: cBatch.trim(),
-          college: cCollege.trim(),
-          contribution: cDesc.trim()
-        })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setFeedback({ type: 'err', msg: data.error || 'Could not save contributor.' });
-        return;
+      const input = {
+        name: cName.trim(),
+        role: cRole.trim() || 'Contributor',
+        batch: cBatch.trim(),
+        college: cCollege.trim() || 'Chittagong Medical College',
+        contribution: cDesc.trim()
+      };
+
+      if (isEdit && editingContributorId) {
+        const updated = await updateContributorPersistent(editingContributorId, input, authToken);
+        onContributorsChange?.(prev =>
+          prev.map(item => (item.id === editingContributorId ? updated : item))
+        );
+      } else {
+        const created = await addContributorPersistent(input, authToken);
+        onContributorsChange?.(prev => [...prev.filter(item => item.id !== created.id), created]);
       }
+
       resetContributorForm();
       setFeedback({
         type: 'ok',
@@ -775,22 +774,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   };
 
   const handleDeleteContributor = async (id: string) => {
-    if (!authToken) {
-      setFeedback({ type: 'err', msg: 'Please sign in again to remove contributors.' });
-      return;
-    }
+    if (!isAdminUser(userProfile)) return;
     setFeedback(null);
     setModeratingItemId(id);
     try {
-      const res = await fetch(`/api/admin/contributors/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${authToken}` }
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setFeedback({ type: 'err', msg: data.error || 'Could not remove contributor.' });
-        return;
-      }
+      await deleteContributorPersistent(id, authToken);
+      onContributorsChange?.(prev => prev.filter(item => item.id !== id));
       if (editingContributorId === id) {
         resetContributorForm();
       }
