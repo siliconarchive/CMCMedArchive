@@ -4,8 +4,10 @@ import {
   ArrowLeft,
   Award,
   BookOpen,
+  Building2,
   Calendar,
   CheckCircle2,
+  Download,
   ExternalLink,
   Eye,
   FileText,
@@ -14,6 +16,7 @@ import {
   Layers,
   Link2,
   Loader2,
+  Megaphone,
   MessageSquarePlus,
   RefreshCw,
   RotateCcw,
@@ -29,19 +32,29 @@ import {
 } from 'lucide-react';
 import { CustomTaxonomy, PageRoute, ProfessionalExamId, UserProfile } from '../types';
 import { getSubjectsForProf } from '../data/curriculumConfig';
+import {
+  formatVivaContributorCredit,
+  VIVA_CONTRIBUTOR_CREDITS,
+  VivaContributorCredit
+} from '../data/vivaSeed';
 import { isAdminUser } from '../utils/appsScriptAuth';
 import {
   DEFAULT_VIVA_COLLEGE,
   deleteVivaFromAppsScript,
+  findMatchingVivaCollegeOption,
   isVivaImageItem,
   listVivaFromAppsScript,
   MAX_VIVA_FILE_BYTES,
   mergeVivaWithSeed,
+  normalizeVivaCollegeKey,
   profIdToVivaProf,
   submitVivaToAppsScript,
+  VIVA_MEDICAL_COLLEGES,
+  VIVA_OTHER_COLLEGE_OPTION,
   VIVA_PROF_OPTIONS,
   VIVA_SESSION_OPTIONS,
   VIVA_YEAR_SUGGESTIONS,
+  vivaCollegesMatch,
   VivaExaminerType,
   vivaFileToBase64,
   VivaFileType,
@@ -68,6 +81,7 @@ type VivaViewTab = 'all' | 'External' | 'Internal' | 'Suggestion';
 
 interface VivaFilterCache {
   examinerView: VivaViewTab;
+  collegeFilter: string;
   profFilter: 'all' | VivaProfLabel;
   subjectFilter: string;
   boardFilter: string;
@@ -95,11 +109,16 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
   const [previewItem, setPreviewItem] = useState<VivaItem | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState<boolean>(false);
   const previewLayerRef = useRef<string | null>(null);
+  const collegeFilterSelectRef = useRef<HTMLSelectElement | null>(null);
 
-  // Filters (default profFilter='all' so all approved Viva entries render immediately)
+  // Filters (default profFilter='all' & collegeFilter='all' so all approved Viva entries render immediately)
   const [examinerView, setExaminerView] = useState<VivaViewTab>(
     savedFilters?.examinerView || 'all'
+  );
+  const [collegeFilter, setCollegeFilter] = useState<string>(
+    savedFilters?.collegeFilter || 'all'
   );
   const [profFilter, setProfFilter] = useState<'all' | VivaProfLabel>(
     savedFilters?.profFilter || 'all'
@@ -139,8 +158,16 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     userProfile?.email || ''
   );
   const [formBatch, setFormBatch] = useState<string>(userProfile?.batch || '');
-  const [formCollegeName, setFormCollegeName] = useState<string>(
+
+  const initialCollegeOption = findMatchingVivaCollegeOption(
     userProfile?.college || DEFAULT_VIVA_COLLEGE
+  );
+  const isInitialListedCollege = VIVA_MEDICAL_COLLEGES.includes(initialCollegeOption);
+  const [formCollegeChoice, setFormCollegeChoice] = useState<string>(
+    isInitialListedCollege ? initialCollegeOption : VIVA_OTHER_COLLEGE_OPTION
+  );
+  const [formCustomCollege, setFormCustomCollege] = useState<string>(
+    isInitialListedCollege ? '' : initialCollegeOption
   );
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -149,6 +176,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   useEffect(() => {
     saveSectionFilters<VivaFilterCache>(VIVA_FILTER_CACHE_KEY, {
       examinerView,
+      collegeFilter,
       profFilter,
       subjectFilter,
       boardFilter,
@@ -156,7 +184,16 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       yearFilter,
       search
     });
-  }, [examinerView, profFilter, subjectFilter, boardFilter, sessionFilter, yearFilter, search]);
+  }, [
+    examinerView,
+    collegeFilter,
+    profFilter,
+    subjectFilter,
+    boardFilter,
+    sessionFilter,
+    yearFilter,
+    search
+  ]);
 
   useEffect(() => {
     return () => {
@@ -192,12 +229,28 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     }
   };
 
+  const applyFormCollegeValue = useCallback((rawCollege?: string) => {
+    const matched = findMatchingVivaCollegeOption(rawCollege || DEFAULT_VIVA_COLLEGE);
+    if (VIVA_MEDICAL_COLLEGES.includes(matched)) {
+      setFormCollegeChoice(matched);
+      setFormCustomCollege('');
+    } else {
+      setFormCollegeChoice(VIVA_OTHER_COLLEGE_OPTION);
+      setFormCustomCollege(matched);
+    }
+  }, []);
+
   const openShareForm = (defaultAsSuggestion = false) => {
     setSubmitError(null);
     setSubmitSuccess(null);
     if (defaultAsSuggestion) {
       setFormExaminerType('Suggestion');
       setFormMarkSuggestion(true);
+    }
+    if (collegeFilter !== 'all' && collegeFilter !== '__other__') {
+      applyFormCollegeValue(collegeFilter);
+    } else if (userProfile?.college) {
+      applyFormCollegeValue(userProfile.college);
     }
     if (!showForm) {
       setShowForm(true);
@@ -231,13 +284,13 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       setFormContributorName(prev => prev || userProfile.fullName || '');
       setFormContributorEmail(prev => prev || userProfile.email || '');
       setFormBatch(prev => prev || userProfile.batch || '');
-      setFormCollegeName(prev => prev || userProfile.college || DEFAULT_VIVA_COLLEGE);
+      applyFormCollegeValue(userProfile.college || DEFAULT_VIVA_COLLEGE);
     } else {
       setVivaItems([]);
       setShowForm(false);
       setLoadError(null);
     }
-  }, [userProfile]);
+  }, [userProfile, applyFormCollegeValue]);
 
   // Keep form prof aligned when global prof switches
   useEffect(() => {
@@ -303,10 +356,28 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     return Array.from(set).sort();
   }, [profFilter, vivaItems, customTaxonomy]);
 
-  // Available boards dynamically extracted from loaded Viva items (scoped by prof/subject if active)
+  // Available Medical Colleges (standard Bangladesh medical colleges + custom colleges from Sheet)
+  const availableColleges = useMemo(() => {
+    const keyMap = new Map<string, string>();
+    VIVA_MEDICAL_COLLEGES.forEach(c => {
+      keyMap.set(normalizeVivaCollegeKey(c), c);
+    });
+    vivaItems.forEach(item => {
+      const clean = String(item.college_name || '').trim();
+      if (!clean) return;
+      const key = normalizeVivaCollegeKey(clean);
+      if (!keyMap.has(key)) {
+        keyMap.set(key, clean);
+      }
+    });
+    return Array.from(keyMap.values());
+  }, [vivaItems]);
+
+  // Available boards dynamically extracted from loaded Viva items (scoped by college/prof/subject if active)
   const availableBoards = useMemo(() => {
     const set = new Set<string>();
     vivaItems.forEach(item => {
+      if (!vivaCollegesMatch(item.college_name, collegeFilter)) return;
       if (profFilter !== 'all' && item.prof !== profFilter) return;
       if (subjectFilter !== 'all' && item.subject.toLowerCase() !== subjectFilter.toLowerCase()) {
         return;
@@ -314,7 +385,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       if (item.board_name) set.add(item.board_name);
     });
     return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  }, [vivaItems, profFilter, subjectFilter]);
+  }, [vivaItems, collegeFilter, profFilter, subjectFilter]);
 
   // Available sessions (merge standard MBBS sessions with any custom session values from Sheet)
   const availableSessions = useMemo(() => {
@@ -334,10 +405,41 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     return Array.from(set).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
   }, [vivaItems]);
 
+  // Deduplicated Viva contributor credits list (seeded credits + dynamic sheet contributors)
+  const contributorCreditList = useMemo(() => {
+    const map = new Map<string, VivaContributorCredit>();
+    const normalizeName = (s: string) => s.trim().toLowerCase();
+
+    VIVA_CONTRIBUTOR_CREDITS.forEach(c => {
+      map.set(normalizeName(c.name), c);
+    });
+
+    vivaItems.forEach(item => {
+      const name = String(item.contributor_name || '').trim();
+      const lower = normalizeName(name);
+      if (!name || lower === 'student contributor' || lower === 'anonymous student') return;
+      const existing = map.get(lower);
+      if (existing) {
+        if (!existing.batch && item.batch) {
+          map.set(lower, { ...existing, batch: item.batch.trim() });
+        }
+      } else {
+        map.set(lower, {
+          name,
+          batch: String(item.batch || '').trim(),
+          note: item.is_suggestion ? 'Viva Suggestion Contributor' : 'Viva Bank Contributor'
+        });
+      }
+    });
+
+    return Array.from(map.values());
+  }, [vivaItems]);
+
   const baseFilteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
     return vivaItems.filter(item => {
       if (item.status !== 'approved') return false;
+      if (!vivaCollegesMatch(item.college_name, collegeFilter)) return false;
       if (profFilter !== 'all' && item.prof !== profFilter) return false;
       if (subjectFilter !== 'all' && item.subject.toLowerCase() !== subjectFilter.toLowerCase()) {
         return false;
@@ -357,7 +459,16 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       }
       return true;
     });
-  }, [vivaItems, profFilter, subjectFilter, boardFilter, sessionFilter, yearFilter, search]);
+  }, [
+    vivaItems,
+    collegeFilter,
+    profFilter,
+    subjectFilter,
+    boardFilter,
+    sessionFilter,
+    yearFilter,
+    search
+  ]);
 
   const externalQuestions = useMemo(
     () =>
@@ -423,12 +534,20 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
     const effectiveSubject =
       formSubject === '__custom__' ? formCustomSubject.trim() : formSubject.trim();
+    const effectiveCollegeName =
+      formCollegeChoice === VIVA_OTHER_COLLEGE_OPTION
+        ? formCustomCollege.trim()
+        : formCollegeChoice.trim();
     const isSuggestionSubmission =
       formExaminerType === 'Suggestion' || formMarkSuggestion;
     const hasFileUpload = attachmentMode === 'file' && Boolean(selectedFile);
     const hasExternalLink = attachmentMode === 'link' && Boolean(formFileUrl.trim());
     const hasWrittenQuestionOrTitle = Boolean(formQuestion.trim() || formTitle.trim());
 
+    if (!effectiveCollegeName) {
+      setSubmitError('Please select or enter your Medical College name.');
+      return;
+    }
     if (!effectiveSubject) {
       setSubmitError('Please select or enter a subject.');
       return;
@@ -498,7 +617,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         contributor_name: formContributorName.trim(),
         contributor_email: formContributorEmail.trim() || userProfile.email || '',
         batch: formBatch.trim(),
-        college_name: formCollegeName.trim() || DEFAULT_VIVA_COLLEGE,
+        college_name: effectiveCollegeName || DEFAULT_VIVA_COLLEGE,
         session: formSession.trim(),
         year: formYear.trim(),
         viva_type: isSuggestionSubmission ? 'suggestion' : 'regular',
@@ -555,6 +674,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   };
 
   const resetFilters = () => {
+    setCollegeFilter('all');
     setProfFilter('all');
     setSubjectFilter('all');
     setBoardFilter('all');
@@ -565,6 +685,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
   const hasActiveFilters =
     Boolean(search) ||
+    collegeFilter !== 'all' ||
     profFilter !== 'all' ||
     subjectFilter !== 'all' ||
     boardFilter !== 'all' ||
@@ -582,6 +703,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     const hasFileUrl = Boolean(item.file_url && item.file_url.trim());
     const isImageFile = hasFileUrl && isVivaImageItem(item);
     const showProminentCredit = Boolean(item.is_seeded || hasFileUrl);
+    const creditLabel = formatVivaContributorCredit(item.contributor_name, item.batch);
 
     return (
       <article
@@ -642,6 +764,12 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   <span>{sessionYearLabel}</span>
                 </span>
               )}
+              {item.college_name && (
+                <span className="px-2 py-0.5 rounded-md bg-teal-500/8 border border-teal-500/25 font-bold text-[11px] text-[#0D9488] inline-flex items-center gap-1 max-w-full">
+                  <Building2 size={10} className="shrink-0" />
+                  <span className="truncate max-w-[210px]">{item.college_name}</span>
+                </span>
+              )}
             </div>
             <span className="text-xs font-bold text-[#0D9488]">{item.subject}</span>
           </div>
@@ -683,8 +811,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                       `${item.subject} Viva ${isImageFile ? 'Image' : 'PDF'}`}
                   </div>
                   <div className="text-[11px] text-[var(--mut)]">
-                    Credit: {item.contributor_name}
-                    {item.batch ? ` (${item.batch})` : ''}
+                    Credit: {creditLabel}
                   </div>
                 </div>
               </div>
@@ -739,18 +866,12 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             {showProminentCredit ? (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-500/10 border border-teal-500/25 font-extrabold text-[#0D9488] truncate">
                 <Award size={13} className="shrink-0" />
-                <span className="truncate">Credit: {item.contributor_name}</span>
+                <span className="truncate">Credit: {creditLabel}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--ink)] truncate">
                 <User size={12} className="text-[#0D9488] shrink-0" />
-                <span className="truncate">{item.contributor_name}</span>
-              </span>
-            )}
-            {item.batch && (
-              <span className="inline-flex items-center gap-1 font-medium">
-                <GraduationCap size={12} />
-                <span>{item.batch}</span>
+                <span className="truncate">{creditLabel}</span>
               </span>
             )}
           </div>
@@ -820,6 +941,76 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
           </div>
         )}
       </div>
+
+      {/* Promotional / Notice Banner for All Medical Colleges */}
+      {!bannerDismissed && (
+        <div className="relative overflow-hidden rounded-2xl border border-teal-500/35 bg-gradient-to-br from-teal-500/10 via-[var(--card)] to-violet-500/10 p-4 sm:p-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pr-7 sm:pr-8">
+            <div className="space-y-1.5 min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#0D9488] text-white text-[11px] font-extrabold uppercase tracking-wider">
+                  <Megaphone size={11} className="shrink-0" />
+                  <span>Now Live &middot; Open For All Medical Colleges</span>
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-violet-500/12 border border-violet-500/30 text-violet-700 dark:text-violet-300 text-[11px] font-bold">
+                  <Sparkles size={11} className="shrink-0" />
+                  <span>Viva Suggestions &amp; PDF/Image Uploads</span>
+                </span>
+              </div>
+              <h2 className="text-sm sm:text-base font-extrabold text-[var(--ink)] m-0 leading-snug">
+                Students from ANY Medical College can now browse &amp; contribute Viva Questions, Suggestions, PDFs &amp; Images
+              </h2>
+              <p className="text-xs sm:text-[13px] text-[var(--ink-secondary)] m-0 leading-relaxed">
+                Select your Medical College below to view college-specific Internal/External Viva questions and high-yield Viva Suggestions, or upload your own questions, PDFs, and notes for your batchmates across Bangladesh.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!userProfile) {
+                    onOpenAuth('signin');
+                    return;
+                  }
+                  collegeFilterSelectRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                  });
+                  setTimeout(() => collegeFilterSelectRef.current?.focus(), 250);
+                }}
+                className="btn sm alt min-h-[38px]"
+              >
+                <Building2 size={13} />
+                <span>Select Medical College</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!userProfile) {
+                    onOpenAuth('signin');
+                    return;
+                  }
+                  openShareForm(examinerView === 'Suggestion');
+                }}
+                className="btn sm min-h-[38px]"
+              >
+                <MessageSquarePlus size={13} />
+                <span>Share Viva / Suggestion</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setBannerDismissed(true)}
+            className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center text-[var(--mut)] hover:text-[var(--ink)] hover:bg-[var(--bg-subtle)]"
+            aria-label="Dismiss notice banner"
+          >
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       {!userProfile ? (
         <AuthRequiredCard
@@ -1193,54 +1384,124 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 </div>
               </div>
 
-              {/* Contributor Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                <div>
-                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Contributor Name (Credit) *
-                  </label>
-                  <input
-                    value={formContributorName}
-                    onChange={e => setFormContributorName(e.target.value)}
-                    placeholder="e.g. Fahad vaiya"
-                    required
-                    className="min-h-[42px] text-sm"
-                  />
+              {/* Contributor Info & Quick-Select Credits */}
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--mut)]">
+                    Quick-Select Contributor Credit:
+                  </span>
+                  {userProfile?.fullName && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormContributorName(userProfile.fullName);
+                        if (userProfile.batch) setFormBatch(userProfile.batch);
+                        if (userProfile.college) applyFormCollegeValue(userProfile.college);
+                      }}
+                      className={`px-2.5 py-1 rounded-md text-xs font-bold border transition-colors ${
+                        formContributorName.trim().toLowerCase() ===
+                        userProfile.fullName.trim().toLowerCase()
+                          ? 'border-[#0D9488] bg-teal-500/10 text-[#0D9488]'
+                          : 'border-[var(--line)] bg-[var(--bg-subtle)] text-[var(--ink-secondary)] hover:border-[#0D9488]'
+                      }`}
+                    >
+                      My Profile ({formatVivaContributorCredit(userProfile.fullName, userProfile.batch)})
+                    </button>
+                  )}
+                  {contributorCreditList.map(c => {
+                    const label = formatVivaContributorCredit(c.name, c.batch);
+                    const isActive =
+                      formContributorName.trim().toLowerCase() === c.name.trim().toLowerCase();
+                    return (
+                      <button
+                        key={c.name}
+                        type="button"
+                        onClick={() => {
+                          setFormContributorName(c.name);
+                          if (c.batch) setFormBatch(c.batch);
+                        }}
+                        className={`px-2.5 py-1 rounded-md text-xs font-bold border transition-colors ${
+                          isActive
+                            ? 'border-[#0D9488] bg-teal-500/10 text-[#0D9488]'
+                            : 'border-[var(--line)] bg-[var(--bg-subtle)] text-[var(--ink-secondary)] hover:border-[#0D9488]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                 </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Batch *
-                  </label>
-                  <input
-                    value={formBatch}
-                    onChange={e => setFormBatch(e.target.value)}
-                    placeholder="e.g. CMC-67"
-                    required
-                    className="min-h-[42px] text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    College
-                  </label>
-                  <input
-                    value={formCollegeName}
-                    onChange={e => setFormCollegeName(e.target.value)}
-                    placeholder="Chittagong Medical College"
-                    className="min-h-[42px] text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Email (Optional)
-                  </label>
-                  <input
-                    type="email"
-                    value={formContributorEmail}
-                    onChange={e => setFormContributorEmail(e.target.value)}
-                    placeholder="student@example.com"
-                    className="min-h-[42px] text-sm"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Contributor Name (Credit) *
+                    </label>
+                    <input
+                      value={formContributorName}
+                      onChange={e => setFormContributorName(e.target.value)}
+                      list="viva-contributor-suggestions"
+                      placeholder="e.g. MD. Naimur Rahman Naim"
+                      required
+                      className="min-h-[42px] text-sm"
+                    />
+                    <datalist id="viva-contributor-suggestions">
+                      {contributorCreditList.map(c => (
+                        <option key={c.name} value={c.name} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Batch *
+                    </label>
+                    <input
+                      value={formBatch}
+                      onChange={e => setFormBatch(e.target.value)}
+                      placeholder="e.g. CMC-67"
+                      required
+                      className="min-h-[42px] text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Medical College *
+                    </label>
+                    <select
+                      value={formCollegeChoice}
+                      onChange={e => setFormCollegeChoice(e.target.value)}
+                      required
+                      className="min-h-[42px] text-sm"
+                    >
+                      {VIVA_MEDICAL_COLLEGES.map(c => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                      <option value={VIVA_OTHER_COLLEGE_OPTION}>{VIVA_OTHER_COLLEGE_OPTION}...</option>
+                    </select>
+                    {formCollegeChoice === VIVA_OTHER_COLLEGE_OPTION && (
+                      <input
+                        value={formCustomCollege}
+                        onChange={e => setFormCustomCollege(e.target.value)}
+                        placeholder="Enter full Medical College name"
+                        required
+                        className="mt-2 min-h-[40px] text-sm"
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Email (Optional)
+                    </label>
+                    <input
+                      type="email"
+                      value={formContributorEmail}
+                      onChange={e => setFormContributorEmail(e.target.value)}
+                      placeholder="student@example.com"
+                      className="min-h-[42px] text-sm"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1347,7 +1608,42 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </button>
           </div>
 
-          {/* Filters Card: Prof-wise, Subject, Board-wise, Session, Year, Search */}
+          {/* Viva Bank Contributor Credits Strip */}
+          {contributorCreditList.length > 0 && (
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0D9488] mr-1">
+                <Award size={14} className="shrink-0" />
+                <span>Viva Bank Contributor Credits:</span>
+              </span>
+              {contributorCreditList.map(c => {
+                const label = formatVivaContributorCredit(c.name, c.batch);
+                const isFilteringContributor =
+                  search.trim().toLowerCase() === c.name.trim().toLowerCase();
+                return (
+                  <button
+                    key={c.name}
+                    type="button"
+                    title={c.note}
+                    onClick={() =>
+                      setSearch(prev =>
+                        prev.trim().toLowerCase() === c.name.trim().toLowerCase() ? '' : c.name
+                      )
+                    }
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border transition-colors ${
+                      isFilteringContributor
+                        ? 'bg-[#0D9488] text-white border-[#0D9488]'
+                        : 'bg-teal-500/8 text-[var(--ink)] border-teal-500/25 hover:border-[#0D9488]'
+                    }`}
+                  >
+                    <GraduationCap size={12} className={isFilteringContributor ? 'text-white' : 'text-[#0D9488]'} />
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Filters Card: Medical College, Prof-wise, Subject, Board-wise, Session, Year, Search */}
           <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 space-y-3">
             <div className="relative">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--mut)]" />
@@ -1355,7 +1651,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Search viva questions, suggestions, hints, boards, sessions, years, or subjects..."
+                placeholder="Search viva questions, suggestions, medical colleges, boards, sessions, years, or subjects..."
                 className="!pl-10 !pr-10 text-sm min-h-[44px]"
               />
               {search && (
@@ -1370,7 +1666,30 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
+                  Medical College
+                </label>
+                <select
+                  ref={collegeFilterSelectRef}
+                  value={collegeFilter}
+                  onChange={e => {
+                    setCollegeFilter(e.target.value);
+                    setBoardFilter('all');
+                  }}
+                  className="text-sm min-h-[42px]"
+                >
+                  <option value="all">All Medical Colleges</option>
+                  {availableColleges.map(c => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                  <option value="__other__">Other / Custom Colleges</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
                   Prof-wise
@@ -1470,7 +1789,17 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </div>
 
             {hasActiveFilters && (
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                <div className="text-xs text-[var(--mut)]">
+                  {collegeFilter !== 'all' && (
+                    <span>
+                      Showing results for{' '}
+                      <strong className="text-[var(--ink)]">
+                        {collegeFilter === '__other__' ? 'Other / Custom Colleges' : collegeFilter}
+                      </strong>
+                    </span>
+                  )}
+                </div>
                 <button type="button" onClick={resetFilters} className="btn sm alt">
                   <RotateCcw size={12} /> Reset Filters
                 </button>
@@ -1495,7 +1824,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               <p className="text-xs text-[var(--mut)] max-w-md mx-auto m-0">
                 {vivaItems.length === 0
                   ? 'Share an External, Internal, or Viva Suggestion entry for fellow students.'
-                  : 'Try switching Prof, Subject, Board, Session, or Year filters, or share a new viva question.'}
+                  : 'Try switching Medical College, Prof, Subject, Board, Session, or Year filters, or contribute the first entry for this college.'}
               </p>
               <div className="flex flex-wrap justify-center gap-2 pt-1">
                 {vivaItems.length > 0 && (
@@ -1646,11 +1975,16 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     <span>
                       {previewItem.subject} &middot; {previewItem.prof}
                     </span>
+                    {previewItem.college_name && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--bg-subtle)] border border-[var(--line)] text-[var(--ink)] font-bold">
+                        <Building2 size={11} />
+                        <span>{previewItem.college_name}</span>
+                      </span>
+                    )}
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/25 text-[#0D9488] font-extrabold">
                       <Award size={11} />
                       <span>
-                        Credit: {previewItem.contributor_name}
-                        {previewItem.batch ? ` (${previewItem.batch})` : ''}
+                        Credit: {formatVivaContributorCredit(previewItem.contributor_name, previewItem.batch)}
                       </span>
                     </span>
                   </div>
@@ -1662,6 +1996,15 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={previewItem.file_url}
+                  download={previewItem.file_name || undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn sm alt no-underline min-h-[38px]"
+                >
+                  <Download size={13} /> Download
+                </a>
                 <a
                   href={previewItem.file_url}
                   target="_blank"

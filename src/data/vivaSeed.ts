@@ -11,6 +11,35 @@ export const VIVA_SEED_PDF_URLS = {
   biochemistry: '/assets/aistudio/CMC_Biochemistry_Combined_Question_Bank_b90c545a.pdf'
 } as const;
 
+export interface VivaContributorCredit {
+  name: string;
+  batch: string;
+  note: string;
+}
+
+export const VIVA_CONTRIBUTOR_CREDITS: VivaContributorCredit[] = [
+  {
+    name: 'Fahad vaiya',
+    batch: '',
+    note: 'Physiology & Biochemistry Viva PDFs'
+  },
+  {
+    name: 'MD. Naimur Rahman Naim',
+    batch: 'CMC-67',
+    note: 'Viva Bank & Suggestions Contributor'
+  }
+];
+
+export function formatVivaContributorCredit(name?: string, batch?: string): string {
+  const cleanName = String(name || '').trim() || 'Student Contributor';
+  const cleanBatch = String(batch || '').trim();
+  if (!cleanBatch) return cleanName;
+  if (cleanName.toLowerCase().includes(cleanBatch.toLowerCase())) {
+    return cleanName;
+  }
+  return `${cleanName} (${cleanBatch})`;
+}
+
 export const DEFAULT_SEED_VIVA_ITEMS: VivaItem[] = [
   {
     id: 'seed_viva_physiology_fahad_pdf',

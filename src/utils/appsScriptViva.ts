@@ -1,3 +1,4 @@
+import { MEDICAL_COLLEGES_BD } from '../data/archiveHelpers';
 import { DEFAULT_SEED_VIVA_ITEMS } from '../data/vivaSeed';
 import { ProfessionalExamId } from '../types';
 import { fileToBase64 } from './appsScriptArchive';
@@ -6,7 +7,49 @@ export const VIVA_APPS_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbyfz3z-DbyTrwa7b37JLjA-QKuqqc_b6xdz8ZJGTiYUKeNL6fWHQ2NgxSLY7mL7MOjm/exec';
 
 export const DEFAULT_VIVA_COLLEGE = 'Chittagong Medical College';
+export const VIVA_OTHER_COLLEGE_OPTION = 'Other Medical College';
+export const VIVA_MEDICAL_COLLEGES: string[] = MEDICAL_COLLEGES_BD.filter(
+  c => c !== VIVA_OTHER_COLLEGE_OPTION
+);
 export const MAX_VIVA_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+
+function stripCollegeParenthetical(name: string): string {
+  return name.replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function extractCollegeAcronym(name: string): string {
+  const m = name.match(/\(([^)]+)\)/);
+  return m ? m[1].trim().toLowerCase() : '';
+}
+
+export function normalizeVivaCollegeKey(name?: string): string {
+  const raw = String(name || '').trim();
+  if (!raw) return stripCollegeParenthetical(DEFAULT_VIVA_COLLEGE);
+  const lower = raw.toLowerCase();
+  if (lower === 'cmc') return 'chittagong medical college';
+  if (lower === 'dmc') return 'dhaka medical college';
+  const byAcronym = VIVA_MEDICAL_COLLEGES.find(c => extractCollegeAcronym(c) === lower);
+  if (byAcronym) return stripCollegeParenthetical(byAcronym);
+  return stripCollegeParenthetical(raw);
+}
+
+export function vivaCollegesMatch(itemCollege?: string, filterCollege?: string): boolean {
+  const filterClean = String(filterCollege || '').trim();
+  if (!filterClean || filterClean.toLowerCase() === 'all') return true;
+  if (filterClean === '__other__') {
+    const itemKey = normalizeVivaCollegeKey(itemCollege);
+    return !VIVA_MEDICAL_COLLEGES.some(c => normalizeVivaCollegeKey(c) === itemKey);
+  }
+  return normalizeVivaCollegeKey(itemCollege) === normalizeVivaCollegeKey(filterClean);
+}
+
+export function findMatchingVivaCollegeOption(collegeName?: string): string {
+  const clean = String(collegeName || '').trim();
+  if (!clean) return VIVA_MEDICAL_COLLEGES[0] || DEFAULT_VIVA_COLLEGE;
+  const key = normalizeVivaCollegeKey(clean);
+  const match = VIVA_MEDICAL_COLLEGES.find(c => normalizeVivaCollegeKey(c) === key);
+  return match || clean;
+}
 
 export type VivaExaminerType = 'External' | 'Internal' | 'Suggestion';
 export type VivaCategoryType = 'regular' | 'suggestion';

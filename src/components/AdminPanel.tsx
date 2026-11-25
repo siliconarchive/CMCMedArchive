@@ -12,6 +12,7 @@ import {
   Megaphone,
   Layers,
   BookOpen,
+  Building2,
   Trash2,
   Plus,
   AlertTriangle,
@@ -55,9 +56,12 @@ import {
   deleteVivaFromAppsScript,
   isVivaImageItem,
   listVivaFromAppsScript,
+  normalizeVivaCollegeKey,
   updateVivaStatusFromAppsScript,
+  vivaCollegesMatch,
   VivaItem
 } from '../utils/appsScriptViva';
+import { formatVivaContributorCredit } from '../data/vivaSeed';
 import {
   addContributorPersistent,
   deleteContributorPersistent,
@@ -108,6 +112,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [tab, setTab] = useState<AdminTab>('submissions');
   const [submissions, setSubmissions] = useState<QuestionSubmission[]>([]);
   const [vivaItems, setVivaItems] = useState<VivaItem[]>([]);
+  const [vivaCollegeFilter, setVivaCollegeFilter] = useState<string>('all');
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [resourceRequests, setResourceRequests] = useState<ResourceRequestRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1835,12 +1840,51 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       )}
 
       {/* TAB 3B: VIVA QUESTIONS */}
-      {tab === 'viva' && (
+      {tab === 'viva' && (() => {
+        const vivaColleges = Array.from(
+          vivaItems.reduce((map, item) => {
+            const name = String(item.college_name || '').trim();
+            if (name) {
+              const key = normalizeVivaCollegeKey(name);
+              if (!map.has(key)) map.set(key, name);
+            }
+            return map;
+          }, new Map<string, string>()).values()
+        );
+        const filteredAdminViva = vivaItems.filter(v =>
+          vivaCollegesMatch(v.college_name, vivaCollegeFilter)
+        );
+
+        return (
         <div className="space-y-3">
-          {vivaItems.length === 0 ? (
-            <div className="empty text-xs">No Viva questions submitted yet.</div>
+          {vivaItems.length > 0 && (
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div className="text-xs font-bold text-[var(--mut)]">
+                Showing {filteredAdminViva.length} of {vivaItems.length} Viva entries
+              </div>
+              <select
+                value={vivaCollegeFilter}
+                onChange={e => setVivaCollegeFilter(e.target.value)}
+                className="sm:!w-72 text-xs min-h-[38px]"
+              >
+                <option value="all">All Medical Colleges ({vivaItems.length})</option>
+                {vivaColleges.map(c => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {filteredAdminViva.length === 0 ? (
+            <div className="empty text-xs">
+              {vivaItems.length === 0
+                ? 'No Viva questions submitted yet.'
+                : 'No Viva entries match the selected Medical College.'}
+            </div>
           ) : (
-            [...vivaItems]
+            [...filteredAdminViva]
               .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
               .map(v => {
                 const isSuggestion =
@@ -1849,6 +1893,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   v.examiner_type === 'Suggestion';
                 const sessionYearLabel = [v.session, v.year].filter(Boolean).join(' ');
                 const isImageFile = Boolean(v.file_url && isVivaImageItem(v));
+                const creditLabel = formatVivaContributorCredit(v.contributor_name, v.batch);
                 return (
                 <div
                   key={v.id}
@@ -1881,6 +1926,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       {sessionYearLabel && (
                         <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/25">
                           {sessionYearLabel}
+                        </span>
+                      )}
+                      {v.college_name && (
+                        <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-teal-500/8 text-[#0D9488] border border-teal-500/25 inline-flex items-center gap-1">
+                          <Building2 size={10} />
+                          <span>{v.college_name}</span>
                         </span>
                       )}
                       <span
@@ -1931,9 +1982,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
                     )}
                     <div className="text-xs text-[var(--mut)]">
-                      Credit / By: <strong className="text-[var(--ink)]">{v.contributor_name}</strong>
-                      {v.batch ? ` (${v.batch})` : ''}
-                      {v.college_name ? ` · ${v.college_name}` : ''}
+                      Credit / By: <strong className="text-[var(--ink)]">{creditLabel}</strong>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -1982,7 +2031,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
               })
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* TAB 3C: RESOURCE REQUESTS */}
       {tab === 'requests' && (

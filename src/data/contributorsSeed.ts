@@ -20,5 +20,15 @@ export const DEFAULT_SEED_CONTRIBUTORS: ContributorRecord[] = [
     contribution: 'Academic Question & Resource Contributor',
     verified: true,
     addedAt: '2026-11-21T00:00:00.000Z'
+  },
+  {
+    id: 'contrib_naimur_rahman_naim',
+    name: 'MD. Naimur Rahman Naim',
+    role: 'Viva Bank Contributor',
+    batch: 'CMC-67',
+    college: 'Chittagong Medical College',
+    contribution: 'Viva Question Bank & High-Yield Viva Suggestion Contributor',
+    verified: true,
+    addedAt: '2026-11-24T00:00:00.000Z'
   }
 ];
