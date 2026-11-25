@@ -2,8 +2,13 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlertCircle,
   ArrowLeft,
+  Award,
   BookOpen,
+  Calendar,
   CheckCircle2,
+  ExternalLink,
+  Eye,
+  FileText,
   GraduationCap,
   Layers,
   Loader2,
@@ -12,6 +17,7 @@ import {
   RotateCcw,
   Search,
   Send,
+  Sparkles,
   Trash2,
   User,
   UserCheck,
@@ -24,9 +30,12 @@ import { isAdminUser } from '../utils/appsScriptAuth';
 import {
   deleteVivaFromAppsScript,
   listVivaFromAppsScript,
+  mergeVivaWithSeed,
   profIdToVivaProf,
   submitVivaToAppsScript,
   VIVA_PROF_OPTIONS,
+  VIVA_SESSION_OPTIONS,
+  VIVA_YEAR_SUGGESTIONS,
   VivaExaminerType,
   VivaItem,
   VivaProfLabel,
@@ -47,11 +56,15 @@ interface VivaSectionProps {
   onNavigate: (page: PageRoute) => void;
 }
 
+type VivaViewTab = 'all' | 'External' | 'Internal' | 'Suggestion';
+
 interface VivaFilterCache {
-  examinerView: 'all' | VivaExaminerType;
+  examinerView: VivaViewTab;
   profFilter: 'all' | VivaProfLabel;
   subjectFilter: string;
   boardFilter: string;
+  sessionFilter: string;
+  yearFilter: string;
   search: string;
 }
 
@@ -67,15 +80,17 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   const { pushSubLayer, popSubLayer, markLayerInactive } = useBackNav();
   const savedFilters = getSavedSectionFilters<VivaFilterCache>(VIVA_FILTER_CACHE_KEY);
 
-  const [vivaItems, setVivaItems] = useState<VivaItem[]>([]);
+  const [vivaItems, setVivaItems] = useState<VivaItem[]>(() => mergeVivaWithSeed([]));
   const [loading, setLoading] = useState<boolean>(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+  const [previewItem, setPreviewItem] = useState<VivaItem | null>(null);
+  const previewLayerRef = useRef<string | null>(null);
 
   // Filters (default profFilter='all' so all approved Viva entries render immediately)
-  const [examinerView, setExaminerView] = useState<'all' | VivaExaminerType>(
+  const [examinerView, setExaminerView] = useState<VivaViewTab>(
     savedFilters?.examinerView || 'all'
   );
   const [profFilter, setProfFilter] = useState<'all' | VivaProfLabel>(
@@ -85,9 +100,11 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     savedFilters?.subjectFilter || 'all'
   );
   const [boardFilter, setBoardFilter] = useState<string>(savedFilters?.boardFilter || 'all');
+  const [sessionFilter, setSessionFilter] = useState<string>(savedFilters?.sessionFilter || 'all');
+  const [yearFilter, setYearFilter] = useState<string>(savedFilters?.yearFilter || 'all');
   const [search, setSearch] = useState<string>(savedFilters?.search || '');
 
-  // Share Viva Question / Experience Form
+  // Share Viva Question / Suggestion Form
   const [showForm, setShowForm] = useState<boolean>(false);
   const formLayerRef = useRef<string | null>(null);
   const [formProf, setFormProf] = useState<VivaProfLabel>(() => profIdToVivaProf(selectedProf));
@@ -96,9 +113,14 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   );
   const [formCustomSubject, setFormCustomSubject] = useState<string>('');
   const [formExaminerType, setFormExaminerType] = useState<VivaExaminerType>('External');
+  const [formMarkSuggestion, setFormMarkSuggestion] = useState<boolean>(false);
   const [formBoardName, setFormBoardName] = useState<string>('');
+  const [formSession, setFormSession] = useState<string>('');
+  const [formYear, setFormYear] = useState<string>(String(new Date().getFullYear()));
+  const [formTitle, setFormTitle] = useState<string>('');
   const [formQuestion, setFormQuestion] = useState<string>('');
   const [formAnswerHint, setFormAnswerHint] = useState<string>('');
+  const [formPdfUrl, setFormPdfUrl] = useState<string>('');
   const [formContributorName, setFormContributorName] = useState<string>(
     userProfile?.fullName || ''
   );
@@ -116,9 +138,11 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       profFilter,
       subjectFilter,
       boardFilter,
+      sessionFilter,
+      yearFilter,
       search
     });
-  }, [examinerView, profFilter, subjectFilter, boardFilter, search]);
+  }, [examinerView, profFilter, subjectFilter, boardFilter, sessionFilter, yearFilter, search]);
 
   useEffect(() => {
     return () => {
@@ -126,12 +150,41 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         markLayerInactive(formLayerRef.current);
         formLayerRef.current = null;
       }
+      if (previewLayerRef.current) {
+        markLayerInactive(previewLayerRef.current);
+        previewLayerRef.current = null;
+      }
     };
   }, [markLayerInactive]);
 
-  const openShareForm = () => {
+  const openPdfPreview = (item: VivaItem) => {
+    if (!item.pdf_url) return;
+    setPreviewItem(item);
+    if (!previewLayerRef.current) {
+      previewLayerRef.current = pushSubLayer('Viva Questions', () => {
+        previewLayerRef.current = null;
+        setPreviewItem(null);
+      });
+    }
+  };
+
+  const closePdfPreview = () => {
+    if (previewLayerRef.current) {
+      const id = previewLayerRef.current;
+      previewLayerRef.current = null;
+      popSubLayer(id);
+    } else {
+      setPreviewItem(null);
+    }
+  };
+
+  const openShareForm = (defaultAsSuggestion = false) => {
     setSubmitError(null);
     setSubmitSuccess(null);
+    if (defaultAsSuggestion) {
+      setFormExaminerType('Suggestion');
+      setFormMarkSuggestion(true);
+    }
     if (!showForm) {
       setShowForm(true);
       formLayerRef.current = pushSubLayer('Viva Questions', () => {
@@ -151,7 +204,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     }
   };
 
-  const handleExaminerViewChange = (nextView: 'all' | VivaExaminerType) => {
+  const handleExaminerViewChange = (nextView: VivaViewTab) => {
     if (nextView === examinerView) return;
     const prevView = examinerView;
     pushSubLayer('Viva Questions', () => setExaminerView(prevView));
@@ -189,8 +242,9 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     setLoadError(null);
     try {
       const items = await listVivaFromAppsScript();
-      setVivaItems(items);
+      setVivaItems(mergeVivaWithSeed(items));
     } catch (err: any) {
+      setVivaItems(mergeVivaWithSeed([]));
       setLoadError(err?.message || 'Could not load Viva questions.');
     } finally {
       setLoading(false);
@@ -247,6 +301,24 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     return Array.from(set).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   }, [vivaItems, profFilter, subjectFilter]);
 
+  // Available sessions (merge standard MBBS sessions with any custom session values from Sheet)
+  const availableSessions = useMemo(() => {
+    const set = new Set<string>(VIVA_SESSION_OPTIONS);
+    vivaItems.forEach(item => {
+      if (item.session) set.add(item.session);
+    });
+    return Array.from(set);
+  }, [vivaItems]);
+
+  // Available years dynamically collected from loaded items + standard year options
+  const availableYears = useMemo(() => {
+    const set = new Set<string>(VIVA_YEAR_SUGGESTIONS);
+    vivaItems.forEach(item => {
+      if (item.year) set.add(item.year);
+    });
+    return Array.from(set).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+  }, [vivaItems]);
+
   const baseFilteredItems = useMemo(() => {
     const q = search.trim().toLowerCase();
     return vivaItems.filter(item => {
@@ -258,21 +330,44 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       if (boardFilter !== 'all' && item.board_name.toLowerCase() !== boardFilter.toLowerCase()) {
         return false;
       }
+      if (sessionFilter !== 'all' && item.session.toLowerCase() !== sessionFilter.toLowerCase()) {
+        return false;
+      }
+      if (yearFilter !== 'all' && item.year.toLowerCase() !== yearFilter.toLowerCase()) {
+        return false;
+      }
       if (q) {
-        const hay = `${item.question} ${item.answer_hint} ${item.subject} ${item.board_name} ${item.prof} ${item.examiner_type} ${item.contributor_name} ${item.batch}`.toLowerCase();
+        const hay = `${item.title || ''} ${item.question} ${item.answer_hint} ${item.pdf_label || ''} ${item.subject} ${item.board_name} ${item.prof} ${item.examiner_type} ${item.session} ${item.year} ${item.is_suggestion ? 'viva suggestion high yield pdf' : ''} ${item.contributor_name} ${item.batch}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [vivaItems, profFilter, subjectFilter, boardFilter, search]);
+  }, [vivaItems, profFilter, subjectFilter, boardFilter, sessionFilter, yearFilter, search]);
 
   const externalQuestions = useMemo(
-    () => baseFilteredItems.filter(item => item.examiner_type === 'External'),
+    () =>
+      baseFilteredItems.filter(
+        item => item.examiner_type === 'External' && !item.is_suggestion
+      ),
     [baseFilteredItems]
   );
 
   const internalQuestions = useMemo(
-    () => baseFilteredItems.filter(item => item.examiner_type === 'Internal'),
+    () =>
+      baseFilteredItems.filter(
+        item => item.examiner_type === 'Internal' && !item.is_suggestion
+      ),
+    [baseFilteredItems]
+  );
+
+  const suggestionQuestions = useMemo(
+    () =>
+      baseFilteredItems.filter(
+        item =>
+          item.is_suggestion ||
+          item.viva_type === 'suggestion' ||
+          item.examiner_type === 'Suggestion'
+      ),
     [baseFilteredItems]
   );
 
@@ -287,19 +382,24 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
     const effectiveSubject =
       formSubject === '__custom__' ? formCustomSubject.trim() : formSubject.trim();
+    const isSuggestionSubmission =
+      formExaminerType === 'Suggestion' || formMarkSuggestion;
 
     if (!effectiveSubject) {
       setSubmitError('Please select or enter a subject.');
       return;
     }
-    if (!formBoardName.trim()) {
+    if (!isSuggestionSubmission && !formBoardName.trim()) {
       setSubmitError('Please enter the Board Name (e.g. Board 1, Board 2).');
       return;
     }
     if (!formQuestion.trim()) {
-      setSubmitError('Please enter the Viva question or experience.');
+      setSubmitError('Please enter the Viva question or suggestion.');
       return;
     }
+
+    const effectiveBoard =
+      formBoardName.trim() || (isSuggestionSubmission ? 'High-Yield Suggestion' : '');
 
     const adminSubmit = isAdminUser(userProfile);
     setSubmitting(true);
@@ -308,9 +408,15 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         prof: formProf,
         subject: effectiveSubject,
         examiner_type: formExaminerType,
-        board_name: formBoardName.trim(),
+        viva_type: isSuggestionSubmission ? 'suggestion' : 'board_question',
+        is_suggestion: isSuggestionSubmission,
+        board_name: effectiveBoard,
+        session: formSession.trim(),
+        year: formYear.trim(),
+        title: formTitle.trim() || undefined,
         question: formQuestion.trim(),
         answer_hint: formAnswerHint.trim(),
+        pdf_url: formPdfUrl.trim() || undefined,
         contributor_name: formContributorName.trim() || userProfile.fullName || 'Anonymous Student',
         contributor_email: formContributorEmail.trim() || userProfile.email || '',
         batch: formBatch.trim() || userProfile.batch || '',
@@ -319,16 +425,24 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       });
 
       if (adminSubmit && created.status === 'approved') {
-        setVivaItems(prev => [created, ...prev.filter(i => i.id !== created.id)]);
-        setSubmitSuccess('Viva question submitted and published live!');
+        setVivaItems(prev => mergeVivaWithSeed([created, ...prev.filter(i => i.id !== created.id)]));
+        setSubmitSuccess(
+          isSuggestionSubmission
+            ? 'Viva Suggestion submitted and published live!'
+            : 'Viva question submitted and published live!'
+        );
       } else {
         setSubmitSuccess(
-          'Viva question submitted! It is currently pending admin approval and will appear in the Viva Bank once approved.'
+          isSuggestionSubmission
+            ? 'Viva Suggestion submitted! It is pending admin approval and will appear under Viva Suggestion once approved.'
+            : 'Viva question submitted! It is currently pending admin approval and will appear in the Viva Bank once approved.'
         );
       }
 
+      setFormTitle('');
       setFormQuestion('');
       setFormAnswerHint('');
+      setFormPdfUrl('');
       setFormCustomSubject('');
       await loadVivaItems();
     } catch (err: any) {
@@ -358,28 +472,65 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     setProfFilter('all');
     setSubjectFilter('all');
     setBoardFilter('all');
+    setSessionFilter('all');
+    setYearFilter('all');
     setSearch('');
   };
 
+  const hasActiveFilters =
+    Boolean(search) ||
+    profFilter !== 'all' ||
+    subjectFilter !== 'all' ||
+    boardFilter !== 'all' ||
+    sessionFilter !== 'all' ||
+    yearFilter !== 'all';
+
   const renderVivaCard = (item: VivaItem) => {
+    const isSuggestion =
+      item.is_suggestion ||
+      item.viva_type === 'suggestion' ||
+      item.examiner_type === 'Suggestion';
     const isExternal = item.examiner_type === 'External';
+    const showExaminerBadge = item.examiner_type !== 'Suggestion';
+    const sessionYearLabel = [item.session, item.year].filter(Boolean).join(' ');
+    const hasPdfUrl = Boolean(item.pdf_url && item.pdf_url.trim());
+    const showProminentCredit = Boolean(item.is_seeded || hasPdfUrl);
+
     return (
       <article
         key={item.id}
-        className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-3.5"
+        className={`bg-[var(--card)] border rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-3.5 ${
+          isSuggestion
+            ? 'border-violet-500/35 dark:border-violet-400/30'
+            : 'border-[var(--line)]'
+        }`}
       >
         <div className="space-y-2.5 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span
-                className={`px-2.5 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border ${
-                  isExternal
-                    ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30'
-                    : 'bg-teal-500/10 text-[#0D9488] border-teal-500/30'
-                }`}
-              >
-                {item.examiner_type} Examiner
-              </span>
+              {isSuggestion && (
+                <span className="px-2.5 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border bg-violet-500/12 text-violet-700 dark:text-violet-300 border-violet-500/35 inline-flex items-center gap-1">
+                  <Sparkles size={11} className="shrink-0" />
+                  <span>Viva Suggestion</span>
+                </span>
+              )}
+              {(hasPdfUrl || item.is_seeded) && (
+                <span className="px-2 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30 inline-flex items-center gap-1">
+                  <FileText size={10} className="shrink-0" />
+                  <span>PDF</span>
+                </span>
+              )}
+              {showExaminerBadge && (
+                <span
+                  className={`px-2.5 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border ${
+                    isExternal
+                      ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30'
+                      : 'bg-teal-500/10 text-[#0D9488] border-teal-500/30'
+                  }`}
+                >
+                  {item.examiner_type} Examiner
+                </span>
+              )}
               <span className="px-2 py-0.5 rounded-md bg-[var(--bg-subtle)] border border-[var(--line)] font-bold text-[11px] text-[var(--ink)]">
                 {item.prof}
               </span>
@@ -388,18 +539,79 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   {item.board_name}
                 </span>
               )}
+              {sessionYearLabel && (
+                <span className="px-2 py-0.5 rounded-md bg-sky-500/10 border border-sky-500/30 font-bold text-[11px] text-sky-800 dark:text-sky-300 inline-flex items-center gap-1">
+                  <Calendar size={10} className="shrink-0" />
+                  <span>{sessionYearLabel}</span>
+                </span>
+              )}
             </div>
             <span className="text-xs font-bold text-[#0D9488]">{item.subject}</span>
           </div>
 
-          <p className="text-sm sm:text-[15px] font-bold text-[var(--ink)] leading-relaxed m-0 break-words whitespace-pre-line">
+          {item.title && (
+            <h3 className="text-sm sm:text-base font-extrabold text-[var(--ink)] leading-snug m-0 break-words">
+              {item.title}
+            </h3>
+          )}
+
+          <p className="text-sm sm:text-[14.5px] font-medium text-[var(--ink-secondary)] leading-relaxed m-0 break-words whitespace-pre-line">
             {item.question}
           </p>
+
+          {hasPdfUrl && item.pdf_url ? (
+            <div className="p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)] flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-300 flex items-center justify-center shrink-0">
+                  <FileText size={15} />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-[var(--ink)] truncate">
+                    {item.pdf_label || item.title || `${item.subject} Viva Suggestion.pdf`}
+                  </div>
+                  <div className="text-[11px] text-[var(--mut)]">
+                    Credit: {item.contributor_name}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openPdfPreview(item)}
+                  className="btn sm min-h-[36px]"
+                >
+                  <Eye size={13} />
+                  <span>View PDF</span>
+                </button>
+                <a
+                  href={item.pdf_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn sm alt no-underline min-h-[36px]"
+                >
+                  <ExternalLink size={13} />
+                  <span>Open</span>
+                </a>
+              </div>
+            </div>
+          ) : item.is_seeded ? (
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 min-w-0">
+                <FileText size={15} className="shrink-0" />
+                <span className="font-semibold">
+                  PDF link configurable — add Google Drive / PDF URL in{' '}
+                  <code className="px-1 py-0.5 rounded bg-amber-500/15 font-mono text-[11px]">
+                    src/data/vivaSeed.ts
+                  </code>
+                </span>
+              </div>
+            </div>
+          ) : null}
 
           {item.answer_hint && (
             <div className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs space-y-1">
               <div className="font-extrabold uppercase tracking-wider text-[10.5px] text-[#0D9488]">
-                Answer Hint / Approach
+                {hasPdfUrl || item.is_seeded ? 'Coverage & Notes' : 'Answer Hint / Approach'}
               </div>
               <p className="text-[var(--ink-secondary)] m-0 leading-relaxed whitespace-pre-line break-words">
                 {item.answer_hint}
@@ -409,11 +621,18 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         </div>
 
         <div className="pt-3 border-t border-[var(--line-light)] flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[var(--mut)] min-w-0">
-            <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--ink)] truncate">
-              <User size={12} className="text-[#0D9488] shrink-0" />
-              <span className="truncate">{item.contributor_name}</span>
-            </span>
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[var(--mut)] min-w-0">
+            {showProminentCredit ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-teal-500/10 border border-teal-500/25 font-extrabold text-[#0D9488] truncate">
+                <Award size={13} className="shrink-0" />
+                <span className="truncate">Credit: {item.contributor_name}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--ink)] truncate">
+                <User size={12} className="text-[#0D9488] shrink-0" />
+                <span className="truncate">{item.contributor_name}</span>
+              </span>
+            )}
             {item.batch && (
               <span className="inline-flex items-center gap-1">
                 <GraduationCap size={12} />
@@ -422,7 +641,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             )}
           </div>
 
-          {isAdminUser(userProfile) && (
+          {isAdminUser(userProfile) && !item.is_seeded && (
             <button
               type="button"
               disabled={deletingId === item.id}
@@ -437,6 +656,11 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               )}
               <span>{deletingId === item.id ? 'Deleting...' : 'Delete'}</span>
             </button>
+          )}
+          {isAdminUser(userProfile) && item.is_seeded && (
+            <span className="text-[11px] font-bold text-[var(--mut)] px-2 py-0.5 rounded bg-[var(--bg-subtle)] border border-[var(--line)]">
+              Seeded Viva PDF
+            </span>
           )}
         </div>
       </article>
@@ -456,7 +680,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             Viva Question Bank
           </h1>
           <p className="text-sm text-[var(--mut)] m-0">
-            Browse External and Internal viva board questions by Professional Exam, Board, and Subject, or share your own viva experience.
+            Browse External, Internal, and Viva Suggestion topics by Professional Exam, Board, Session, Year, and Subject, or share your own viva experience.
           </p>
         </div>
 
@@ -473,7 +697,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => (showForm ? closeShareForm() : openShareForm())}
+              onClick={() => (showForm ? closeShareForm() : openShareForm(examinerView === 'Suggestion'))}
               className="btn min-h-[42px]"
             >
               <MessageSquarePlus size={15} />
@@ -486,12 +710,12 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       {!userProfile ? (
         <AuthRequiredCard
           title="Sign In to View Viva Question Bank"
-          description="An account is required to view uploaded Viva board questions and submit your viva experiences."
+          description="An account is required to view uploaded Viva board questions, Viva Suggestions, and submit your viva experiences."
           onOpenAuth={onOpenAuth}
         />
       ) : (
         <>
-          {/* Share Viva Question / Experience Form */}
+          {/* Share Viva Question / Suggestion Form */}
           {showForm && (
             <form
               onSubmit={handleSubmitViva}
@@ -508,7 +732,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     <span>Back to Viva Questions</span>
                   </button>
                   <h2 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0">
-                    Share Viva Question / Experience
+                    Share Viva Question / Suggestion
                   </h2>
                   <p className="text-xs text-[var(--mut)] m-0 mt-0.5">
                     {isAdminUser(userProfile)
@@ -540,32 +764,59 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 </div>
               )}
 
-              {/* Examiner Type Selector */}
-              <div className="space-y-1.5">
+              {/* Entry / Examiner Type Selector */}
+              <div className="space-y-2">
                 <label className="block text-xs font-bold text-[var(--ink)]">
-                  Examiner Type *
+                  Examiner / Viva Category *
                 </label>
-                <div className="grid grid-cols-2 gap-2.5 max-w-md">
-                  {(['External', 'Internal'] as VivaExaminerType[]).map(type => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setFormExaminerType(type)}
-                      className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold min-h-[44px] flex items-center justify-center gap-2 transition-all ${
-                        formExaminerType === type
-                          ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488] ring-1 ring-[#0D9488]'
-                          : 'border-[var(--line)] bg-[var(--card-subtle)] text-[var(--ink-secondary)]'
-                      }`}
-                    >
-                      {type === 'External' ? <Users size={15} /> : <UserCheck size={15} />}
-                      <span>{type} Examiner</span>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 max-w-2xl">
+                  {(
+                    [
+                      { id: 'External' as VivaExaminerType, label: 'External Examiner', icon: Users },
+                      { id: 'Internal' as VivaExaminerType, label: 'Internal Examiner', icon: UserCheck },
+                      { id: 'Suggestion' as VivaExaminerType, label: 'Viva Suggestion', icon: Sparkles }
+                    ]
+                  ).map(opt => {
+                    const Icon = opt.icon;
+                    const active = formExaminerType === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setFormExaminerType(opt.id);
+                          setFormMarkSuggestion(opt.id === 'Suggestion');
+                        }}
+                        className={`py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold min-h-[44px] flex items-center justify-center gap-2 transition-all ${
+                          active
+                            ? opt.id === 'Suggestion'
+                              ? 'border-violet-500 bg-violet-500/10 text-violet-700 dark:text-violet-300 ring-1 ring-violet-500'
+                              : 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488] ring-1 ring-[#0D9488]'
+                            : 'border-[var(--line)] bg-[var(--card-subtle)] text-[var(--ink-secondary)]'
+                        }`}
+                      >
+                        <Icon size={15} />
+                        <span>{opt.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {formExaminerType !== 'Suggestion' && (
+                  <label className="inline-flex items-center gap-2 pt-1 text-xs font-semibold text-[var(--ink-secondary)] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formMarkSuggestion}
+                      onChange={e => setFormMarkSuggestion(e.target.checked)}
+                      className="!w-4 !h-4 rounded"
+                    />
+                    <span>Also mark as a High-Yield Viva Suggestion</span>
+                  </label>
+                )}
               </div>
 
-              {/* Prof, Subject, Board Name */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              {/* Prof, Subject, Board Name, Session, Year */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
                     Professional Exam *
@@ -612,14 +863,18 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Board Name *
+                    Board Name {formExaminerType === 'Suggestion' ? '(Optional)' : '*'}
                   </label>
                   <input
                     value={formBoardName}
                     onChange={e => setFormBoardName(e.target.value)}
                     list="viva-board-suggestions"
-                    placeholder="e.g. Board 1, Board 2"
-                    required
+                    placeholder={
+                      formExaminerType === 'Suggestion'
+                        ? 'e.g. High-Yield / Board 1'
+                        : 'e.g. Board 1, Board 2'
+                    }
+                    required={formExaminerType !== 'Suggestion' && !formMarkSuggestion}
                     className="min-h-[44px] text-sm"
                   />
                   <datalist id="viva-board-suggestions">
@@ -628,19 +883,86 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     ))}
                   </datalist>
                 </div>
-              </div>
 
-              {/* Question & Optional Answer Hint */}
-              <div className="space-y-3.5">
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Viva Question / Examiner Experience *
+                    Session (Optional)
+                  </label>
+                  <select
+                    value={formSession}
+                    onChange={e => setFormSession(e.target.value)}
+                    className="min-h-[44px] text-sm"
+                  >
+                    <option value="">Not specified</option>
+                    {VIVA_SESSION_OPTIONS.map(sess => (
+                      <option key={sess} value={sess}>
+                        {sess}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Year (Optional)
+                  </label>
+                  <input
+                    value={formYear}
+                    onChange={e => setFormYear(e.target.value)}
+                    list="viva-year-suggestions"
+                    placeholder="e.g. 2026"
+                    className="min-h-[44px] text-sm"
+                  />
+                  <datalist id="viva-year-suggestions">
+                    {VIVA_YEAR_SUGGESTIONS.map(yr => (
+                      <option key={yr} value={yr} />
+                    ))}
+                  </datalist>
+                </div>
+              </div>
+
+              {/* Optional Title, Question, Answer Hint, PDF Link */}
+              <div className="space-y-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      Title / Topic Heading (Optional)
+                    </label>
+                    <input
+                      value={formTitle}
+                      onChange={e => setFormTitle(e.target.value)}
+                      placeholder="e.g. CMC Physiology Prof Viva — Organized Bank"
+                      className="min-h-[42px] text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                      PDF / Google Drive Link (Optional)
+                    </label>
+                    <input
+                      value={formPdfUrl}
+                      onChange={e => setFormPdfUrl(e.target.value)}
+                      placeholder="https://drive.google.com/file/d/.../view"
+                      className="min-h-[42px] text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    {formExaminerType === 'Suggestion'
+                      ? 'Viva Suggestion Topic / Question *'
+                      : 'Viva Question / Examiner Experience *'}
                   </label>
                   <textarea
                     rows={3}
                     value={formQuestion}
                     onChange={e => setFormQuestion(e.target.value)}
-                    placeholder="Write the exact question(s) asked or viva board scenario..."
+                    placeholder={
+                      formExaminerType === 'Suggestion'
+                        ? 'Write the high-yield viva suggestion topic or frequently asked examiner question...'
+                        : 'Write the exact question(s) asked or viva board scenario...'
+                    }
                     required
                     className="text-sm"
                   />
@@ -705,8 +1027,12 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     {submitting
                       ? 'Submitting...'
                       : isAdminUser(userProfile)
-                        ? 'Publish Viva Question Live'
-                        : 'Submit Viva Question'}
+                        ? formExaminerType === 'Suggestion'
+                          ? 'Publish Viva Suggestion Live'
+                          : 'Publish Viva Question Live'
+                        : formExaminerType === 'Suggestion'
+                          ? 'Submit Viva Suggestion'
+                          : 'Submit Viva Question'}
                   </span>
                 </button>
                 <button
@@ -750,7 +1076,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </div>
           )}
 
-          {/* Examiner Type Switcher Tabs */}
+          {/* Examiner Type & Viva Suggestion Subsegment Tabs */}
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
@@ -761,7 +1087,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
               }`}
             >
-              All Questions ({baseFilteredItems.length})
+              All ({baseFilteredItems.length})
             </button>
             <button
               type="button"
@@ -773,7 +1099,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               }`}
             >
               <Users size={13} />
-              <span>External Questions ({externalQuestions.length})</span>
+              <span>External ({externalQuestions.length})</span>
             </button>
             <button
               type="button"
@@ -785,11 +1111,23 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               }`}
             >
               <UserCheck size={13} />
-              <span>Internal Questions ({internalQuestions.length})</span>
+              <span>Internal ({internalQuestions.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleExaminerViewChange('Suggestion')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-colors min-h-[40px] flex items-center gap-1.5 ${
+                examinerView === 'Suggestion'
+                  ? 'bg-violet-600 text-white'
+                  : 'bg-[var(--card)] border border-[var(--line)] text-[var(--ink-secondary)]'
+              }`}
+            >
+              <Sparkles size={13} />
+              <span>Viva Suggestion ({suggestionQuestions.length})</span>
             </button>
           </div>
 
-          {/* Filters Card: Prof-wise, Subject, Board-wise, Search */}
+          {/* Filters Card: Prof-wise, Subject, Board-wise, Session, Year, Search */}
           <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 space-y-3">
             <div className="relative">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--mut)]" />
@@ -797,7 +1135,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 type="text"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Search viva questions, hints, boards, subjects, or contributors..."
+                placeholder="Search viva questions, suggestions, hints, boards, sessions, years, or subjects..."
                 className="!pl-10 !pr-10 text-sm min-h-[44px]"
               />
               {search && (
@@ -812,10 +1150,10 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
-                  Prof-wise Filter
+                  Prof-wise
                 </label>
                 <select
                   value={profFilter}
@@ -858,7 +1196,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
-                  Board-wise Filter
+                  Board-wise
                 </label>
                 <select
                   value={boardFilter}
@@ -873,9 +1211,45 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
+                  Session
+                </label>
+                <select
+                  value={sessionFilter}
+                  onChange={e => setSessionFilter(e.target.value)}
+                  className="text-sm min-h-[42px]"
+                >
+                  <option value="all">All Sessions</option>
+                  {availableSessions.map(sess => (
+                    <option key={sess} value={sess}>
+                      {sess}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--mut)] mb-1">
+                  Year
+                </label>
+                <select
+                  value={yearFilter}
+                  onChange={e => setYearFilter(e.target.value)}
+                  className="text-sm min-h-[42px]"
+                >
+                  <option value="all">All Years</option>
+                  {availableYears.map(yr => (
+                    <option key={yr} value={yr}>
+                      {yr}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {(search || profFilter !== 'all' || subjectFilter !== 'all' || boardFilter !== 'all') && (
+            {hasActiveFilters && (
               <div className="flex justify-end">
                 <button type="button" onClick={resetFilters} className="btn sm alt">
                   <RotateCcw size={12} /> Reset Filters
@@ -900,24 +1274,47 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               </div>
               <p className="text-xs text-[var(--mut)] max-w-md mx-auto m-0">
                 {vivaItems.length === 0
-                  ? 'Share an External or Internal viva board question for fellow students.'
-                  : 'Try switching Prof, Subject, or Board filters, or share a new viva question.'}
+                  ? 'Share an External, Internal, or Viva Suggestion entry for fellow students.'
+                  : 'Try switching Prof, Subject, Board, Session, or Year filters, or share a new viva question.'}
               </p>
               <div className="flex flex-wrap justify-center gap-2 pt-1">
                 {vivaItems.length > 0 && (
                   <button type="button" onClick={resetFilters} className="btn sm alt min-h-[40px]">
-                    <RotateCcw size={13} /> Show All Profs &amp; Boards
+                    <RotateCcw size={13} /> Show All Filters
                   </button>
                 )}
                 <button
                   type="button"
-                  onClick={openShareForm}
+                  onClick={() => openShareForm(examinerView === 'Suggestion')}
                   className="btn sm min-h-[40px]"
                 >
                   <MessageSquarePlus size={13} /> Share Viva Question
                 </button>
               </div>
             </div>
+          ) : examinerView === 'Suggestion' ? (
+            <section className="space-y-3">
+              <h2 className="text-base font-extrabold text-[var(--ink)] m-0 flex items-center gap-2">
+                <Sparkles size={16} className="text-violet-600 dark:text-violet-400" />
+                <span>Viva Suggestion List ({suggestionQuestions.length})</span>
+              </h2>
+              {suggestionQuestions.length === 0 ? (
+                <div className="empty text-xs space-y-2">
+                  <div>No Viva Suggestions match your active filters.</div>
+                  <button
+                    type="button"
+                    onClick={() => openShareForm(true)}
+                    className="btn sm"
+                  >
+                    <Sparkles size={13} /> Share a Viva Suggestion
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {suggestionQuestions.map(renderVivaCard)}
+                </div>
+              )}
+            </section>
           ) : examinerView === 'External' ? (
             <section className="space-y-3">
               <h2 className="text-base font-extrabold text-[var(--ink)] m-0 flex items-center gap-2">
@@ -948,6 +1345,21 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </section>
           ) : (
             <div className="space-y-8">
+              {/* Viva Suggestion Subsegment (shown prominently in All view when items exist) */}
+              {suggestionQuestions.length > 0 && (
+                <section className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-[var(--line-light)] pb-2">
+                    <h2 className="text-base sm:text-lg font-extrabold text-[var(--ink)] m-0 flex items-center gap-2">
+                      <Sparkles size={17} className="text-violet-600 dark:text-violet-400" />
+                      <span>Viva Suggestions ({suggestionQuestions.length})</span>
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {suggestionQuestions.map(renderVivaCard)}
+                  </div>
+                </section>
+              )}
+
               {/* External Questions List */}
               <section className="space-y-3">
                 <div className="flex items-center justify-between border-b border-[var(--line-light)] pb-2">
@@ -988,6 +1400,84 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </div>
           )}
         </>
+      )}
+
+      {/* Inline PDF Preview Modal for Viva Suggestion PDFs */}
+      {previewItem && previewItem.pdf_url && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={closePdfPreview}
+        >
+          <div className="modal-content !max-w-4xl" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="min-w-0 pr-3 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={closePdfPreview}
+                  className="btn sm alt shrink-0 min-h-[36px]"
+                >
+                  <ArrowLeft size={14} />
+                  <span>Back</span>
+                </button>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-2">
+                    <span>
+                      {previewItem.subject} &middot; {previewItem.prof}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/25 text-[#0D9488] font-extrabold">
+                      <Award size={11} />
+                      <span>Credit: {previewItem.contributor_name}</span>
+                    </span>
+                  </div>
+                  <div className="text-sm font-extrabold text-[var(--ink)] truncate mt-0.5">
+                    {previewItem.title || previewItem.pdf_label || `${previewItem.subject} Viva Suggestion`}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={previewItem.pdf_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn sm alt no-underline min-h-[38px]"
+                >
+                  <ExternalLink size={13} /> Open Tab
+                </a>
+                <button
+                  type="button"
+                  onClick={closePdfPreview}
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-[var(--mut)] hover:text-[var(--ink)] hover:bg-[var(--card)]"
+                  aria-label="Close preview"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-4 sm:p-5 overflow-y-auto space-y-3">
+              {(() => {
+                const rawUrl = previewItem.pdf_url || '';
+                const driveMatch =
+                  rawUrl.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i) ||
+                  rawUrl.match(/drive\.google\.com\/open\?id=([^&#]+)/i);
+                const driveId = driveMatch?.[1];
+                const iframeSrc = driveId
+                  ? `https://drive.google.com/file/d/${driveId}/preview`
+                  : rawUrl;
+
+                return (
+                  <iframe
+                    src={iframeSrc}
+                    title={previewItem.title || `${previewItem.subject} Viva PDF`}
+                    className="w-full h-[68dvh] rounded-lg border border-[var(--line)] bg-white"
+                  />
+                );
+              })()}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

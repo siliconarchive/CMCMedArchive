@@ -1840,17 +1840,34 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           ) : (
             [...vivaItems]
               .sort((a, b) => (a.status === 'pending' ? 0 : 1) - (b.status === 'pending' ? 0 : 1))
-              .map(v => (
+              .map(v => {
+                const isSuggestion =
+                  v.is_suggestion ||
+                  v.viva_type === 'suggestion' ||
+                  v.examiner_type === 'Suggestion';
+                const sessionYearLabel = [v.session, v.year].filter(Boolean).join(' ');
+                return (
                 <div
                   key={v.id}
                   className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
                 >
                   <div className="space-y-1 min-w-0">
                     <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-1.5">
+                      {isSuggestion && (
+                        <span className="px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 inline-flex items-center gap-1">
+                          <Sparkles size={10} />
+                          <span>Viva Suggestion</span>
+                        </span>
+                      )}
                       <span>
-                        {v.examiner_type} Examiner &bull; {v.prof} &bull; {v.subject}
+                        {v.examiner_type === 'Suggestion' ? 'High-Yield' : `${v.examiner_type} Examiner`} &bull; {v.prof} &bull; {v.subject}
                         {v.board_name ? ` · ${v.board_name}` : ''}
                       </span>
+                      {sessionYearLabel && (
+                        <span className="px-2 py-0.5 rounded text-[10.5px] font-bold bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-500/25">
+                          {sessionYearLabel}
+                        </span>
+                      )}
                       <span
                         className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase ${
                           v.status === 'approved'
@@ -1867,16 +1884,35 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                             : 'Pending Approval'}
                       </span>
                     </div>
-                    <div className="font-bold text-sm text-[var(--ink)] break-words">
+                    {v.title && (
+                      <div className="font-extrabold text-sm text-[var(--ink)] break-words">
+                        {v.title}
+                      </div>
+                    )}
+                    <div className={`${v.title ? 'text-xs font-medium text-[var(--ink-secondary)]' : 'font-bold text-sm text-[var(--ink)]'} break-words`}>
                       {v.question}
                     </div>
+                    {v.pdf_url && (
+                      <div>
+                        <a
+                          href={v.pdf_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D9488] hover:underline"
+                        >
+                          <FileText size={12} />
+                          <span>{v.pdf_label || 'Open Attached Viva PDF'}</span>
+                          <ExternalLink size={11} />
+                        </a>
+                      </div>
+                    )}
                     {v.answer_hint && (
                       <div className="text-xs text-[var(--ink-secondary)] break-words">
                         Hint: {v.answer_hint}
                       </div>
                     )}
                     <div className="text-xs text-[var(--mut)]">
-                      By {v.contributor_name}
+                      Credit / By: <strong className="text-[var(--ink)]">{v.contributor_name}</strong>
                       {v.batch ? ` (${v.batch})` : ''}
                     </div>
                   </div>
@@ -1922,7 +1958,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     </button>
                   </div>
                 </div>
-              ))
+                );
+              })
           )}
         </div>
       )}
