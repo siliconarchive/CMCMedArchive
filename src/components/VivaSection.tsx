@@ -11,7 +11,6 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  GraduationCap,
   Image as ImageIcon,
   Layers,
   Link2,
@@ -48,6 +47,7 @@ import {
   mergeVivaWithSeed,
   normalizeVivaCollegeKey,
   profIdToVivaProf,
+  sanitizeVivaErrorMessage,
   submitVivaToAppsScript,
   VIVA_MEDICAL_COLLEGES,
   VIVA_OTHER_COLLEGE_OPTION,
@@ -310,10 +310,10 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     setLoadError(null);
     try {
       const items = await listVivaFromAppsScript();
-      setVivaItems(mergeVivaWithSeed(items));
+      setVivaItems(mergeVivaWithSeed(items.filter(item => item.status === 'approved')));
     } catch (err: any) {
       setVivaItems(mergeVivaWithSeed([]));
-      setLoadError(err?.message || 'Could not load Viva questions.');
+      setLoadError(sanitizeVivaErrorMessage(err?.message || 'Could not load Viva questions.'));
     } finally {
       setLoading(false);
     }
@@ -607,7 +607,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         file_type = 'link';
       }
 
-      const created = await submitVivaToAppsScript({
+      await submitVivaToAppsScript({
         prof: formProf,
         subject: effectiveSubject,
         examiner_type: formExaminerType,
@@ -628,16 +628,14 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         file_base64,
         file_url,
         file_type,
-        status: 'approved',
+        status: 'pending',
         is_admin: isAdminUser(userProfile)
       });
 
-      setVivaItems(prev => mergeVivaWithSeed([created, ...prev.filter(i => i.id !== created.id)]));
-      setSubmitSuccess(
-        isSuggestionSubmission
-          ? 'Viva Suggestion published live to the Viva Bank!'
-          : 'Viva question published live to the Viva Bank!'
-      );
+      const submittedMsg =
+        'Submitted for admin review! It will be published publicly once approved by the admin.';
+      setSubmitSuccess(submittedMsg);
+      setActionSuccess(submittedMsg);
 
       setFormTitle('');
       setFormQuestion('');
@@ -651,7 +649,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       }
       await loadVivaItems();
     } catch (err: any) {
-      setSubmitError(err?.message || 'Failed to submit Viva entry.');
+      setSubmitError(sanitizeVivaErrorMessage(err?.message || 'Failed to submit Viva entry.'));
     } finally {
       setSubmitting(false);
     }
@@ -667,7 +665,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       setVivaItems(prev => prev.filter(item => item.id !== id));
       setActionSuccess('Viva question permanently deleted from Google Sheet and website.');
     } catch (err: any) {
-      setActionError(err?.message || 'Failed to delete Viva question.');
+      setActionError(sanitizeVivaErrorMessage(err?.message || 'Failed to delete Viva question.'));
     } finally {
       setDeletingId(null);
     }
@@ -1040,7 +1038,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     Share Viva Question / Suggestion
                   </h2>
                   <p className="text-xs text-[var(--mut)] m-0 mt-0.5">
-                    Open for all students — attach a PDF, image (up to 10 MB), or Google Drive link and publish directly to the Viva Bank.
+                    Open for all students — attach a PDF, image (up to 10 MB), or Google Drive link. Submissions enter the admin review queue before publishing.
                   </p>
                 </div>
                 <button
@@ -1510,10 +1508,10 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   {submitting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                   <span>
                     {submitting
-                      ? 'Uploading & Publishing...'
+                      ? 'Submitting for Review...'
                       : formExaminerType === 'Suggestion' || formMarkSuggestion
-                        ? 'Publish Viva Suggestion'
-                        : 'Publish Viva Question'}
+                        ? 'Submit Viva Suggestion'
+                        : 'Submit Viva Question'}
                   </span>
                 </button>
                 <button
@@ -1607,41 +1605,6 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               <span>Viva Suggestion ({suggestionQuestions.length})</span>
             </button>
           </div>
-
-          {/* Viva Bank Contributor Credits Strip */}
-          {contributorCreditList.length > 0 && (
-            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#0D9488] mr-1">
-                <Award size={14} className="shrink-0" />
-                <span>Viva Bank Contributor Credits:</span>
-              </span>
-              {contributorCreditList.map(c => {
-                const label = formatVivaContributorCredit(c.name, c.batch);
-                const isFilteringContributor =
-                  search.trim().toLowerCase() === c.name.trim().toLowerCase();
-                return (
-                  <button
-                    key={c.name}
-                    type="button"
-                    title={c.note}
-                    onClick={() =>
-                      setSearch(prev =>
-                        prev.trim().toLowerCase() === c.name.trim().toLowerCase() ? '' : c.name
-                      )
-                    }
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border transition-colors ${
-                      isFilteringContributor
-                        ? 'bg-[#0D9488] text-white border-[#0D9488]'
-                        : 'bg-teal-500/8 text-[var(--ink)] border-teal-500/25 hover:border-[#0D9488]'
-                    }`}
-                  >
-                    <GraduationCap size={12} className={isFilteringContributor ? 'text-white' : 'text-[#0D9488]'} />
-                    <span>{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
 
           {/* Filters Card: Medical College, Prof-wise, Subject, Board-wise, Session, Year, Search */}
           <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 space-y-3">

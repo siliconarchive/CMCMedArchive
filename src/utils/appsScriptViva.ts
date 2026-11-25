@@ -403,26 +403,81 @@ export function mergeVivaWithSeed(remoteList: VivaItem[]): VivaItem[] {
   return merged;
 }
 
-async function postVivaScript(payload: Record<string, unknown>): Promise<VivaScriptResponse> {
-  const res = await fetch(VIVA_APPS_SCRIPT_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8'
-    },
-    body: JSON.stringify(payload)
-  });
+export function sanitizeVivaErrorMessage(rawMessage: unknown): string {
+  const raw = String(rawMessage || '').trim();
+  const withoutUrls = raw
+    .replace(/https?:\/\/(?:www\.)?googleapis\.com\/auth\/[^\s"'<>)]+/gi, '')
+    .replace(/https?:\/\/accounts\.google\.com\/[^\s"'<>)]+/gi, '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const lower = raw.toLowerCase();
 
-  const text = await res.text();
+  if (
+    lower.includes('googleapis.com/auth') ||
+    lower.includes('authorization is required') ||
+    lower.includes('you do not have permission') ||
+    lower.includes('specified permissions') ||
+    lower.includes('permission denied') ||
+    lower.includes('access denied') ||
+    lower.includes('unauthorized') ||
+    lower.includes('script function not found') ||
+    lower.includes('401') ||
+    lower.includes('403')
+  ) {
+    return 'The Viva archive service could not authorize this request. Please verify the Google Apps Script Web App access settings or try again shortly.';
+  }
+
+  if (
+    lower.includes('failed to fetch') ||
+    lower.includes('networkerror') ||
+    lower.includes('network request failed') ||
+    lower.includes('load failed') ||
+    lower.includes('err_network') ||
+    lower.includes('aborted') ||
+    lower.includes('timeout')
+  ) {
+    return 'Network error while connecting to the Viva archive service. Please check your internet connection and try again.';
+  }
+
+  if (lower.includes('<!doctype') || lower.includes('<html')) {
+    return 'The Viva archive service is temporarily unavailable or requires re-authorization. Please try again shortly.';
+  }
+
+  return withoutUrls || 'Unable to complete the Viva archive request. Please try again.';
+}
+
+async function postVivaScript(payload: Record<string, unknown>): Promise<VivaScriptResponse> {
+  let res: Response;
+  try {
+    res = await fetch(VIVA_APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload)
+    });
+  } catch (err: any) {
+    throw new Error(sanitizeVivaErrorMessage(err?.message || 'Failed to fetch'));
+  }
+
+  let text = '';
+  try {
+    text = await res.text();
+  } catch (err: any) {
+    throw new Error(sanitizeVivaErrorMessage(err?.message || 'Network error'));
+  }
+
   let data: VivaScriptResponse;
   try {
     data = JSON.parse(text) as VivaScriptResponse;
   } catch {
-    throw new Error('Unexpected response from Viva archive service.');
+    throw new Error(sanitizeVivaErrorMessage(text || 'Unexpected response from Viva archive service.'));
   }
 
   const isSuccess = data.ok === true || (data.ok === undefined && data.success === true);
   if (!res.ok || !isSuccess) {
-    throw new Error(data.error || data.message || 'Viva request failed.');
+    throw new Error(sanitizeVivaErrorMessage(data.error || data.message || 'Viva request failed.'));
   }
 
   return data;
@@ -462,7 +517,7 @@ export async function listVivaFromAppsScript(options?: {
 }
 
 export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promise<VivaItem> {
-  const desiredStatus: VivaApprovalStatus = payload.status || 'approved';
+  const desiredStatus: VivaApprovalStatus = payload.status || 'pending';
   const isSuggestion = Boolean(
     payload.is_suggestion ||
       payload.viva_type === 'suggestion' ||
@@ -540,7 +595,8 @@ export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promis
         file_url: created.file_url || created.pdf_url || cleanFileUrl,
         file_name: created.file_name || cleanFileName,
         mime_type: created.mime_type || cleanMimeType,
-        file_type: created.file_type || fileType
+        file_type: created.file_type || fileType,
+        status: cleanStr(created.status) || desiredStatus
       },
       0,
       desiredStatus

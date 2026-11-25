@@ -13,13 +13,16 @@ import {
   Layers,
   BookOpen,
   Building2,
+  Clock,
+  Eye,
   Trash2,
   Plus,
   AlertTriangle,
   RefreshCw,
   Save,
   ArrowLeft,
-  Pencil
+  Pencil,
+  X
 } from 'lucide-react';
 import {
   AnnouncementRecord,
@@ -57,6 +60,7 @@ import {
   isVivaImageItem,
   listVivaFromAppsScript,
   normalizeVivaCollegeKey,
+  sanitizeVivaErrorMessage,
   updateVivaStatusFromAppsScript,
   vivaCollegesMatch,
   VivaItem
@@ -113,6 +117,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [submissions, setSubmissions] = useState<QuestionSubmission[]>([]);
   const [vivaItems, setVivaItems] = useState<VivaItem[]>([]);
   const [vivaCollegeFilter, setVivaCollegeFilter] = useState<string>('all');
+  const [vivaStatusFilter, setVivaStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [previewVivaItem, setPreviewVivaItem] = useState<VivaItem | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [resourceRequests, setResourceRequests] = useState<ResourceRequestRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -231,7 +237,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
 
       const vivaPromise = listVivaFromAppsScript({ includeUnapproved: true }).catch(err => {
         console.error('Failed to load viva items:', err);
-        errors.push(err?.message || 'Failed to load viva questions.');
+        errors.push(sanitizeVivaErrorMessage(err?.message || 'Failed to load viva questions.'));
         return null;
       });
 
@@ -464,7 +470,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             : 'Viva question rejected.'
       });
     } catch (err: any) {
-      setFeedback({ type: 'err', msg: err?.message || 'Viva status update failed.' });
+      setFeedback({ type: 'err', msg: sanitizeVivaErrorMessage(err?.message || 'Viva status update failed.') });
     } finally {
       setModeratingItemId(null);
     }
@@ -482,12 +488,13 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     try {
       await deleteVivaFromAppsScript(cleanId);
       setVivaItems(prev => prev.filter(v => v.id !== cleanId));
+      setPreviewVivaItem(prev => (prev?.id === cleanId ? null : prev));
       setFeedback({
         type: 'ok',
         msg: 'Viva question permanently deleted from Google Sheet and website.'
       });
     } catch (err: any) {
-      setFeedback({ type: 'err', msg: err?.message || 'Viva deletion failed.' });
+      setFeedback({ type: 'err', msg: sanitizeVivaErrorMessage(err?.message || 'Viva deletion failed.') });
     } finally {
       setModeratingItemId(null);
     }
@@ -925,7 +932,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
           },
           {
             id: 'viva' as const,
-            label: `Viva (${vivaItems.length})`,
+            label: (() => {
+              const pendingVivaCount = vivaItems.filter(v => v.status === 'pending').length;
+              return pendingVivaCount > 0
+                ? `Viva (${pendingVivaCount} Pending · ${vivaItems.length})`
+                : `Viva (${vivaItems.length})`;
+            })(),
             icon: Sparkles
           },
           {
@@ -1851,29 +1863,55 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             return map;
           }, new Map<string, string>()).values()
         );
-        const filteredAdminViva = vivaItems.filter(v =>
-          vivaCollegesMatch(v.college_name, vivaCollegeFilter)
-        );
+        const pendingVivaCount = vivaItems.filter(v => v.status === 'pending').length;
+        const approvedVivaCount = vivaItems.filter(v => v.status === 'approved').length;
+        const rejectedVivaCount = vivaItems.filter(v => v.status === 'rejected').length;
+
+        const filteredAdminViva = vivaItems.filter(v => {
+          if (!vivaCollegesMatch(v.college_name, vivaCollegeFilter)) return false;
+          if (vivaStatusFilter !== 'all' && v.status !== vivaStatusFilter) return false;
+          return true;
+        });
 
         return (
         <div className="space-y-3">
           {vivaItems.length > 0 && (
-            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-              <div className="text-xs font-bold text-[var(--mut)]">
-                Showing {filteredAdminViva.length} of {vivaItems.length} Viva entries
+            <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-3 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[var(--mut)]">
+                <span>
+                  Showing {filteredAdminViva.length} of {vivaItems.length} Viva entries
+                </span>
+                {pendingVivaCount > 0 && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/35">
+                    <Clock size={11} />
+                    <span>{pendingVivaCount} Pending Review</span>
+                  </span>
+                )}
               </div>
-              <select
-                value={vivaCollegeFilter}
-                onChange={e => setVivaCollegeFilter(e.target.value)}
-                className="sm:!w-72 text-xs min-h-[38px]"
-              >
-                <option value="all">All Medical Colleges ({vivaItems.length})</option>
-                {vivaColleges.map(c => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <select
+                  value={vivaStatusFilter}
+                  onChange={e => setVivaStatusFilter(e.target.value as 'all' | 'pending' | 'approved' | 'rejected')}
+                  className="sm:!w-48 text-xs min-h-[38px]"
+                >
+                  <option value="all">All Statuses ({vivaItems.length})</option>
+                  <option value="pending">Pending Review ({pendingVivaCount})</option>
+                  <option value="approved">Approved ({approvedVivaCount})</option>
+                  <option value="rejected">Rejected ({rejectedVivaCount})</option>
+                </select>
+                <select
+                  value={vivaCollegeFilter}
+                  onChange={e => setVivaCollegeFilter(e.target.value)}
+                  className="sm:!w-72 text-xs min-h-[38px]"
+                >
+                  <option value="all">All Medical Colleges ({vivaItems.length})</option>
+                  {vivaColleges.map(c => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
 
@@ -1881,7 +1919,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
             <div className="empty text-xs">
               {vivaItems.length === 0
                 ? 'No Viva questions submitted yet.'
-                : 'No Viva entries match the selected Medical College.'}
+                : 'No Viva entries match the selected filters.'}
             </div>
           ) : (
             [...filteredAdminViva]
@@ -1894,13 +1932,36 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 const sessionYearLabel = [v.session, v.year].filter(Boolean).join(' ');
                 const isImageFile = Boolean(v.file_url && isVivaImageItem(v));
                 const creditLabel = formatVivaContributorCredit(v.contributor_name, v.batch);
+                const isPending = v.status === 'pending';
                 return (
                 <div
                   key={v.id}
-                  className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3"
+                  className={`border rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 ${
+                    isPending
+                      ? 'bg-amber-500/5 border-amber-500/45 ring-1 ring-amber-500/20'
+                      : 'bg-[var(--card)] border-[var(--line)]'
+                  }`}
                 >
-                  <div className="space-y-1 min-w-0">
+                  <div className="space-y-1.5 min-w-0">
                     <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase inline-flex items-center gap-1 ${
+                          v.status === 'approved'
+                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+                            : v.status === 'rejected'
+                              ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
+                              : 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border border-amber-500/45'
+                        }`}
+                      >
+                        {isPending && <Clock size={10} />}
+                        <span>
+                          {v.status === 'approved'
+                            ? 'Approved'
+                            : v.status === 'rejected'
+                              ? 'Rejected'
+                              : 'Pending Review'}
+                        </span>
+                      </span>
                       {isSuggestion && (
                         <span className="px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 inline-flex items-center gap-1">
                           <Sparkles size={10} />
@@ -1916,7 +1977,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           }`}
                         >
                           {isImageFile ? <ImageIcon size={10} /> : <FileText size={10} />}
-                          <span>{isImageFile ? 'Image' : 'PDF'}</span>
+                          <span>{isImageFile ? 'Image' : 'PDF / File'}</span>
                         </span>
                       )}
                       <span>
@@ -1934,21 +1995,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                           <span>{v.college_name}</span>
                         </span>
                       )}
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase ${
-                          v.status === 'approved'
-                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
-                            : v.status === 'rejected'
-                              ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
-                              : 'bg-amber-500/15 text-amber-800 dark:text-amber-300'
-                        }`}
-                      >
-                        {v.status === 'approved'
-                          ? 'Approved'
-                          : v.status === 'rejected'
-                            ? 'Rejected'
-                            : 'Pending Approval'}
-                      </span>
                     </div>
                     {v.title && (
                       <div className="font-extrabold text-sm text-[var(--ink)] break-words">
@@ -1961,7 +2007,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                       </div>
                     )}
                     {v.file_url && (
-                      <div>
+                      <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewVivaItem(v)}
+                          className="btn sm alt min-h-[32px]"
+                        >
+                          <Eye size={12} />
+                          <span>{isImageFile ? 'Preview Image' : 'Preview PDF / File'}</span>
+                        </button>
                         <a
                           href={v.file_url}
                           target="_blank"
@@ -1981,8 +2035,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         Hint: {v.answer_hint}
                       </div>
                     )}
-                    <div className="text-xs text-[var(--mut)]">
-                      Credit / By: <strong className="text-[var(--ink)]">{creditLabel}</strong>
+                    <div className="text-xs text-[var(--mut)] flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                      <span>
+                        Credit / By: <strong className="text-[var(--ink)]">{creditLabel}</strong>
+                      </span>
+                      {v.contributor_email && <span>&bull; {v.contributor_email}</span>}
+                      {v.created_at && (
+                        <span>&bull; {new Date(v.created_at).toLocaleDateString()}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
@@ -2001,7 +2061,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         <span>Approve</span>
                       </button>
                     )}
-                    {v.status === 'pending' && (
+                    {v.status !== 'rejected' && (
                       <button
                         type="button"
                         disabled={moderatingItemId === v.id}
@@ -2029,6 +2089,89 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                 </div>
                 );
               })
+          )}
+
+          {/* Viva Attachment Review Modal */}
+          {previewVivaItem && previewVivaItem.file_url && (
+            <div
+              className="modal-overlay"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setPreviewVivaItem(null)}
+            >
+              <div className="modal-content !max-w-4xl" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                  <div className="min-w-0 pr-3">
+                    <div className="text-xs font-bold text-[#0D9488] flex flex-wrap items-center gap-2">
+                      <span>{previewVivaItem.subject} &middot; {previewVivaItem.prof}</span>
+                      {previewVivaItem.college_name && (
+                        <span className="px-2 py-0.5 rounded bg-[var(--bg-subtle)] border border-[var(--line)] text-[var(--ink)]">
+                          {previewVivaItem.college_name}
+                        </span>
+                      )}
+                      <span className="px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/25 text-[#0D9488]">
+                        {formatVivaContributorCredit(previewVivaItem.contributor_name, previewVivaItem.batch)}
+                      </span>
+                    </div>
+                    <div className="text-sm font-extrabold text-[var(--ink)] truncate mt-0.5">
+                      {previewVivaItem.title || previewVivaItem.file_name || 'Viva Submission Attachment'}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={previewVivaItem.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn sm alt no-underline min-h-[36px]"
+                    >
+                      <ExternalLink size={13} /> Open Tab
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewVivaItem(null)}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--mut)] hover:text-[var(--ink)] hover:bg-[var(--card)]"
+                      aria-label="Close attachment preview"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                </div>
+                <div className="p-4 sm:p-5 overflow-y-auto space-y-3">
+                  {(() => {
+                    const rawUrl = previewVivaItem.file_url || '';
+                    const driveMatch =
+                      rawUrl.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i) ||
+                      rawUrl.match(/drive\.google\.com\/open\?id=([^&#]+)/i);
+                    const driveId = driveMatch?.[1];
+                    if (driveId) {
+                      return (
+                        <iframe
+                          src={`https://drive.google.com/file/d/${driveId}/preview`}
+                          title={previewVivaItem.title || previewVivaItem.file_name || 'Viva Attachment'}
+                          className="w-full h-[65dvh] rounded-lg border border-[var(--line)] bg-white"
+                        />
+                      );
+                    }
+                    if (isVivaImageItem(previewVivaItem)) {
+                      return (
+                        <img
+                          src={rawUrl}
+                          alt={previewVivaItem.title || previewVivaItem.file_name || 'Viva Attachment'}
+                          className="w-full max-h-[65dvh] object-contain rounded-lg border border-[var(--line)] bg-[var(--bg-subtle)]"
+                        />
+                      );
+                    }
+                    return (
+                      <iframe
+                        src={rawUrl}
+                        title={previewVivaItem.title || previewVivaItem.file_name || 'Viva Attachment'}
+                        className="w-full h-[65dvh] rounded-lg border border-[var(--line)] bg-white"
+                      />
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
           )}
         </div>
         );
