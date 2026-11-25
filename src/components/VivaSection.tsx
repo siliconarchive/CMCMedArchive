@@ -10,7 +10,9 @@ import {
   Eye,
   FileText,
   GraduationCap,
+  Image as ImageIcon,
   Layers,
+  Link2,
   Loader2,
   MessageSquarePlus,
   RefreshCw,
@@ -19,6 +21,7 @@ import {
   Send,
   Sparkles,
   Trash2,
+  Upload,
   User,
   UserCheck,
   Users,
@@ -28,8 +31,11 @@ import { CustomTaxonomy, PageRoute, ProfessionalExamId, UserProfile } from '../t
 import { getSubjectsForProf } from '../data/curriculumConfig';
 import { isAdminUser } from '../utils/appsScriptAuth';
 import {
+  DEFAULT_VIVA_COLLEGE,
   deleteVivaFromAppsScript,
+  isVivaImageItem,
   listVivaFromAppsScript,
+  MAX_VIVA_FILE_BYTES,
   mergeVivaWithSeed,
   profIdToVivaProf,
   submitVivaToAppsScript,
@@ -37,6 +43,8 @@ import {
   VIVA_SESSION_OPTIONS,
   VIVA_YEAR_SUGGESTIONS,
   VivaExaminerType,
+  vivaFileToBase64,
+  VivaFileType,
   VivaItem,
   VivaProfLabel,
   vivaProfToProfId
@@ -107,6 +115,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   // Share Viva Question / Suggestion Form
   const [showForm, setShowForm] = useState<boolean>(false);
   const formLayerRef = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [formProf, setFormProf] = useState<VivaProfLabel>(() => profIdToVivaProf(selectedProf));
   const [formSubject, setFormSubject] = useState<string>(
     () => getSubjectsForProf(selectedProf, customTaxonomy)[0] || 'Anatomy'
@@ -120,7 +129,9 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
   const [formTitle, setFormTitle] = useState<string>('');
   const [formQuestion, setFormQuestion] = useState<string>('');
   const [formAnswerHint, setFormAnswerHint] = useState<string>('');
-  const [formPdfUrl, setFormPdfUrl] = useState<string>('');
+  const [attachmentMode, setAttachmentMode] = useState<'none' | 'file' | 'link'>('none');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [formFileUrl, setFormFileUrl] = useState<string>('');
   const [formContributorName, setFormContributorName] = useState<string>(
     userProfile?.fullName || ''
   );
@@ -128,6 +139,9 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     userProfile?.email || ''
   );
   const [formBatch, setFormBatch] = useState<string>(userProfile?.batch || '');
+  const [formCollegeName, setFormCollegeName] = useState<string>(
+    userProfile?.college || DEFAULT_VIVA_COLLEGE
+  );
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
@@ -157,8 +171,8 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     };
   }, [markLayerInactive]);
 
-  const openPdfPreview = (item: VivaItem) => {
-    if (!item.pdf_url) return;
+  const openFilePreview = (item: VivaItem) => {
+    if (!item.file_url) return;
     setPreviewItem(item);
     if (!previewLayerRef.current) {
       previewLayerRef.current = pushSubLayer('Viva Questions', () => {
@@ -217,6 +231,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       setFormContributorName(prev => prev || userProfile.fullName || '');
       setFormContributorEmail(prev => prev || userProfile.email || '');
       setFormBatch(prev => prev || userProfile.batch || '');
+      setFormCollegeName(prev => prev || userProfile.college || DEFAULT_VIVA_COLLEGE);
     } else {
       setVivaItems([]);
       setShowForm(false);
@@ -337,7 +352,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         return false;
       }
       if (q) {
-        const hay = `${item.title || ''} ${item.question} ${item.answer_hint} ${item.pdf_label || ''} ${item.subject} ${item.board_name} ${item.prof} ${item.examiner_type} ${item.session} ${item.year} ${item.is_suggestion ? 'viva suggestion high yield pdf' : ''} ${item.contributor_name} ${item.batch}`.toLowerCase();
+        const hay = `${item.title || ''} ${item.question} ${item.answer_hint} ${item.file_name || ''} ${item.subject} ${item.board_name} ${item.prof} ${item.examiner_type} ${item.session} ${item.year} ${item.is_suggestion ? 'viva suggestion high yield pdf image' : ''} ${item.contributor_name} ${item.batch} ${item.college_name}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
@@ -371,6 +386,32 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     [baseFilteredItems]
   );
 
+  const handleFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubmitError(null);
+    const file = e.target.files?.[0] || null;
+    if (!file) {
+      setSelectedFile(null);
+      return;
+    }
+
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setSubmitError('Please select a PDF or Image file (JPG, PNG, or WebP).');
+      e.target.value = '';
+      setSelectedFile(null);
+      return;
+    }
+
+    if (file.size > MAX_VIVA_FILE_BYTES) {
+      setSubmitError('File exceeds the 10 MB limit. Please upload a smaller PDF or image.');
+      e.target.value = '';
+      setSelectedFile(null);
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
   const handleSubmitViva = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userProfile) {
@@ -384,69 +425,114 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
       formSubject === '__custom__' ? formCustomSubject.trim() : formSubject.trim();
     const isSuggestionSubmission =
       formExaminerType === 'Suggestion' || formMarkSuggestion;
+    const hasFileUpload = attachmentMode === 'file' && Boolean(selectedFile);
+    const hasExternalLink = attachmentMode === 'link' && Boolean(formFileUrl.trim());
+    const hasWrittenQuestionOrTitle = Boolean(formQuestion.trim() || formTitle.trim());
 
     if (!effectiveSubject) {
       setSubmitError('Please select or enter a subject.');
       return;
     }
-    if (!isSuggestionSubmission && !formBoardName.trim()) {
-      setSubmitError('Please enter the Board Name (e.g. Board 1, Board 2).');
+    if (!formSession.trim()) {
+      setSubmitError('Please select the exam Session (e.g., May, November).');
       return;
     }
-    if (!formQuestion.trim()) {
-      setSubmitError('Please enter the Viva question or suggestion.');
+    if (!formYear.trim()) {
+      setSubmitError('Please enter the Year (e.g., 2026).');
+      return;
+    }
+    if (!formContributorName.trim()) {
+      setSubmitError('Please enter the Contributor Name for credit.');
+      return;
+    }
+    if (!formBatch.trim()) {
+      setSubmitError('Please enter your Batch (e.g., CMC-67).');
+      return;
+    }
+    if (attachmentMode === 'file' && !selectedFile) {
+      setSubmitError('Please choose a PDF or Image file (max 10 MB), or switch attachment mode.');
+      return;
+    }
+    if (attachmentMode === 'link' && !formFileUrl.trim()) {
+      setSubmitError('Please paste an external Google Drive or PDF/Image link.');
+      return;
+    }
+    if (!hasWrittenQuestionOrTitle && !hasFileUpload && !hasExternalLink) {
+      setSubmitError(
+        'Please enter a Topic/Question or attach a PDF, Image, or External Drive/PDF link.'
+      );
       return;
     }
 
     const effectiveBoard =
       formBoardName.trim() || (isSuggestionSubmission ? 'High-Yield Suggestion' : '');
+    const effectiveQuestion =
+      formQuestion.trim() || formTitle.trim();
 
-    const adminSubmit = isAdminUser(userProfile);
     setSubmitting(true);
     try {
+      let file_base64 = '';
+      let file_name = '';
+      let mime_type = '';
+      let file_url = '';
+      let file_type: VivaFileType = 'none';
+
+      if (hasFileUpload && selectedFile) {
+        const encoded = await vivaFileToBase64(selectedFile);
+        file_base64 = encoded.file_base64;
+        file_name = encoded.file_name;
+        mime_type = encoded.mime_type;
+        file_type = encoded.mime_type.startsWith('image/') ? 'image' : 'pdf';
+      } else if (hasExternalLink) {
+        file_url = formFileUrl.trim();
+        file_type = 'link';
+      }
+
       const created = await submitVivaToAppsScript({
         prof: formProf,
         subject: effectiveSubject,
         examiner_type: formExaminerType,
-        viva_type: isSuggestionSubmission ? 'suggestion' : 'board_question',
-        is_suggestion: isSuggestionSubmission,
         board_name: effectiveBoard,
+        question: effectiveQuestion,
+        answer_hint: formAnswerHint.trim(),
+        contributor_name: formContributorName.trim(),
+        contributor_email: formContributorEmail.trim() || userProfile.email || '',
+        batch: formBatch.trim(),
+        college_name: formCollegeName.trim() || DEFAULT_VIVA_COLLEGE,
         session: formSession.trim(),
         year: formYear.trim(),
+        viva_type: isSuggestionSubmission ? 'suggestion' : 'regular',
+        is_suggestion: isSuggestionSubmission,
         title: formTitle.trim() || undefined,
-        question: formQuestion.trim(),
-        answer_hint: formAnswerHint.trim(),
-        pdf_url: formPdfUrl.trim() || undefined,
-        contributor_name: formContributorName.trim() || userProfile.fullName || 'Anonymous Student',
-        contributor_email: formContributorEmail.trim() || userProfile.email || '',
-        batch: formBatch.trim() || userProfile.batch || '',
-        status: adminSubmit ? 'approved' : 'pending',
-        is_admin: adminSubmit
+        file_name,
+        mime_type,
+        file_base64,
+        file_url,
+        file_type,
+        status: 'approved',
+        is_admin: isAdminUser(userProfile)
       });
 
-      if (adminSubmit && created.status === 'approved') {
-        setVivaItems(prev => mergeVivaWithSeed([created, ...prev.filter(i => i.id !== created.id)]));
-        setSubmitSuccess(
-          isSuggestionSubmission
-            ? 'Viva Suggestion submitted and published live!'
-            : 'Viva question submitted and published live!'
-        );
-      } else {
-        setSubmitSuccess(
-          isSuggestionSubmission
-            ? 'Viva Suggestion submitted! It is pending admin approval and will appear under Viva Suggestion once approved.'
-            : 'Viva question submitted! It is currently pending admin approval and will appear in the Viva Bank once approved.'
-        );
-      }
+      setVivaItems(prev => mergeVivaWithSeed([created, ...prev.filter(i => i.id !== created.id)]));
+      setSubmitSuccess(
+        isSuggestionSubmission
+          ? 'Viva Suggestion published live to the Viva Bank!'
+          : 'Viva question published live to the Viva Bank!'
+      );
 
       setFormTitle('');
       setFormQuestion('');
       setFormAnswerHint('');
-      setFormPdfUrl('');
+      setFormFileUrl('');
+      setSelectedFile(null);
+      setAttachmentMode('none');
       setFormCustomSubject('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       await loadVivaItems();
     } catch (err: any) {
-      setSubmitError(err?.message || 'Failed to submit Viva question.');
+      setSubmitError(err?.message || 'Failed to submit Viva entry.');
     } finally {
       setSubmitting(false);
     }
@@ -493,8 +579,9 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
     const isExternal = item.examiner_type === 'External';
     const showExaminerBadge = item.examiner_type !== 'Suggestion';
     const sessionYearLabel = [item.session, item.year].filter(Boolean).join(' ');
-    const hasPdfUrl = Boolean(item.pdf_url && item.pdf_url.trim());
-    const showProminentCredit = Boolean(item.is_seeded || hasPdfUrl);
+    const hasFileUrl = Boolean(item.file_url && item.file_url.trim());
+    const isImageFile = hasFileUrl && isVivaImageItem(item);
+    const showProminentCredit = Boolean(item.is_seeded || hasFileUrl);
 
     return (
       <article
@@ -514,10 +601,20 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   <span>Viva Suggestion</span>
                 </span>
               )}
-              {(hasPdfUrl || item.is_seeded) && (
-                <span className="px-2 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30 inline-flex items-center gap-1">
-                  <FileText size={10} className="shrink-0" />
-                  <span>PDF</span>
+              {hasFileUrl && (
+                <span
+                  className={`px-2 py-0.5 rounded-md font-extrabold text-[11px] uppercase tracking-wider border inline-flex items-center gap-1 ${
+                    isImageFile
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                      : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30'
+                  }`}
+                >
+                  {isImageFile ? (
+                    <ImageIcon size={10} className="shrink-0" />
+                  ) : (
+                    <FileText size={10} className="shrink-0" />
+                  )}
+                  <span>{isImageFile ? 'Image' : 'PDF'}</span>
                 </span>
               )}
               {showExaminerBadge && (
@@ -555,36 +652,53 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
             </h3>
           )}
 
-          <p className="text-sm sm:text-[14.5px] font-medium text-[var(--ink-secondary)] leading-relaxed m-0 break-words whitespace-pre-line">
-            {item.question}
-          </p>
+          {item.question ? (
+            <p className="text-sm sm:text-[14.5px] font-medium text-[var(--ink-secondary)] leading-relaxed m-0 break-words whitespace-pre-line">
+              {item.question}
+            </p>
+          ) : (
+            hasFileUrl && (
+              <p className="text-sm font-bold text-[var(--ink)] leading-relaxed m-0 break-words">
+                {item.file_name || `${item.subject} ${isSuggestion ? 'Viva Suggestion' : 'Viva'} Attachment`}
+              </p>
+            )
+          )}
 
-          {hasPdfUrl && item.pdf_url ? (
+          {hasFileUrl && item.file_url ? (
             <div className="p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)] flex flex-wrap items-center justify-between gap-2.5">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-600 dark:text-rose-300 flex items-center justify-center shrink-0">
-                  <FileText size={15} />
+                <div
+                  className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${
+                    isImageFile
+                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 dark:text-emerald-300'
+                      : 'bg-rose-500/10 border-rose-500/25 text-rose-600 dark:text-rose-300'
+                  }`}
+                >
+                  {isImageFile ? <ImageIcon size={15} /> : <FileText size={15} />}
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs font-bold text-[var(--ink)] truncate">
-                    {item.pdf_label || item.title || `${item.subject} Viva Suggestion.pdf`}
+                    {item.file_name ||
+                      item.title ||
+                      `${item.subject} Viva ${isImageFile ? 'Image' : 'PDF'}`}
                   </div>
                   <div className="text-[11px] text-[var(--mut)]">
                     Credit: {item.contributor_name}
+                    {item.batch ? ` (${item.batch})` : ''}
                   </div>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                 <button
                   type="button"
-                  onClick={() => openPdfPreview(item)}
+                  onClick={() => openFilePreview(item)}
                   className="btn sm min-h-[36px]"
                 >
                   <Eye size={13} />
-                  <span>View PDF</span>
+                  <span>{isImageFile ? 'View Image' : 'View PDF'}</span>
                 </button>
                 <a
-                  href={item.pdf_url}
+                  href={item.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn sm alt no-underline min-h-[36px]"
@@ -611,7 +725,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
           {item.answer_hint && (
             <div className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--line)] text-xs space-y-1">
               <div className="font-extrabold uppercase tracking-wider text-[10.5px] text-[#0D9488]">
-                {hasPdfUrl || item.is_seeded ? 'Coverage & Notes' : 'Answer Hint / Approach'}
+                {hasFileUrl || item.is_seeded ? 'Coverage & Notes' : 'Answer Hint / Approach'}
               </div>
               <p className="text-[var(--ink-secondary)] m-0 leading-relaxed whitespace-pre-line break-words">
                 {item.answer_hint}
@@ -634,7 +748,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               </span>
             )}
             {item.batch && (
-              <span className="inline-flex items-center gap-1">
+              <span className="inline-flex items-center gap-1 font-medium">
                 <GraduationCap size={12} />
                 <span>{item.batch}</span>
               </span>
@@ -735,9 +849,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     Share Viva Question / Suggestion
                   </h2>
                   <p className="text-xs text-[var(--mut)] m-0 mt-0.5">
-                    {isAdminUser(userProfile)
-                      ? 'Admin submissions are published live immediately.'
-                      : 'Submissions stay pending until approved by an administrator.'}
+                    Open for all students — attach a PDF, image (up to 10 MB), or Google Drive link and publish directly to the Viva Bank.
                   </p>
                 </div>
                 <button
@@ -863,7 +975,7 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Board Name {formExaminerType === 'Suggestion' ? '(Optional)' : '*'}
+                    Board Name <span className="text-[var(--mut)] font-normal">(Optional)</span>
                   </label>
                   <input
                     value={formBoardName}
@@ -874,7 +986,6 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                         ? 'e.g. High-Yield / Board 1'
                         : 'e.g. Board 1, Board 2'
                     }
-                    required={formExaminerType !== 'Suggestion' && !formMarkSuggestion}
                     className="min-h-[44px] text-sm"
                   />
                   <datalist id="viva-board-suggestions">
@@ -886,14 +997,15 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Session (Optional)
+                    Session *
                   </label>
                   <select
                     value={formSession}
                     onChange={e => setFormSession(e.target.value)}
+                    required
                     className="min-h-[44px] text-sm"
                   >
-                    <option value="">Not specified</option>
+                    <option value="">Select Session...</option>
                     {VIVA_SESSION_OPTIONS.map(sess => (
                       <option key={sess} value={sess}>
                         {sess}
@@ -904,13 +1016,14 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Year (Optional)
+                    Year *
                   </label>
                   <input
                     value={formYear}
                     onChange={e => setFormYear(e.target.value)}
                     list="viva-year-suggestions"
                     placeholder="e.g. 2026"
+                    required
                     className="min-h-[44px] text-sm"
                   />
                   <datalist id="viva-year-suggestions">
@@ -921,38 +1034,31 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                 </div>
               </div>
 
-              {/* Optional Title, Question, Answer Hint, PDF Link */}
+              {/* Topic/Title, Written Question, Attachment (PDF/Image/Link), Answer Hint */}
               <div className="space-y-3.5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                      Title / Topic Heading (Optional)
-                    </label>
-                    <input
-                      value={formTitle}
-                      onChange={e => setFormTitle(e.target.value)}
-                      placeholder="e.g. CMC Physiology Prof Viva — Organized Bank"
-                      className="min-h-[42px] text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                      PDF / Google Drive Link (Optional)
-                    </label>
-                    <input
-                      value={formPdfUrl}
-                      onChange={e => setFormPdfUrl(e.target.value)}
-                      placeholder="https://drive.google.com/file/d/.../view"
-                      className="min-h-[42px] text-sm"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    Topic / Title{' '}
+                    <span className="text-[var(--mut)] font-normal">
+                      (Recommended when uploading a PDF or image)
+                    </span>
+                  </label>
+                  <input
+                    value={formTitle}
+                    onChange={e => setFormTitle(e.target.value)}
+                    placeholder="e.g. CMC Physiology Prof Viva — Organized Bank"
+                    className="min-h-[42px] text-sm"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
                     {formExaminerType === 'Suggestion'
-                      ? 'Viva Suggestion Topic / Question *'
-                      : 'Viva Question / Examiner Experience *'}
+                      ? 'Viva Suggestion Description / Questions'
+                      : 'Viva Question / Examiner Experience'}{' '}
+                    <span className="text-[var(--mut)] font-normal">
+                      (Optional if PDF, image, or link is attached)
+                    </span>
                   </label>
                   <textarea
                     rows={3}
@@ -960,12 +1066,117 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     onChange={e => setFormQuestion(e.target.value)}
                     placeholder={
                       formExaminerType === 'Suggestion'
-                        ? 'Write the high-yield viva suggestion topic or frequently asked examiner question...'
-                        : 'Write the exact question(s) asked or viva board scenario...'
+                        ? 'Write the high-yield viva suggestion topic or leave brief if attaching a PDF/image...'
+                        : 'Write the exact question(s) asked or viva board scenario (optional if uploading a file)...'
                     }
-                    required
                     className="text-sm"
                   />
+                </div>
+
+                {/* Attachment Mode Selector: Text only / PDF or Image Upload / External Link */}
+                <div className="space-y-2.5 p-3.5 rounded-xl bg-[var(--bg-subtle)] border border-[var(--line)]">
+                  <label className="block text-xs font-bold text-[var(--ink)]">
+                    Attach PDF, Image, or External Link (Optional)
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachmentMode('none');
+                        setSelectedFile(null);
+                        setFormFileUrl('');
+                      }}
+                      className={`py-2 px-3 rounded-lg border text-xs font-bold min-h-[40px] flex items-center justify-center gap-1.5 ${
+                        attachmentMode === 'none'
+                          ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488]'
+                          : 'border-[var(--line)] bg-[var(--card)] text-[var(--ink-secondary)]'
+                      }`}
+                    >
+                      <span>No File Attachment</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachmentMode('file');
+                        setFormFileUrl('');
+                      }}
+                      className={`py-2 px-3 rounded-lg border text-xs font-bold min-h-[40px] flex items-center justify-center gap-1.5 ${
+                        attachmentMode === 'file'
+                          ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488]'
+                          : 'border-[var(--line)] bg-[var(--card)] text-[var(--ink-secondary)]'
+                      }`}
+                    >
+                      <Upload size={13} />
+                      <span>Upload PDF / Image (≤ 10MB)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAttachmentMode('link');
+                        setSelectedFile(null);
+                      }}
+                      className={`py-2 px-3 rounded-lg border text-xs font-bold min-h-[40px] flex items-center justify-center gap-1.5 ${
+                        attachmentMode === 'link'
+                          ? 'border-[#0D9488] bg-teal-50/70 dark:bg-teal-950/40 text-[#0D9488]'
+                          : 'border-[var(--line)] bg-[var(--card)] text-[var(--ink-secondary)]'
+                      }`}
+                    >
+                      <Link2 size={13} />
+                      <span>Google Drive / External Link</span>
+                    </button>
+                  </div>
+
+                  {attachmentMode === 'file' && (
+                    <div className="space-y-2 pt-1">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="application/pdf,image/jpeg,image/png,image/webp"
+                        onChange={handleFileSelected}
+                        className="text-xs file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#0D9488] file:text-white hover:file:opacity-90"
+                      />
+                      {selectedFile && (
+                        <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-[var(--card)] border border-[var(--line)] text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {selectedFile.type.startsWith('image/') ? (
+                              <ImageIcon size={14} className="text-emerald-600 shrink-0" />
+                            ) : (
+                              <FileText size={14} className="text-rose-600 shrink-0" />
+                            )}
+                            <span className="font-bold text-[var(--ink)] truncate">
+                              {selectedFile.name}
+                            </span>
+                            <span className="text-[var(--mut)] shrink-0">
+                              ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                            className="text-[var(--mut)] hover:text-rose-600"
+                            aria-label="Remove selected file"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {attachmentMode === 'link' && (
+                    <div className="pt-1">
+                      <input
+                        type="url"
+                        value={formFileUrl}
+                        onChange={e => setFormFileUrl(e.target.value)}
+                        placeholder="https://drive.google.com/file/d/.../view"
+                        className="min-h-[42px] text-sm"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -983,26 +1194,39 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
               </div>
 
               {/* Contributor Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Contributor Name
+                    Contributor Name (Credit) *
                   </label>
                   <input
                     value={formContributorName}
                     onChange={e => setFormContributorName(e.target.value)}
-                    placeholder="Your name (or Anonymous)"
+                    placeholder="e.g. Fahad vaiya"
+                    required
                     className="min-h-[42px] text-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[var(--ink)] mb-1">
-                    Batch (Optional)
+                    Batch *
                   </label>
                   <input
                     value={formBatch}
                     onChange={e => setFormBatch(e.target.value)}
-                    placeholder="e.g. CMC 67"
+                    placeholder="e.g. CMC-67"
+                    required
+                    className="min-h-[42px] text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[var(--ink)] mb-1">
+                    College
+                  </label>
+                  <input
+                    value={formCollegeName}
+                    onChange={e => setFormCollegeName(e.target.value)}
+                    placeholder="Chittagong Medical College"
                     className="min-h-[42px] text-sm"
                   />
                 </div>
@@ -1025,14 +1249,10 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                   {submitting ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
                   <span>
                     {submitting
-                      ? 'Submitting...'
-                      : isAdminUser(userProfile)
-                        ? formExaminerType === 'Suggestion'
-                          ? 'Publish Viva Suggestion Live'
-                          : 'Publish Viva Question Live'
-                        : formExaminerType === 'Suggestion'
-                          ? 'Submit Viva Suggestion'
-                          : 'Submit Viva Question'}
+                      ? 'Uploading & Publishing...'
+                      : formExaminerType === 'Suggestion' || formMarkSuggestion
+                        ? 'Publish Viva Suggestion'
+                        : 'Publish Viva Question'}
                   </span>
                 </button>
                 <button
@@ -1402,8 +1622,8 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
         </>
       )}
 
-      {/* Inline PDF Preview Modal for Viva Suggestion PDFs */}
-      {previewItem && previewItem.pdf_url && (
+      {/* Inline File Preview Modal for Viva PDFs & Images */}
+      {previewItem && previewItem.file_url && (
         <div
           className="modal-overlay"
           role="dialog"
@@ -1428,17 +1648,22 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-teal-500/10 border border-teal-500/25 text-[#0D9488] font-extrabold">
                       <Award size={11} />
-                      <span>Credit: {previewItem.contributor_name}</span>
+                      <span>
+                        Credit: {previewItem.contributor_name}
+                        {previewItem.batch ? ` (${previewItem.batch})` : ''}
+                      </span>
                     </span>
                   </div>
                   <div className="text-sm font-extrabold text-[var(--ink)] truncate mt-0.5">
-                    {previewItem.title || previewItem.pdf_label || `${previewItem.subject} Viva Suggestion`}
+                    {previewItem.title ||
+                      previewItem.file_name ||
+                      `${previewItem.subject} Viva ${isVivaImageItem(previewItem) ? 'Image' : 'Suggestion'}`}
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <a
-                  href={previewItem.pdf_url}
+                  href={previewItem.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn sm alt no-underline min-h-[38px]"
@@ -1458,19 +1683,36 @@ export const VivaSection: React.FC<VivaSectionProps> = ({
 
             <div className="p-4 sm:p-5 overflow-y-auto space-y-3">
               {(() => {
-                const rawUrl = previewItem.pdf_url || '';
+                const rawUrl = previewItem.file_url || '';
                 const driveMatch =
                   rawUrl.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i) ||
                   rawUrl.match(/drive\.google\.com\/open\?id=([^&#]+)/i);
                 const driveId = driveMatch?.[1];
-                const iframeSrc = driveId
-                  ? `https://drive.google.com/file/d/${driveId}/preview`
-                  : rawUrl;
+
+                if (driveId) {
+                  return (
+                    <iframe
+                      src={`https://drive.google.com/file/d/${driveId}/preview`}
+                      title={previewItem.title || previewItem.file_name || `${previewItem.subject} Viva File`}
+                      className="w-full h-[68dvh] rounded-lg border border-[var(--line)] bg-white"
+                    />
+                  );
+                }
+
+                if (isVivaImageItem(previewItem)) {
+                  return (
+                    <img
+                      src={rawUrl}
+                      alt={previewItem.title || previewItem.file_name || `${previewItem.subject} Viva Image`}
+                      className="w-full max-h-[68dvh] object-contain rounded-lg border border-[var(--line)] bg-[var(--bg-subtle)]"
+                    />
+                  );
+                }
 
                 return (
                   <iframe
-                    src={iframeSrc}
-                    title={previewItem.title || `${previewItem.subject} Viva PDF`}
+                    src={rawUrl}
+                    title={previewItem.title || previewItem.file_name || `${previewItem.subject} Viva PDF`}
                     className="w-full h-[68dvh] rounded-lg border border-[var(--line)] bg-white"
                   />
                 );

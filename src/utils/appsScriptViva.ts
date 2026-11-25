@@ -1,11 +1,16 @@
 import { DEFAULT_SEED_VIVA_ITEMS } from '../data/vivaSeed';
 import { ProfessionalExamId } from '../types';
+import { fileToBase64 } from './appsScriptArchive';
 
 export const VIVA_APPS_SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbyfz3z-DbyTrwa7b37JLjA-QKuqqc_b6xdz8ZJGTiYUKeNL6fWHQ2NgxSLY7mL7MOjm/exec';
 
+export const DEFAULT_VIVA_COLLEGE = 'Chittagong Medical College';
+export const MAX_VIVA_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export type VivaExaminerType = 'External' | 'Internal' | 'Suggestion';
-export type VivaCategoryType = 'board_question' | 'suggestion';
+export type VivaCategoryType = 'regular' | 'suggestion';
+export type VivaFileType = 'pdf' | 'image' | 'link' | 'none';
 export type VivaProfLabel = '1st Prof' | '2nd Prof' | '3rd Prof' | 'Final Prof';
 export type VivaApprovalStatus = 'pending' | 'approved' | 'rejected';
 
@@ -24,19 +29,22 @@ export interface VivaItem {
   prof: VivaProfLabel;
   subject: string;
   examiner_type: VivaExaminerType;
-  viva_type: VivaCategoryType;
-  is_suggestion: boolean;
   board_name: string;
-  session: string;
-  year: string;
-  title?: string;
   question: string;
   answer_hint: string;
-  pdf_url?: string;
-  pdf_label?: string;
   contributor_name: string;
   contributor_email: string;
   batch: string;
+  college_name: string;
+  session: string;
+  year: string;
+  viva_type: VivaCategoryType;
+  is_suggestion: boolean;
+  title?: string;
+  file_url?: string;
+  file_name?: string;
+  mime_type?: string;
+  file_type: VivaFileType;
   status: VivaApprovalStatus;
   created_at: string;
   is_seeded?: boolean;
@@ -46,18 +54,23 @@ export interface SubmitVivaPayload {
   prof: VivaProfLabel;
   subject: string;
   examiner_type: VivaExaminerType;
-  viva_type?: VivaCategoryType;
-  is_suggestion?: boolean;
   board_name: string;
-  session?: string;
-  year?: string;
-  title?: string;
   question: string;
   answer_hint: string;
-  pdf_url?: string;
   contributor_name: string;
   contributor_email: string;
   batch: string;
+  college_name?: string;
+  session: string;
+  year: string;
+  viva_type: VivaCategoryType;
+  is_suggestion?: boolean;
+  title?: string;
+  file_name?: string;
+  mime_type?: string;
+  file_base64?: string;
+  file_url?: string;
+  file_type?: VivaFileType;
   status?: 'pending' | 'approved';
   is_admin?: boolean;
 }
@@ -69,23 +82,27 @@ interface RawVivaRecord {
   prof?: string;
   subject?: string;
   examiner_type?: string;
-  viva_type?: string;
-  category?: string;
-  is_suggestion?: boolean | string;
   board_name?: string;
-  session?: string;
-  year?: string | number;
-  title?: string;
   question?: string;
   answer_hint?: string;
-  pdf_url?: string;
-  file_url?: string;
-  drive_url?: string;
-  document_url?: string;
-  pdf_label?: string;
   contributor_name?: string;
   contributor_email?: string;
   batch?: string;
+  college_name?: string;
+  session?: string;
+  year?: string | number;
+  viva_type?: string;
+  category?: string;
+  is_suggestion?: boolean | string;
+  title?: string;
+  file_url?: string;
+  pdf_url?: string;
+  drive_url?: string;
+  document_url?: string;
+  file_name?: string;
+  pdf_label?: string;
+  mime_type?: string;
+  file_type?: string;
   status?: string;
   is_admin?: boolean | string;
   is_bank?: boolean | string;
@@ -107,6 +124,8 @@ interface VivaScriptResponse {
   data?: RawVivaRecord[] | RawVivaRecord;
 }
 
+export { fileToBase64 as vivaFileToBase64 };
+
 export function profIdToVivaProf(profId: ProfessionalExamId): VivaProfLabel {
   if (profId === 'Second Professional') return '2nd Prof';
   if (profId === 'Third Professional') return '3rd Prof';
@@ -127,6 +146,11 @@ export function normalizeVivaProf(raw?: string): VivaProfLabel {
   if (s.includes('3rd') || s.includes('third')) return '3rd Prof';
   if (s.includes('final') || s.includes('4th') || s.includes('fourth')) return 'Final Prof';
   return '1st Prof';
+}
+
+function cleanStr(val: unknown): string {
+  const s = val !== undefined && val !== null ? String(val).trim() : '';
+  return s === 'undefined' || s === 'null' ? '' : s;
 }
 
 function isTruthyFlag(val: unknown): boolean {
@@ -161,6 +185,53 @@ export function resolveVivaSuggestionFlag(raw: {
   );
 }
 
+export function inferVivaFileType(raw: {
+  file_type?: string;
+  mime_type?: string;
+  file_url?: string;
+  file_name?: string;
+}): VivaFileType {
+  const ft = cleanStr(raw.file_type).toLowerCase();
+  const mt = cleanStr(raw.mime_type).toLowerCase();
+  const url = cleanStr(raw.file_url);
+  const name = cleanStr(raw.file_name);
+
+  if (ft === 'image' || ft === 'images' || mt.startsWith('image/')) return 'image';
+  if (ft === 'pdf' || mt === 'application/pdf') return 'pdf';
+  if (ft === 'link' || ft === 'drive_link') {
+    if (/\.(png|jpe?g|webp|gif)(\?|#|$)/i.test(url) || /\.(png|jpe?g|webp|gif)$/i.test(name)) {
+      return 'image';
+    }
+    if (/\.pdf(\?|#|$)/i.test(url) || /\.pdf$/i.test(name)) {
+      return 'pdf';
+    }
+    return 'link';
+  }
+  if (ft === 'none') return 'none';
+
+  if (/\.(png|jpe?g|webp|gif)(\?|#|$)/i.test(url) || /\.(png|jpe?g|webp|gif)$/i.test(name)) {
+    return 'image';
+  }
+  if (/\.pdf(\?|#|$)/i.test(url) || /\.pdf$/i.test(name)) {
+    return 'pdf';
+  }
+  if (url) return 'link';
+  return 'none';
+}
+
+export function isVivaImageItem(item: {
+  file_type?: string;
+  mime_type?: string;
+  file_url?: string;
+  file_name?: string;
+}): boolean {
+  if (item.file_type === 'image') return true;
+  if (cleanStr(item.mime_type).toLowerCase().startsWith('image/')) return true;
+  const url = cleanStr(item.file_url);
+  const name = cleanStr(item.file_name);
+  return /\.(png|jpe?g|webp|gif)(\?|#|$)/i.test(url) || /\.(png|jpe?g|webp|gif)$/i.test(name);
+}
+
 export function normalizeVivaStatus(
   rawStatus?: string,
   rawRecord?: { is_admin?: unknown; is_bank?: unknown }
@@ -173,13 +244,14 @@ export function normalizeVivaStatus(
   if (isTruthyFlag(rawRecord?.is_admin) || isTruthyFlag(rawRecord?.is_bank)) {
     return 'approved';
   }
-  return 'pending';
+  // Backward compatibility: legacy Viva_Questions rows without a status value default to approved
+  return s === '' ? 'approved' : 'pending';
 }
 
 function mapRawVivaRecord(
   raw: RawVivaRecord,
   idx: number,
-  fallbackStatus: VivaApprovalStatus = 'pending'
+  fallbackStatus: VivaApprovalStatus = 'approved'
 ): VivaItem {
   const rawId = raw.id ?? raw.viva_id ?? raw.row_id;
   const normStatus =
@@ -195,22 +267,19 @@ function mapRawVivaRecord(
 
   const examinerType = normalizeExaminerType(raw.examiner_type);
   const isSuggestion = resolveVivaSuggestionFlag(raw);
-  const vivaType: VivaCategoryType = isSuggestion ? 'suggestion' : 'board_question';
+  const vivaType: VivaCategoryType = isSuggestion ? 'suggestion' : 'regular';
 
-  const rawYear =
-    raw.year !== undefined && raw.year !== null ? String(raw.year).trim() : '';
-  const cleanYear = rawYear === 'undefined' || rawYear === 'null' ? '' : rawYear;
-  const rawSession = String(raw.session || '').trim();
-  const cleanSession = rawSession === 'undefined' || rawSession === 'null' ? '' : rawSession;
+  const fileUrl = cleanStr(raw.file_url || raw.pdf_url || raw.drive_url || raw.document_url);
+  const fileName = cleanStr(raw.file_name || raw.pdf_label);
+  const mimeType = cleanStr(raw.mime_type);
+  const fileType = inferVivaFileType({
+    file_type: raw.file_type,
+    mime_type: mimeType,
+    file_url: fileUrl,
+    file_name: fileName
+  });
 
-  const rawTitle = String(raw.title || '').trim();
-  const cleanTitle = rawTitle === 'undefined' || rawTitle === 'null' ? '' : rawTitle;
-  const rawPdfUrl = String(
-    raw.pdf_url || raw.file_url || raw.drive_url || raw.document_url || ''
-  ).trim();
-  const cleanPdfUrl = rawPdfUrl === 'undefined' || rawPdfUrl === 'null' ? '' : rawPdfUrl;
-  const rawPdfLabel = String(raw.pdf_label || '').trim();
-  const cleanPdfLabel = rawPdfLabel === 'undefined' || rawPdfLabel === 'null' ? '' : rawPdfLabel;
+  const cleanTitle = cleanStr(raw.title);
 
   return {
     id:
@@ -218,23 +287,26 @@ function mapRawVivaRecord(
         ? String(rawId).trim()
         : `viva_${idx}_${Date.now()}`,
     prof: normalizeVivaProf(raw.prof),
-    subject: String(raw.subject || '').trim() || 'General',
+    subject: cleanStr(raw.subject) || 'General',
     examiner_type: examinerType,
+    board_name: cleanStr(raw.board_name),
+    question: cleanStr(raw.question),
+    answer_hint: cleanStr(raw.answer_hint),
+    contributor_name: cleanStr(raw.contributor_name) || 'Student Contributor',
+    contributor_email: cleanStr(raw.contributor_email),
+    batch: cleanStr(raw.batch),
+    college_name: cleanStr(raw.college_name) || DEFAULT_VIVA_COLLEGE,
+    session: cleanStr(raw.session),
+    year: cleanStr(raw.year),
     viva_type: vivaType,
     is_suggestion: isSuggestion,
-    board_name: String(raw.board_name || '').trim(),
-    session: cleanSession,
-    year: cleanYear,
     title: cleanTitle || undefined,
-    question: String(raw.question || '').trim(),
-    answer_hint: String(raw.answer_hint || '').trim(),
-    pdf_url: cleanPdfUrl || undefined,
-    pdf_label: cleanPdfLabel || undefined,
-    contributor_name: String(raw.contributor_name || '').trim() || 'Student Contributor',
-    contributor_email: String(raw.contributor_email || '').trim(),
-    batch: String(raw.batch || '').trim(),
+    file_url: fileUrl || undefined,
+    file_name: fileName || undefined,
+    mime_type: mimeType || undefined,
+    file_type: fileType,
     status: safeStatus,
-    created_at: String(raw.created_at || new Date().toISOString())
+    created_at: cleanStr(raw.created_at) || new Date().toISOString()
   };
 }
 
@@ -255,22 +327,29 @@ export function mergeVivaWithSeed(remoteList: VivaItem[]): VivaItem[] {
       Boolean(remote.title && seed.title) &&
       normalizeKey(remote.title) === normalizeKey(seed.title);
     if (sameTitle) return true;
-    return sameSubject && sameContributor && (remote.is_suggestion || Boolean(remote.pdf_url));
+    return sameSubject && sameContributor && (remote.is_suggestion || Boolean(remote.file_url));
   };
 
-  // Enrich matching remote records with seed pdf_url/title fallback if omitted in sheet
   const merged = remoteList.map(remote => {
     const matchedSeed = DEFAULT_SEED_VIVA_ITEMS.find(seed => matchesSeed(remote, seed));
     if (!matchedSeed) return remote;
+    const resolvedFileUrl = remote.file_url || matchedSeed.file_url;
+    const resolvedFileName = remote.file_name || matchedSeed.file_name;
+    const resolvedFileType =
+      remote.file_type && remote.file_type !== 'none'
+        ? remote.file_type
+        : matchedSeed.file_type;
+
     return {
       ...remote,
       title: remote.title || matchedSeed.title,
-      pdf_url: remote.pdf_url || matchedSeed.pdf_url,
-      pdf_label: remote.pdf_label || matchedSeed.pdf_label
+      file_url: resolvedFileUrl,
+      file_name: resolvedFileName,
+      mime_type: remote.mime_type || matchedSeed.mime_type,
+      file_type: resolvedFileType
     };
   });
 
-  // Append any seed entries not already represented in the remote sheet
   for (const seed of DEFAULT_SEED_VIVA_ITEMS) {
     const alreadyPresent = merged.some(item => matchesSeed(item, seed));
     if (!alreadyPresent) {
@@ -310,12 +389,12 @@ export async function listVivaFromAppsScript(options?: {
   includeUnapproved?: boolean;
 }): Promise<VivaItem[]> {
   const data = await postVivaScript({ action: 'list_viva' });
-  const rawList = Array.isArray(data.viva_list)
-    ? data.viva_list
-    : Array.isArray(data.vivas)
-      ? data.vivas
-      : Array.isArray(data.items)
-        ? data.items
+  const rawList = Array.isArray(data.items)
+    ? data.items
+    : Array.isArray(data.viva_list)
+      ? data.viva_list
+      : Array.isArray(data.vivas)
+        ? data.vivas
         : Array.isArray(data.questions)
           ? data.questions
           : Array.isArray(data.data)
@@ -326,7 +405,11 @@ export async function listVivaFromAppsScript(options?: {
 
   return rawList
     .filter(r => {
-      if (!String(r.question || '').trim()) return false;
+      const hasContent =
+        Boolean(cleanStr(r.question)) ||
+        Boolean(cleanStr(r.file_url || r.pdf_url || r.drive_url || r.document_url)) ||
+        Boolean(cleanStr(r.title));
+      if (!hasContent) return false;
       const s = normalizeVivaStatus(r.status, r);
       if (s === 'deleted') return false;
       if (options?.includeUnapproved) return true;
@@ -336,35 +419,51 @@ export async function listVivaFromAppsScript(options?: {
 }
 
 export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promise<VivaItem> {
-  const desiredStatus: VivaApprovalStatus =
-    payload.status === 'approved' || payload.is_admin ? 'approved' : 'pending';
+  const desiredStatus: VivaApprovalStatus = payload.status || 'approved';
   const isSuggestion = Boolean(
     payload.is_suggestion ||
       payload.viva_type === 'suggestion' ||
       payload.examiner_type === 'Suggestion'
   );
-  const vivaType: VivaCategoryType = isSuggestion ? 'suggestion' : 'board_question';
+  const vivaType: VivaCategoryType = isSuggestion ? 'suggestion' : 'regular';
+  const collegeName = cleanStr(payload.college_name) || DEFAULT_VIVA_COLLEGE;
+  const cleanFileUrl = cleanStr(payload.file_url);
+  const cleanFileName = cleanStr(payload.file_name);
+  const cleanMimeType = cleanStr(payload.mime_type);
+  const fileType: VivaFileType =
+    payload.file_type ||
+    inferVivaFileType({
+      mime_type: cleanMimeType,
+      file_url: cleanFileUrl,
+      file_name: cleanFileName
+    });
 
-  const requestBody = {
+  const requestBody: Record<string, unknown> = {
     action: 'submit_viva',
     prof: payload.prof,
     subject: payload.subject,
     examiner_type: payload.examiner_type,
-    viva_type: vivaType,
-    is_suggestion: isSuggestion,
     board_name: payload.board_name,
-    session: (payload.session || '').trim(),
-    year: (payload.year || '').trim(),
-    title: (payload.title || '').trim(),
     question: payload.question,
     answer_hint: payload.answer_hint,
-    pdf_url: (payload.pdf_url || '').trim(),
     contributor_name: payload.contributor_name,
     contributor_email: payload.contributor_email,
     batch: payload.batch,
-    status: desiredStatus,
-    is_admin: Boolean(payload.is_admin)
+    college_name: collegeName,
+    session: cleanStr(payload.session),
+    year: cleanStr(payload.year),
+    viva_type: vivaType,
+    file_name: cleanFileName,
+    mime_type: cleanMimeType,
+    file_base64: payload.file_base64 || '',
+    file_url: cleanFileUrl,
+    file_type: fileType,
+    status: desiredStatus
   };
+
+  if (cleanStr(payload.title)) {
+    requestBody.title = cleanStr(payload.title);
+  }
 
   const data = await postVivaScript(requestBody);
   const created =
@@ -375,15 +474,30 @@ export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promis
   if (created) {
     return mapRawVivaRecord(
       {
-        ...requestBody,
         ...created,
-        viva_type: created.viva_type || requestBody.viva_type,
+        prof: created.prof || payload.prof,
+        subject: created.subject || payload.subject,
+        examiner_type: created.examiner_type || payload.examiner_type,
+        board_name: created.board_name !== undefined ? created.board_name : payload.board_name,
+        question: created.question !== undefined ? created.question : payload.question,
+        answer_hint: created.answer_hint !== undefined ? created.answer_hint : payload.answer_hint,
+        contributor_name: created.contributor_name || payload.contributor_name,
+        contributor_email:
+          created.contributor_email !== undefined
+            ? created.contributor_email
+            : payload.contributor_email,
+        batch: created.batch !== undefined ? created.batch : payload.batch,
+        college_name: created.college_name || collegeName,
+        session: created.session !== undefined ? created.session : payload.session,
+        year: created.year !== undefined ? created.year : payload.year,
+        viva_type: created.viva_type || vivaType,
         is_suggestion:
-          created.is_suggestion !== undefined ? created.is_suggestion : requestBody.is_suggestion,
-        session: created.session !== undefined ? created.session : requestBody.session,
-        year: created.year !== undefined ? created.year : requestBody.year,
-        title: created.title !== undefined ? created.title : requestBody.title,
-        pdf_url: created.pdf_url !== undefined ? created.pdf_url : requestBody.pdf_url
+          created.is_suggestion !== undefined ? created.is_suggestion : isSuggestion,
+        title: created.title !== undefined ? created.title : payload.title,
+        file_url: created.file_url || created.pdf_url || cleanFileUrl,
+        file_name: created.file_name || cleanFileName,
+        mime_type: created.mime_type || cleanMimeType,
+        file_type: created.file_type || fileType
       },
       0,
       desiredStatus
@@ -395,18 +509,22 @@ export async function submitVivaToAppsScript(payload: SubmitVivaPayload): Promis
     prof: payload.prof,
     subject: payload.subject,
     examiner_type: payload.examiner_type,
-    viva_type: vivaType,
-    is_suggestion: isSuggestion,
     board_name: payload.board_name,
-    session: requestBody.session,
-    year: requestBody.year,
-    title: requestBody.title || undefined,
     question: payload.question,
     answer_hint: payload.answer_hint,
-    pdf_url: requestBody.pdf_url || undefined,
     contributor_name: payload.contributor_name,
     contributor_email: payload.contributor_email,
     batch: payload.batch,
+    college_name: collegeName,
+    session: cleanStr(payload.session),
+    year: cleanStr(payload.year),
+    viva_type: vivaType,
+    is_suggestion: isSuggestion,
+    title: cleanStr(payload.title) || undefined,
+    file_url: cleanFileUrl || undefined,
+    file_name: cleanFileName || undefined,
+    mime_type: cleanMimeType || undefined,
+    file_type: fileType,
     status: desiredStatus,
     created_at: new Date().toISOString()
   };
@@ -420,11 +538,24 @@ export async function updateVivaStatusFromAppsScript(
   if (!cleanId) {
     throw new Error('Missing Viva ID for status update.');
   }
-  await postVivaScript({
-    action: 'update_viva_status',
-    id: cleanId,
-    status
-  });
+  try {
+    await postVivaScript({
+      action: 'update_status',
+      id: cleanId,
+      status
+    });
+  } catch (err: any) {
+    const msg = String(err?.message || '').toLowerCase();
+    if (msg.includes('unknown action') || msg.includes('invalid action')) {
+      await postVivaScript({
+        action: 'update_viva_status',
+        id: cleanId,
+        status
+      });
+      return;
+    }
+    throw err;
+  }
 }
 
 export async function deleteVivaFromAppsScript(id: string): Promise<void> {

@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   XCircle,
   ExternalLink,
+  Image as ImageIcon,
   Loader2,
   Users,
   Megaphone,
@@ -52,6 +53,7 @@ import {
 } from '../utils/appsScriptArchive';
 import {
   deleteVivaFromAppsScript,
+  isVivaImageItem,
   listVivaFromAppsScript,
   updateVivaStatusFromAppsScript,
   VivaItem
@@ -1846,6 +1848,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                   v.viva_type === 'suggestion' ||
                   v.examiner_type === 'Suggestion';
                 const sessionYearLabel = [v.session, v.year].filter(Boolean).join(' ');
+                const isImageFile = Boolean(v.file_url && isVivaImageItem(v));
                 return (
                 <div
                   key={v.id}
@@ -1857,6 +1860,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         <span className="px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase bg-violet-500/15 text-violet-700 dark:text-violet-300 border border-violet-500/30 inline-flex items-center gap-1">
                           <Sparkles size={10} />
                           <span>Viva Suggestion</span>
+                        </span>
+                      )}
+                      {v.file_url && (
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10.5px] font-extrabold uppercase border inline-flex items-center gap-1 ${
+                            isImageFile
+                              ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
+                              : 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30'
+                          }`}
+                        >
+                          {isImageFile ? <ImageIcon size={10} /> : <FileText size={10} />}
+                          <span>{isImageFile ? 'Image' : 'PDF'}</span>
                         </span>
                       )}
                       <span>
@@ -1889,19 +1904,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                         {v.title}
                       </div>
                     )}
-                    <div className={`${v.title ? 'text-xs font-medium text-[var(--ink-secondary)]' : 'font-bold text-sm text-[var(--ink)]'} break-words`}>
-                      {v.question}
-                    </div>
-                    {v.pdf_url && (
+                    {v.question && (
+                      <div className={`${v.title ? 'text-xs font-medium text-[var(--ink-secondary)]' : 'font-bold text-sm text-[var(--ink)]'} break-words`}>
+                        {v.question}
+                      </div>
+                    )}
+                    {v.file_url && (
                       <div>
                         <a
-                          href={v.pdf_url}
+                          href={v.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0D9488] hover:underline"
                         >
-                          <FileText size={12} />
-                          <span>{v.pdf_label || 'Open Attached Viva PDF'}</span>
+                          {isImageFile ? <ImageIcon size={12} /> : <FileText size={12} />}
+                          <span>
+                            {v.file_name || (isImageFile ? 'Open Attached Viva Image' : 'Open Attached Viva PDF')}
+                          </span>
                           <ExternalLink size={11} />
                         </a>
                       </div>
@@ -1914,6 +1933,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
                     <div className="text-xs text-[var(--mut)]">
                       Credit / By: <strong className="text-[var(--ink)]">{v.contributor_name}</strong>
                       {v.batch ? ` (${v.batch})` : ''}
+                      {v.college_name ? ` · ${v.college_name}` : ''}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 shrink-0">
